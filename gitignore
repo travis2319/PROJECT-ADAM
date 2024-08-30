@@ -1,0 +1,9 @@
+# Ignore all venv directories in subfolders
+**/venv/
+**/venv/*
+**/adam_venv/
+**/adam_venv/*
+
+
+
+
