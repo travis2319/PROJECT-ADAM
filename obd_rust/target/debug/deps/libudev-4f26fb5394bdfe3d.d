@@ -1,0 +1,12 @@
+/home/kali/test/obd_rust/target/debug/deps/liblibudev-4f26fb5394bdfe3d.rmeta: /home/kali/.cargo/registry/src/index.crates.io-6f17d22bba15001f/libudev-0.3.0/src/lib.rs /home/kali/.cargo/registry/src/index.crates.io-6f17d22bba15001f/libudev-0.3.0/src/context.rs /home/kali/.cargo/registry/src/index.crates.io-6f17d22bba15001f/libudev-0.3.0/src/device.rs /home/kali/.cargo/registry/src/index.crates.io-6f17d22bba15001f/libudev-0.3.0/src/enumerator.rs /home/kali/.cargo/registry/src/index.crates.io-6f17d22bba15001f/libudev-0.3.0/src/error.rs /home/kali/.cargo/registry/src/index.crates.io-6f17d22bba15001f/libudev-0.3.0/src/monitor.rs /home/kali/.cargo/registry/src/index.crates.io-6f17d22bba15001f/libudev-0.3.0/src/handle.rs /home/kali/.cargo/registry/src/index.crates.io-6f17d22bba15001f/libudev-0.3.0/src/util.rs
+
+/home/kali/test/obd_rust/target/debug/deps/libudev-4f26fb5394bdfe3d.d: /home/kali/.cargo/registry/src/index.crates.io-6f17d22bba15001f/libudev-0.3.0/src/lib.rs /home/kali/.cargo/registry/src/index.crates.io-6f17d22bba15001f/libudev-0.3.0/src/context.rs /home/kali/.cargo/registry/src/index.crates.io-6f17d22bba15001f/libudev-0.3.0/src/device.rs /home/kali/.cargo/registry/src/index.crates.io-6f17d22bba15001f/libudev-0.3.0/src/enumerator.rs /home/kali/.cargo/registry/src/index.crates.io-6f17d22bba15001f/libudev-0.3.0/src/error.rs /home/kali/.cargo/registry/src/index.crates.io-6f17d22bba15001f/libudev-0.3.0/src/monitor.rs /home/kali/.cargo/registry/src/index.crates.io-6f17d22bba15001f/libudev-0.3.0/src/handle.rs /home/kali/.cargo/registry/src/index.crates.io-6f17d22bba15001f/libudev-0.3.0/src/util.rs
+
+/home/kali/.cargo/registry/src/index.crates.io-6f17d22bba15001f/libudev-0.3.0/src/lib.rs:
+/home/kali/.cargo/registry/src/index.crates.io-6f17d22bba15001f/libudev-0.3.0/src/context.rs:
+/home/kali/.cargo/registry/src/index.crates.io-6f17d22bba15001f/libudev-0.3.0/src/device.rs:
+/home/kali/.cargo/registry/src/index.crates.io-6f17d22bba15001f/libudev-0.3.0/src/enumerator.rs:
+/home/kali/.cargo/registry/src/index.crates.io-6f17d22bba15001f/libudev-0.3.0/src/error.rs:
+/home/kali/.cargo/registry/src/index.crates.io-6f17d22bba15001f/libudev-0.3.0/src/monitor.rs:
+/home/kali/.cargo/registry/src/index.crates.io-6f17d22bba15001f/libudev-0.3.0/src/handle.rs:
+/home/kali/.cargo/registry/src/index.crates.io-6f17d22bba15001f/libudev-0.3.0/src/util.rs:

@@ -1,0 +1,100 @@
+2024-09-05 17:53:51,039  root       get_pty    DEBUG    Pty name: /dev/pts/1
+2024-09-05 17:53:51,040  root       run        INFO     
+
+ELM327 OBD-II adapter emulator v3.0.0 started on pseudo-tty port "/dev/pts/1".
+
+2024-09-05 18:34:28,960  root       run        DEBUG    Received '010D'
+2024-09-05 18:34:28,961  root       handle_request DEBUG    Handling: '010D', header '7E0', ECU '7E0'
+2024-09-05 18:34:28,961  root       handle_request DEBUG    Instantiating ECU task "Default ECU Task module" for ECU "7E0"
+2024-09-05 18:34:28,961  root       handle_request DEBUG    Description: Vehicle Speed, PID SPEED (010D)
+2024-09-05 18:34:28,961  root       handle_response DEBUG    Processing: '<pos_answer>04</pos_answer> <header>7EA</header><size>03</size><data>41 0D 04</data>'
+2024-09-05 18:34:28,962  root       handle_response DEBUG    Write: '41 0D 04 \r41 0D 04 \r\r>'
+2024-09-05 18:36:36,567  root       run        DEBUG    Received '010D'
+2024-09-05 18:36:36,567  root       handle_request DEBUG    Handling: '010D', header '7E0', ECU '7E0'
+2024-09-05 18:36:36,567  root       handle_request DEBUG    UDS P3 timer expired: running stop() method for ECU task "Default ECU Task module", ECU="7E0".
+2024-09-05 18:36:36,567  root       handle_request DEBUG    Description: Vehicle Speed, PID SPEED (010D)
+2024-09-05 18:36:36,567  root       handle_response DEBUG    Processing: '<pos_answer>08</pos_answer> <header>7EA</header><size>03</size><data>41 0D 08</data>'
+2024-09-05 18:36:36,568  root       handle_response DEBUG    Write: '41 0D 08 \r41 0D 08 \r\r>'
+2024-09-05 18:40:01,815  root       run        DEBUG    Received 'ATZ'
+2024-09-05 18:40:01,815  root       handle_request DEBUG    Handling: 'ATZ', header '7E0', ECU '7E0'
+2024-09-05 18:40:01,819  root       handle_request DEBUG    Description: AT RESET, PID AT_RESET (ATZ)
+2024-09-05 18:40:01,819  root       reset      DEBUG    Resetting counters and sleeping for 0.5 seconds
+2024-09-05 18:40:02,320  root       <module>   DEBUG    Reset and sleep 0.5 seconds
+2024-09-05 18:40:02,320  root       handle_response DEBUG    Processing: '<writeln></writeln><writeln></writeln><writeln>ELM327 v1.5</writeln>'
+2024-09-05 18:40:02,320  root       handle_response DEBUG    Write: '\r\rELM327 v1.5\r\r>'
+2024-09-05 18:40:02,320  root       run        DEBUG    Received '010D'
+2024-09-05 18:40:02,321  root       handle_request DEBUG    Handling: '010D', header '7E0', ECU '7E0'
+2024-09-05 18:40:02,321  root       handle_request DEBUG    UDS P3 timer expired: running stop() method for ECU task "Default ECU Task module", ECU="7E0".
+2024-09-05 18:40:02,321  root       handle_request DEBUG    Description: Vehicle Speed, PID SPEED (010D)
+2024-09-05 18:40:02,321  root       handle_response DEBUG    Processing: '<pos_answer>0C</pos_answer> <header>7EA</header><size>03</size><data>41 0D 0C</data>'
+2024-09-05 18:40:02,321  root       handle_response DEBUG    Write: '41 0D 0C \r41 0D 0C \r\r>'
+2024-09-05 18:43:39,017  root       run        DEBUG    Received 'ATZ'
+2024-09-05 18:43:39,018  root       handle_request DEBUG    Handling: 'ATZ', header '7E0', ECU '7E0'
+2024-09-05 18:43:39,018  root       handle_request DEBUG    Description: AT RESET, PID AT_RESET (ATZ)
+2024-09-05 18:43:39,018  root       reset      DEBUG    Resetting counters and sleeping for 0.5 seconds
+2024-09-05 18:43:39,519  root       <module>   DEBUG    Reset and sleep 0.5 seconds
+2024-09-05 18:43:39,519  root       handle_response DEBUG    Processing: '<writeln></writeln><writeln></writeln><writeln>ELM327 v1.5</writeln>'
+2024-09-05 18:43:39,519  root       handle_response DEBUG    Write: '\r\rELM327 v1.5\r\r>'
+2024-09-05 18:43:39,519  root       run        DEBUG    Received '010D'
+2024-09-05 18:43:39,519  root       handle_request DEBUG    Handling: '010D', header '7E0', ECU '7E0'
+2024-09-05 18:43:39,520  root       handle_request DEBUG    UDS P3 timer expired: running stop() method for ECU task "Default ECU Task module", ECU="7E0".
+2024-09-05 18:43:39,520  root       handle_request DEBUG    Description: Vehicle Speed, PID SPEED (010D)
+2024-09-05 18:43:39,520  root       handle_response DEBUG    Processing: '<pos_answer>10</pos_answer> <header>7EA</header><size>03</size><data>41 0D 10</data>'
+2024-09-05 18:43:39,520  root       handle_response DEBUG    Write: '41 0D 10 \r41 0D 10 \r\r>'
+2024-09-05 18:43:46,177  root       run        DEBUG    Received 'ATZ'
+2024-09-05 18:43:46,177  root       handle_request DEBUG    Handling: 'ATZ', header '7E0', ECU '7E0'
+2024-09-05 18:43:46,177  root       handle_request DEBUG    Description: AT RESET, PID AT_RESET (ATZ)
+2024-09-05 18:43:46,178  root       reset      DEBUG    Resetting counters and sleeping for 0.5 seconds
+2024-09-05 18:43:46,678  root       <module>   DEBUG    Reset and sleep 0.5 seconds
+2024-09-05 18:43:46,679  root       handle_response DEBUG    Processing: '<writeln></writeln><writeln></writeln><writeln>ELM327 v1.5</writeln>'
+2024-09-05 18:43:46,679  root       handle_response DEBUG    Write: '\r\rELM327 v1.5\r\r>'
+2024-09-05 18:43:46,680  root       run        DEBUG    Received '010D'
+2024-09-05 18:43:46,680  root       handle_request DEBUG    Handling: '010D', header '7E0', ECU '7E0'
+2024-09-05 18:43:46,680  root       handle_request DEBUG    UDS P3 timer expired: running stop() method for ECU task "Default ECU Task module", ECU="7E0".
+2024-09-05 18:43:46,681  root       handle_request DEBUG    Description: Vehicle Speed, PID SPEED (010D)
+2024-09-05 18:43:46,681  root       handle_response DEBUG    Processing: '<pos_answer>14</pos_answer> <header>7EA</header><size>03</size><data>41 0D 14</data>'
+2024-09-05 18:43:46,685  root       handle_response DEBUG    Write: '41 0D 14 \r41 0D 14 \r\r>'
+2024-09-05 18:43:55,847  root       run        DEBUG    Received 'ATZ'
+2024-09-05 18:43:55,847  root       handle_request DEBUG    Handling: 'ATZ', header '7E0', ECU '7E0'
+2024-09-05 18:43:55,848  root       handle_request DEBUG    Description: AT RESET, PID AT_RESET (ATZ)
+2024-09-05 18:43:55,848  root       reset      DEBUG    Resetting counters and sleeping for 0.5 seconds
+2024-09-05 18:43:56,348  root       <module>   DEBUG    Reset and sleep 0.5 seconds
+2024-09-05 18:43:56,349  root       handle_response DEBUG    Processing: '<writeln></writeln><writeln></writeln><writeln>ELM327 v1.5</writeln>'
+2024-09-05 18:43:56,349  root       handle_response DEBUG    Write: '\r\rELM327 v1.5\r\r>'
+2024-09-05 18:43:56,350  root       run        DEBUG    Received '010D'
+2024-09-05 18:43:56,350  root       handle_request DEBUG    Handling: '010D', header '7E0', ECU '7E0'
+2024-09-05 18:43:56,351  root       handle_request DEBUG    UDS P3 timer expired: running stop() method for ECU task "Default ECU Task module", ECU="7E0".
+2024-09-05 18:43:56,351  root       handle_request DEBUG    Description: Vehicle Speed, PID SPEED (010D)
+2024-09-05 18:43:56,351  root       handle_response DEBUG    Processing: '<pos_answer>18</pos_answer> <header>7EA</header><size>03</size><data>41 0D 18</data>'
+2024-09-05 18:43:56,352  root       handle_response DEBUG    Write: '41 0D 18 \r41 0D 18 \r\r>'
+2024-09-05 18:44:03,883  root       run        DEBUG    Received 'ATZ'
+2024-09-05 18:44:03,884  root       handle_request DEBUG    Handling: 'ATZ', header '7E0', ECU '7E0'
+2024-09-05 18:44:03,884  root       handle_request DEBUG    Description: AT RESET, PID AT_RESET (ATZ)
+2024-09-05 18:44:03,885  root       reset      DEBUG    Resetting counters and sleeping for 0.5 seconds
+2024-09-05 18:44:04,385  root       <module>   DEBUG    Reset and sleep 0.5 seconds
+2024-09-05 18:44:04,385  root       handle_response DEBUG    Processing: '<writeln></writeln><writeln></writeln><writeln>ELM327 v1.5</writeln>'
+2024-09-05 18:44:04,385  root       handle_response DEBUG    Write: '\r\rELM327 v1.5\r\r>'
+2024-09-05 18:44:04,386  root       run        DEBUG    Received '010D'
+2024-09-05 18:44:04,386  root       handle_request DEBUG    Handling: '010D', header '7E0', ECU '7E0'
+2024-09-05 18:44:04,386  root       handle_request DEBUG    UDS P3 timer expired: running stop() method for ECU task "Default ECU Task module", ECU="7E0".
+2024-09-05 18:44:04,386  root       handle_request DEBUG    Description: Vehicle Speed, PID SPEED (010D)
+2024-09-05 18:44:04,386  root       handle_response DEBUG    Processing: '<pos_answer>1C</pos_answer> <header>7EA</header><size>03</size><data>41 0D 1C</data>'
+2024-09-05 18:44:04,386  root       handle_response DEBUG    Write: '41 0D 1C \r41 0D 1C \r\r>'
+2024-09-05 18:44:18,632  root       run        DEBUG    Received 'ATZ'
+2024-09-05 18:44:18,632  root       handle_request DEBUG    Handling: 'ATZ', header '7E0', ECU '7E0'
+2024-09-05 18:44:18,633  root       handle_request DEBUG    Description: AT RESET, PID AT_RESET (ATZ)
+2024-09-05 18:44:18,633  root       reset      DEBUG    Resetting counters and sleeping for 0.5 seconds
+2024-09-05 18:44:19,133  root       <module>   DEBUG    Reset and sleep 0.5 seconds
+2024-09-05 18:44:19,134  root       handle_response DEBUG    Processing: '<writeln></writeln><writeln></writeln><writeln>ELM327 v1.5</writeln>'
+2024-09-05 18:44:19,134  root       handle_response DEBUG    Write: '\r\rELM327 v1.5\r\r>'
+2024-09-05 18:44:19,134  root       run        DEBUG    Received '010D'
+2024-09-05 18:44:19,134  root       handle_request DEBUG    Handling: '010D', header '7E0', ECU '7E0'
+2024-09-05 18:44:19,134  root       handle_request DEBUG    UDS P3 timer expired: running stop() method for ECU task "Default ECU Task module", ECU="7E0".
+2024-09-05 18:44:19,135  root       handle_request DEBUG    Description: Vehicle Speed, PID SPEED (010D)
+2024-09-05 18:44:19,135  root       handle_response DEBUG    Processing: '<pos_answer>20</pos_answer> <header>7EA</header><size>03</size><data>41 0D 20</data>'
+2024-09-05 18:44:19,135  root       handle_response DEBUG    Write: '41 0D 20 \r41 0D 20 \r\r>'
+2024-09-06 11:18:03,224  root       get_pty    DEBUG    Pty name: /dev/pts/2
+2024-09-06 11:18:03,225  root       run        INFO     
+
+ELM327 OBD-II adapter emulator v3.0.0 started on pseudo-tty port "/dev/pts/2".
+
