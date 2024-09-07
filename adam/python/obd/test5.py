@@ -43,14 +43,21 @@ def determine_supported_pids():
     # Print the supported PIDs
     print(f"Supported PIDs: {supported_pids}")
 
-# Function to print the values of supported PIDs with a delay
 def query_pids():
     for pid in supported_pids:
-        cmd = obd.commands.get(int(pid, 16))
-        if cmd:
-            response = connection.query(cmd)
-            print(f"PID {pid}: {response.value}")
-            time.sleep(0.5)  # Wait for 0.5 seconds between queries
+        # Convert hex PID to decimal
+        pid_decimal = int(pid, 16)
+
+        # Check if the PID is within the valid range
+        if 0 <= pid_decimal < len(obd.commands[1]): 
+            cmd = obd.commands[1][pid_decimal]  # Access command directly
+
+            if cmd:
+                response = connection.query(cmd)
+                print(f"PID {pid}: {response.value}")
+                time.sleep(0.5)  # Wait for 0.5 seconds between queries
+        else:
+            print(f"PID {pid} is out of range.")
 
 # Run the process
 determine_supported_pids()
