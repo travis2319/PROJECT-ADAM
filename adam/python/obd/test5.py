@@ -1,3 +1,4 @@
+import pandas as pd
 import obd
 import time
 
@@ -5,6 +6,22 @@ import time
 supported_pids_A = []
 supported_pids_B = []
 supported_pids_C = []
+
+# List of OBD-II parameters we want to collect
+OBD_PARAMETERS = [
+    'STATUS', 'FUEL_STATUS', 'ENGINE_LOAD', 'COOLANT_TEMP', 'SHORT_FUEL_TRIM_1',
+    'LONG_FUEL_TRIM_1', 'INTAKE_PRESSURE', 'RPM', 'SPEED', 'TIMING_ADVANCE',
+    'INTAKE_TEMP', 'THROTTLE_POS', 'O2_SENSORS', 'O2_B1S1', 'O2_B1S2',
+    'OBD_COMPLIANCE', 'RUN_TIME', 'PIDS_B', 'DISTANCE_W_MIL', 'EVAPORATIVE_PURGE',
+    'WARMUPS_SINCE_DTC_CLEAR', 'DISTANCE_SINCE_DTC_CLEAR', 'BAROMETRIC_PRESSURE',
+    'PIDS_C', 'CONTROL_MODULE_VOLTAGE', 'ABSOLUTE_LOAD', 'RELATIVE_THROTTLE_POS',
+    'THROTTLE_POS_B', 'ACCELERATOR_POS_D', 'ACCELERATOR_POS_E', 'THROTTLE_ACTUATOR'
+]
+
+# Dictionary to store the latest values for each parameter
+latest_values = {param: None for param in OBD_PARAMETERS}
+
+df = pd.DataFrame(columns=['Time'] + OBD_PARAMETERS)
 
 # Dictionary to store the PID responses
 pid_responses = {
@@ -33,6 +50,9 @@ def pid_callback_initial(response):
 def pid_callback(response):
     if not response.is_null():
         print(f"{response.command.name}: {response.value}")
+        if param_name in latest_values:
+            latest_values[param_name] = response.value.magnitude if hasattr(response.value, 'magnitude') else response.value
+
 
 # Function to dynamically create and watch commands based on supported PIDs
 def watch_supported_pids(connection, supported_pids, mode=1):
