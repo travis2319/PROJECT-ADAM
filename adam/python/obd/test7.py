@@ -1,9 +1,10 @@
 import obd
 
-obd_connector = "/dev/pts/2"  # Replace with your OBD-II port
+# obd_connector = "/dev/pts/2"  # Replace with your OBD-II port
+obd_connector = "/dev/ttyACM0"
 connection = obd.OBD(obd_connector) # auto-connects to USB or RF port
 
-cmd = obd.commands.MIDS_A # select an OBD command (sensor)
+cmd = obd.commands.MIDS_D # select an OBD command (sensor)
 
 response = connection.query(cmd) # send the command, and parse the response
 

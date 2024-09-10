@@ -29,6 +29,7 @@ import pandas as pd
 import numpy as np
 import matplotlib
 import obd
+import os
 import time
 import datetime
 import requests
@@ -161,8 +162,10 @@ def pid_callback(response):
         pid_responses[cmd_name] = response.value.bits  # Store the binary value
 
 # Connect to OBD-II interface
-obd_connector = "/dev/pts/2"  # Replace with your OBD-II port
+# obd_connector = "/dev/pts/2"  # Replace with your OBD-II port?
+obd_connector = "/dev/ttyACM0"
 connection = obd.Async(obd_connector)
+
 
 # Watch the PIDS_A, PIDS_B, PIDS_C commands and store their results
 connection.watch(obd.commands.PIDS_A, callback=pid_callback)
@@ -172,7 +175,7 @@ connection.watch(obd.commands.PIDS_C, callback=pid_callback)
 connection.start()
 
 # Wait for 10 seconds to receive data
-time.sleep(10)
+time.sleep(5)
 
 # Stop the connection
 connection.stop()
@@ -209,6 +212,7 @@ def get_pid_names(supported_pids):
 
 # Get the names of the supported PIDs
 supported_pid_names = get_pid_names(supported_pids)
+print(len(supported_pid_names))
 df = pd.DataFrame(columns=supported_pid_names)
 
 # Print the names of supported PIDs
@@ -216,28 +220,30 @@ print("Supported PIDs and their descriptions:")
 for pid_name in supported_pid_names:
     print(pid_name)
 
+# Get the first and last elements dynamically from the list
+first_pid = supported_pid_names[0]  # First element (replace "SPEED")
+last_pid = supported_pid_names[-1]  # Last element (replace "THROTTLE_POS")
+
 
 def pid_data_callback(response):
     global df
     command_name = response.command.name
-    value = response.value
+    value = response.value.magnitude if hasattr(response.value, 'magnitude') else response.value
     print(command_name,value)
 
-    # Handle different types of values
-    if isinstance(value, str):
-        # Convert string value to a format compatible with DataFrame
-        value = value.strip()
-    elif hasattr(value, 'value'):
-        # If value has an attribute 'value', get it
-        value = value.value
-    elif isinstance(value, list):
-        # If value is a list, convert to a string representation
-        value = ', '.join(map(str, value))
-
-    if command_name in df.columns:
-        df.loc[len(df), [command_name]] = value
+    if command_name == first_pid:
+            # Create a new row with the PID name and value
+            new_row = {col: np.nan for col in df.columns}
+            new_row[first_pid] = value
+            df = pd.concat([df, pd.DataFrame([new_row])], ignore_index=True)
+            # print(f"Speed: {value}")
     else:
-        print(f"Command {command_name} is not in the supported PID list")
+        # Update the last row with the current PID value
+        if command_name in df.columns:
+            df.at[len(df) - 1, command_name] = value
+            # print(f"{command_name}: {value}")
+        else:
+            print(f"Warning: {command_name} not found in DataFrame columns")
 
 # Path to store the dataset
 # file_path = 'dataset/async_log_single_row.csv'
@@ -249,9 +255,20 @@ if supported_pids:
         connection.watch(command, callback=pid_data_callback)
 
     connection.start()
-    time.sleep(20)
+    time.sleep(25)
     connection.stop()
 else:
     print("No supported PIDs found.")
-
+# pd.set_option('display.max_columns', None)
+# Replace NaNs with None
+# df = df.where(pd.notnull(df), None)
 print(df)
+
+# Path to store the dataset
+file_path = 'dataset/real_car.csv'
+
+file_exists = os.path.isfile(file_path)
+# Save the DataFrame to a CSV file
+df.to_csv(file_path, mode='a', index=False, header=not file_exists)
+
+print(f"DataFrame saved to {file_path}")
