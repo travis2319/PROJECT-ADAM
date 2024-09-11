@@ -162,8 +162,8 @@ def pid_callback(response):
         pid_responses[cmd_name] = response.value.bits  # Store the binary value
 
 # Connect to OBD-II interface
-# obd_connector = "/dev/pts/2"  # Replace with your OBD-II port?
-obd_connector = "/dev/ttyACM0"
+obd_connector = "/dev/pts/2"  # Replace with your OBD-II port?
+# obd_connector = "/dev/ttyACM0"
 connection = obd.Async(obd_connector)
 
 
@@ -257,18 +257,19 @@ if supported_pids:
     connection.start()
     time.sleep(25)
     connection.stop()
+
+    print(df)
+
+    # Path to store the dataset
+    file_path = 'dataset/real_car.csv'
+
+    file_exists = os.path.isfile(file_path)
+    # Save the DataFrame to a CSV file
+    df.to_csv(file_path, mode='a', index=False, header=not file_exists)
+
+    print(f"DataFrame saved to {file_path}")
 else:
     print("No supported PIDs found.")
 # pd.set_option('display.max_columns', None)
 # Replace NaNs with None
 # df = df.where(pd.notnull(df), None)
-print(df)
-
-# Path to store the dataset
-file_path = 'dataset/real_car.csv'
-
-file_exists = os.path.isfile(file_path)
-# Save the DataFrame to a CSV file
-df.to_csv(file_path, mode='a', index=False, header=not file_exists)
-
-print(f"DataFrame saved to {file_path}")
