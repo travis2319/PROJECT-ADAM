@@ -5,7 +5,8 @@ import time
 import os
 
 # Initialize OBD connection
-obd_connector = "/dev/ttyACM0"  # Replace with your OBD-II port
+# obd_connector = "/dev/ttyACM0"  # Replace with your OBD-II port
+obd_connector = "/dev/pts/2"  # Replace with your OBD-II port
 connection = obd.Async(obd_connector)
 
 # Global variables for supported PIDs and DataFrame
@@ -45,25 +46,26 @@ def pid_callback_initial(response):
 
 # Updated callback function to collect real-time data
 def pid_data_callback(response):
+    global df
     command_name = response.command.name
     value = response.value
+    timestamp = time.time()
 
-    # When the STATUS command is received, add a new row
-    if command_name == "STATUS":
-        start_timestamp = time.time()
-        # Create a new row with the start timestamp and value for STATUS, and NaN for other columns
-        new_row = [start_timestamp] + [np.nan] * (len(columns) - 2) + [np.nan]  # Initialize all as NaN
-        df.loc[len(df)] = new_row
-        df.loc[len(df) - 1, command_name] = value  # Set the value for STATUS
-        print(f"STATUS: {value}")
+    # Add the timestamp and the value to the DataFrame
+    df.loc[len(df), 'Time'] = timestamp
+
+    # Handle cases where the value is a list (e.g., O2 sensors)
+    if isinstance(value, list):
+        # Ensure there are enough columns for the list elements
+        for i in range(len(value)):
+            column_name = f"{command_name}_{i+1}"  # Create dynamic column names
+            if column_name not in df.columns:
+                df[column_name] = np.nan  # Add new column if needed
+            df.loc[len(df) - 1, column_name] = value[i]
     else:
-        # Update the last row with the new data
-        if command_name == "THROTTLE_ACTUATOR":
-            end_timestamp = time.time()
-            df.loc[len(df) - 1, "End_Time"] = end_timestamp  # Update the end time
-        if command_name in df.columns:
-            df.loc[len(df) - 1, command_name] = value
-        print(f"{command_name}: {value}")
+        df.loc[len(df) - 1, command_name] = value
+
+    print(f"{command_name}: {value}")
 
 # Steps 1-3: Discover supported PIDs and process them
 connection.watch(obd.commands.PIDS_A, callback=pid_callback_initial)
