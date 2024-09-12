@@ -93,7 +93,7 @@ if all_supported_pids:
         connection.watch(command, callback=pid_data_callback)
 
     connection.start()
-    time.sleep(20)
+    time.sleep(10)
     connection.stop()
 
     # Save collected data to a CSV file
