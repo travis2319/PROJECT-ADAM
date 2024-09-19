@@ -1,0 +1,198 @@
+from flask import Flask, render_template, request
+import requests
+import time
+
+app = Flask(__name__)
+
+# Define Hugging Face API key and URL
+api_key = "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"  # Replace with your actual token
+# Updated model to 'distilbert-base-uncased'
+api_url = "https://api-inference.huggingface.co/models/distilbert-base-uncased"
+headers = {"Authorization": f"Bearer {api_key}"}
+
+
+# Function to call Hugging Face API with reflection-based reasoning and retry logic
+def get_diagnosis(user_input, retries=3, delay=5):
+    # <thinking>
+    thinking = "<thinking>\n"
+    thinking += "Analyzing the user input and preparing to call the Hugging Face API...\n"
+    thinking += f"User Input: {user_input}\n"
+
+    # Prepare the payload for the API
+    payload = {
+        "inputs": user_input,
+        "options": {
+            "wait_for_model": True
+        }
+    }
+
+    # Chain of thought: Try the request with retries in case of a 503 error
+    thinking += "Step 1: Preparing the API request payload and sending the request.\n"
+
+    for attempt in range(retries):
+        response = requests.post(api_url, headers=headers, json=payload)
+
+        if response.status_code == 200:
+            result = response.json()
+            diagnostic_text = result.get('generated_text', 'No diagnostic information available.')
+            thinking += f"Step 2: Received response from API: {diagnostic_text}\n"
+
+            # <reflection> section to review the answer
+            reflection = "<reflection>\n"
+            reflection += "Reviewing the API response for potential issues or oversights.\n"
+            if not diagnostic_text or "error" in diagnostic_text.lower():
+                reflection += "The response contains an error or is empty, adjusting the conclusion.\n"
+                diagnostic_text = "Unable to provide a proper diagnosis at this time. Please try again later."
+            else:
+                reflection += "The response seems valid and informative.\n"
+            reflection += "</reflection>\n"
+
+            # Conclude the thinking section
+            thinking += reflection + "</thinking>\n"
+
+            # <output> section with the final answer
+            output = f"<output>{diagnostic_text}</output>"
+            return output
+
+        elif response.status_code == 503:
+            thinking += f"Attempt {attempt + 1}: API responded with 503, retrying after {delay} seconds...\n"
+            time.sleep(delay)
+        else:
+            error_msg = f"Error {response.status_code}: Unable to process the request."
+            thinking += f"API request failed with error: {error_msg}\n"
+            thinking += "</thinking>\n"
+            return f"<output>{error_msg}</output>"
+
+    # If all retries fail
+    thinking += "</thinking>\n"
+    return "<output>Error 503: Service temporarily unavailable after multiple attempts.</output>"
+
+
+# Route for the main page
+@app.route("/", methods=["GET", "POST"])
+def diagnostic_chatbot():
+    response_text = ""
+
+    if request.method == "POST":
+        user_query = request.form["query"]
+        # Call the function to get the diagnosis with internal reflection
+        response_text = get_diagnosis(user_query)
+
+    return render_template("chatbot.html", response=response_text)
+
+
+if __name__ == "__main__":
+    app.run(debug=True)
+
+
+2)
+from fastapi import FastAPI, UploadFile, File, HTTPException
+import pandas as pd
+import chromadb
+from chromadb.utils import embedding_functions
+from transformers import pipeline
+import uuid
+
+app = FastAPI()
+
+# Initialize ChromaDB client
+chroma_client = chromadb.Client()
+
+# Initialize Hugging Face's text generation model
+generator = pipeline('text-generation', model='distilgpt2', tokenizer='distilgpt2', device=-1)
+
+# Create the embedding function by passing the model name
+embedding_function = embedding_functions.SentenceTransformerEmbeddingFunction(model_name="all-MiniLM-L6-v2")
+
+# Create or load a collection in ChromaDB
+collection = chroma_client.get_or_create_collection(
+    name="csv_data",
+    embedding_function=embedding_function
+)
+
+
+@app.post("/upload-csv/")
+async def upload_csv(file: UploadFile = File(...)):
+    if not file.filename.endswith(".csv"):
+        raise HTTPException(status_code=400, detail="Only CSV files are allowed.")
+
+    # Read CSV data into a pandas dataframe
+    try:
+        df = pd.read_csv(file.file)
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=f"Error reading CSV file: {str(e)}")
+
+    # Store CSV data in Chroma VectorDB
+    try:
+        for index, row in df.iterrows():
+            row_data = row.to_dict()
+            row_text = " ".join([f"{key}: {value}" for key, value in row_data.items()])
+
+            # Generate unique ID for the document
+            document_id = str(uuid.uuid4())
+
+            # Embed the text of the row into a vector using the SentenceTransformerEmbeddingFunction
+            # Use `embedding_function.__call__()` instead of `embed_documents()`
+            vector = embedding_function([row_text])[0]
+
+            # Add the embedded row to the collection with metadata
+            collection.add(
+                ids=[document_id],
+                embeddings=[vector],
+                metadatas=[row_data],
+                documents=[row_text]
+            )
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error storing data in Chroma: {str(e)}")
+
+    return {"detail": "CSV data uploaded and embedded successfully"}
+
+
+@app.post("/diagnosis/")
+async def diagnosis(query: str):
+    # Retrieve similar data from ChromaDB based on the query
+    try:
+        embedding_query = embedding_function([query])[0]
+        results = collection.query(query_embeddings=[embedding_query], n_results=5)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error querying Chroma: {str(e)}")
+
+    if not results['documents']:
+        raise HTTPException(status_code=404, detail="No relevant documents found.")
+
+    # Generate text based on the retrieved documents using Hugging Face's pipeline
+    try:
+        retrieved_text = " ".join(results['documents'])
+        generated_text = generator(retrieved_text, max_length=500, num_return_sequences=1)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error generating text: {str(e)}")
+
+    # Return generated output in paragraph format
+    return {"generated_paragraph": generated_text[0]['generated_text']}
+
+
+@app.get("/display/")
+async def display():
+    # Display all the vectors and their metadata stored in the ChromaDB collection
+    try:
+        all_data = collection.get()
+        if not all_data['documents']:
+            return {"detail": "No data in the collection"}
+
+        detailed_view = []
+        for doc, metadata, vector in zip(all_data['documents'], all_data['metadatas'], all_data['embeddings']):
+            detailed_view.append({
+                "document": doc,
+                "metadata": metadata,
+                "vector": vector
+            })
+
+        return {"data": detailed_view}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error fetching data: {str(e)}")
+
+
+# Ensure to persist data at shutdown
+@app.on_event("shutdown")
+def shutdown():
+    chroma_client.persist()
