@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 import pandas as pd
 import numpy as np
 import obd
@@ -189,8 +190,8 @@ def pid_data_callback(response):
         df = pd.concat([df, pd.DataFrame([new_row])], ignore_index=True)
     else:
         # Update the last row with the current PID value
-        if command_name in df.columns:
-            df.at[len(df) - 1, command_name] = value
+        if not df.empty and command_name in df.columns:
+                    df.at[len(df) - 1, command_name] = value
         else:
             print(f"Warning: {command_name} not found in DataFrame columns")
 
@@ -220,10 +221,15 @@ def main(obd_connector, sleep_interval=30):
                 time.sleep(sleep_interval)
                 continue
 
-            if supported_pids:
-                for pid in supported_pids:
-                    command = obd.commands[1][int(pid, 16)]
-                    connection.watch(command, callback=pid_data_callback)
+            if supported_pid_names:
+                for pid in supported_pid_names:
+                    # command = obd.commands[1][int(pid, 16)]
+                    # connection.watch(command, callback=pid_data_callback)
+                    command = getattr(obd.commands, pid, None)
+                    if command:
+                        connection.watch(command, callback=pid_data_callback)
+                    else:
+                        print(f"Command {pid} is not supported.")
 
                 connection.start()
                 time.sleep(25)  # Data collection period
@@ -232,10 +238,11 @@ def main(obd_connector, sleep_interval=30):
                 print(df)
 
                 # Save DataFrame to CSV
-                file_path = 'dataset/real_car_2.csv'
+                file_path = 'dataset/test.csv'
                 file_exists = os.path.isfile(file_path)
                 df.to_csv(file_path, mode='a', index=False, header=not file_exists)
                 print(f"DataFrame saved to {file_path}")
+                df = df[0:0]
             else:
                 print("No supported PIDs found.")
 
@@ -250,6 +257,6 @@ def main(obd_connector, sleep_interval=30):
         print("Program terminated.")
 
 if __name__ == "__main__":
-    # obd_connector = "/dev/pts/2"  # Replace with your actual OBD-II port
-    obd_connector="/dev/ttyACM0"
-    main(obd_connector, sleep_interval=30)  # 30-second interval between cycles
+    obd_connector = "/dev/pts/2"  # Replace with your actual OBD-II port
+    # obd_connector="/dev/ttyACM0"
+    main(obd_connector, sleep_interval=10)  # 30-second interval between cycles
