@@ -122,7 +122,16 @@ def map_binary_to_pids(binary_string, start_pid):
 pid_responses = {
     'PIDS_A': None,
     'PIDS_B': None,
-    'PIDS_C': None
+    'PIDS_C': None,
+}
+
+mid_responses={
+    'MIDS_A': None,
+    'MIDS_B': None,
+    'MIDS_C': None,
+    'MIDS_D': None,
+    'MIDS_E': None,
+    'MIDS_F': None
 }
 
 # Callback function that stores values for PIDS_A, PIDS_B, PIDS_C
@@ -180,7 +189,13 @@ def pid_data_callback(response):
     global df
     command_name = response.command.name
     value = response.value.magnitude if hasattr(response.value, 'magnitude') else response.value
-    print(command_name, value)
+    print(command_name, value,response.time)
+    if hasattr(response.value, 'MIL'):
+        print("MIL (Check Engine Light):", response.value.MIL)
+    if hasattr(response.value, 'DTC_count'):
+        print("DTC Count:", response.value.DTC_count)
+    if hasattr(response.value, 'ignition_type'):
+        print("Ignition Type:", response.value.ignition_type)
 
     if command_name == df.columns[1]:  # First element in columns
         # Create a new row with the PID name and value
@@ -197,13 +212,6 @@ def pid_data_callback(response):
 
 # Main loop function
 def main(obd_connector, sleep_interval=30):
-    """
-    Main loop for continuous data retrieval and storage.
-
-    Parameters:
-    - obd_connector: The OBD-II port.
-    - sleep_interval: Time (in seconds) to wait between iterations.
-    """
     print("Starting OBD-II data collection cycle...")
     connection = connect_obd(obd_connector)
     # Initialize supported PIDs if not already done
@@ -248,6 +256,13 @@ def main(obd_connector, sleep_interval=30):
 
             # Wait for a specified time before the next iteration
             print(f"Waiting for {sleep_interval} seconds before the next cycle...")
+            mid_connection = obd.OBD(obd_connector) # auto-connects to USB or RF port
+
+            cmd = obd.commands.MIDS_A # select an OBD command (sensor)
+
+            response = mid_connection.query(cmd) # send the command, and parse the response
+
+            print(response.value) # returns unit-bearing values thanks to Pint
             time.sleep(sleep_interval)
 
     except KeyboardInterrupt:
