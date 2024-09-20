@@ -135,13 +135,13 @@ mid_responses={
 }
 
 # Callback function that stores values for PIDS_A, PIDS_B, PIDS_C
-def pid_callback(response):
-    if not response.is_null():
-        cmd_name = response.command.name
-        pid_responses[cmd_name] = response.value.bits  # Store the binary value
+# def pid_callback(response):
+#     if not response.is_null():
+#         cmd_name = response.command.name
+#         pid_responses[cmd_name] = response.value.bits  # Store the binary value
 
 # Function to connect to the OBD-II interface
-def connect_obd(obd_connector):
+def async_connection(obd_connector):
     try:
         connection = obd.Async(obd_connector)
         return connection
@@ -151,13 +151,24 @@ def connect_obd(obd_connector):
 
 # Function to initialize supported PIDs
 def initialize_supported_pids(connection):
-    connection.watch(obd.commands.PIDS_A, callback=pid_callback)
-    connection.watch(obd.commands.PIDS_B, callback=pid_callback)
-    connection.watch(obd.commands.PIDS_C, callback=pid_callback)
+    pid_responses["PIDS_A"] = connection.query(obd.commands.PIDS_A) # send the command, and parse the response
+    pid_responses["PIDS_B"] = connection.query(obd.commands.PIDS_B) # send the command, and parse the response
+    pid_responses["PIDS_C"]  = connection.query(obd.commands.PIDS_C) # send the command, and parse the response
+    mid_responses["MIDS_A"]  = connection.query(obd.commands.MIDS_A) # send the command, and parse the response
+    mid_responses["MIDS_B"]  = connection.query(obd.commands.MIDS_B) # send the command, and parse the response
+    mid_responses["MIDS_C"]  = connection.query(obd.commands.MIDS_C) # send the command, and parse the response
+    mid_responses["MIDS_D"]  = connection.query(obd.commands.MIDS_D) # send the command, and parse the response
+    mid_responses["MIDS_E"]  = connection.query(obd.commands.MIDS_E) # send the command, and parse the response
+    mid_responses["MIDS_F"]  = connection.query(obd.commands.MIDS_F) # send the command, and parse the response
+    
+    
+    # connection.watch(obd.commands.PIDS_A, callback=pid_callback)
+    # connection.watch(obd.commands.PIDS_B, callback=pid_callback)
+    # connection.watch(obd.commands.PIDS_C, callback=pid_callback)
 
-    connection.start()
-    time.sleep(5)
-    connection.stop()
+    # connection.start()
+    # time.sleep(5)
+    # connection.stop()
 
     if pid_responses['PIDS_A']:
         supported_pids.extend(map_binary_to_pids(pid_responses['PIDS_A'], 0x01))
@@ -213,7 +224,7 @@ def pid_data_callback(response):
 # Main loop function
 def main(obd_connector, sleep_interval=30):
     print("Starting OBD-II data collection cycle...")
-    connection = connect_obd(obd_connector)
+    connection = obd.OBD(obd_connector) # auto-connects to USB or RF port
     # Initialize supported PIDs if not already done
     initialize_supported_pids(connection)
     supported_pid_names = get_pid_names(supported_pids)
@@ -223,8 +234,9 @@ def main(obd_connector, sleep_interval=30):
     df = pd.DataFrame(columns=['Timestamp'] + supported_pid_names)
     try:
         while True:
+            async_connection = async_connection(obd_connector)
 
-            if not connection:
+            if not async_connection:
                 print("Unable to establish connection. Retrying...")
                 time.sleep(sleep_interval)
                 continue
@@ -235,13 +247,13 @@ def main(obd_connector, sleep_interval=30):
                     # connection.watch(command, callback=pid_data_callback)
                     command = getattr(obd.commands, pid, None)
                     if command:
-                        connection.watch(command, callback=pid_data_callback)
+                        async_connection.watch(command, callback=pid_data_callback)
                     else:
                         print(f"Command {pid} is not supported.")
 
-                connection.start()
+                async_connection.start()
                 time.sleep(25)  # Data collection period
-                connection.stop()
+                async_connection.stop()
 
                 print(df)
 
@@ -256,19 +268,12 @@ def main(obd_connector, sleep_interval=30):
 
             # Wait for a specified time before the next iteration
             print(f"Waiting for {sleep_interval} seconds before the next cycle...")
-            mid_connection = obd.OBD(obd_connector) # auto-connects to USB or RF port
-
-            cmd = obd.commands.MIDS_A # select an OBD command (sensor)
-
-            response = mid_connection.query(cmd) # send the command, and parse the response
-
-            print(response.value) # returns unit-bearing values thanks to Pint
             time.sleep(sleep_interval)
 
     except KeyboardInterrupt:
         print("\nData collection stopped by user.")
-        if connection:
-            connection.stop()  # Ensure the OBD connection is closed
+        if async_connection:
+            async_connection.stop()  # Ensure the OBD connection is closed
         print("Program terminated.")
 
 if __name__ == "__main__":
