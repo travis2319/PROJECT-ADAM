@@ -185,7 +185,7 @@ def pid_data_callback(response):
     if command_name == df.columns[1]:  # First element in columns
         # Create a new row with the PID name and value
         new_row = {col: np.nan for col in df.columns}
-        new_row['Timestamp'] = time.time() # Add current timestamp
+        new_row['Timestamp'] = response.time # Add current timestamp
         new_row[command_name] = value
         df = pd.concat([df, pd.DataFrame([new_row])], ignore_index=True)
     else:
