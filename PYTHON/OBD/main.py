@@ -380,7 +380,7 @@ def main(obd_connector, sleep_interval=30):
                 print(df)
 
                 # Save DataFrame to CSV
-                file_path = 'dataset/test.csv'
+                file_path = 'dataset/test8.csv'
                 file_exists = os.path.isfile(file_path)
                 df.to_csv(file_path, mode='a', index=False, header=not file_exists)
                 print(f"DataFrame saved to {file_path}")
@@ -399,6 +399,6 @@ def main(obd_connector, sleep_interval=30):
         print("Program terminated.")
 
 if __name__ == "__main__":
-    obd_connector = "/dev/pts/2"  # Replace with your actual OBD-II port
-    # obd_connector="/dev/ttyACM0"
+    # obd_connector = "/dev/pts/2/  # Replace with your actual OBD-II port
+    obd_connector="/dev/ttyACM0"
     main(obd_connector, sleep_interval=10)  # 30-second interval between cycles
