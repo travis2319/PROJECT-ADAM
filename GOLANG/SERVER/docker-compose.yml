@@ -1,0 +1,26 @@
+version: '3.8' # Specify a suitable Docker Compose version
+
+services:
+  app:
+    build: .  # Build the current directory containing your Go application
+    ports:
+      - "8080:8080" # Map port 8080 from container to host
+    depends_on:
+      - db # Ensure the 'db' service starts before 'app'
+    environment:
+      - POSTGRES_HOST=db # Set the PostgreSQL host for your app
+      - POSTGRES_PORT=5432 # Set the PostgreSQL port for your app
+      - POSTGRES_USER=postgres # Set the PostgreSQL user for your app
+      - POSTGRES_PASSWORD=mysecretpassword # Set a strong password for your PostgreSQL user
+      - POSTGRES_DB=mydb # Set the PostgreSQL database name for your app
+
+  db:
+    image: postgres:latest # Use the latest official PostgreSQL image
+    environment:
+      - POSTGRES_PASSWORD=mysecretpassword # Set the same password as used in the 'app' service
+      - POSTGRES_DB=mydb # Set the same database name as used in the 'app' service
+    volumes:
+      - postgres_data:/var/lib/postgresql/data1 # Persist PostgreSQL data
+
+volumes:
+  postgres_data: # Named volume for PostgreSQL data persistence
