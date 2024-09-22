@@ -322,7 +322,7 @@ def pid_data_callback(response):
     global df
     command_name = response.command.name
     value = response.value.magnitude if hasattr(response.value, 'magnitude') else response.value
-    print(command_name, value,response.time)
+    # print(command_name, value,response.time)
     if hasattr(response.value, 'MIL'):
         print("MIL (Check Engine Light):", response.value.MIL)
     if hasattr(response.value, 'DTC_count'):
@@ -338,6 +338,8 @@ def pid_data_callback(response):
         df = pd.concat([df, pd.DataFrame([new_row])], ignore_index=True)
     else:
         # Update the last row with the current PID value
+        if command_name == df.columns[27]:
+            print(df.iloc[-1])
         if not df.empty and command_name in df.columns:
                     df.at[len(df) - 1, command_name] = value
         else:
