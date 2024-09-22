@@ -1,0 +1,215 @@
+Project-folder/
+│
+├── main.py
+├── routes/
+│   ├── csv_routes.py
+│   ├── diagnosis_routes.py
+│   ├── display_routes.py
+│   └── clear_routes.py
+├── utils/
+│   ├── chromadb_client.py
+│   └── embedding.py
+└── requirements.txt
+
+main)
+
+from fastapi import FastAPI
+from routes.csv_routes import csv_router
+from routes.diagnosis_routes import diagnosis_router
+from routes.display_routes import display_router
+from routes.clear_routes import clear_router
+from utils.chromadb_client import chroma_client
+
+app = FastAPI()
+
+# Include routers
+app.include_router(csv_router, prefix="/api")
+app.include_router(diagnosis_router, prefix="/api")
+app.include_router(display_router, prefix="/api")
+app.include_router(clear_router, prefix="/api")
+
+# Shutdown event to persist ChromaDB data
+@app.on_event("shutdown")
+def shutdown():
+    chroma_client.persist()
+
+# Root route
+@app.get("/")
+def read_root():
+    return {"message": "FastAPI is running!"}
+
+
+
+routes/csv_routes.py)
+
+from fastapi import APIRouter, UploadFile, File, HTTPException
+import pandas as pd
+from utils.chromadb_client import collection
+from utils.embedding import embedding_function
+import uuid
+
+csv_router = APIRouter()
+
+@csv_router.post("/upload-csv/")
+async def upload_csv(file: UploadFile = File(...)):
+    # Check if data already exists in the collection
+    existing_data = collection.count()
+    if existing_data > 0:
+        return {"detail": "Data already exists in the collection. No need to upload again."}
+
+    if not file.filename.endswith(".csv"):
+        raise HTTPException(status_code=400, detail="Only CSV files are allowed.")
+
+    # Read CSV data into a pandas dataframe
+    try:
+        df = pd.read_csv(file.file)
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=f"Error reading CSV file: {str(e)}")
+
+    # Store CSV data in Chroma VectorDB
+    try:
+        for _, row in df.iterrows():
+            row_data = row.to_dict()
+            row_text = " ".join([f"{key}: {value}" for key, value in row_data.items()])
+            document_id = str(uuid.uuid4())
+
+            # Embed the text of the row into a vector and convert to a list
+            vector = embedding_function([row_text])[0].tolist()
+
+            # Add the embedded row to the collection with metadata
+            collection.add(
+                ids=[document_id],
+                embeddings=[vector],
+                metadatas=[row_data],
+                documents=[row_text]
+            )
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error storing data in Chroma: {str(e)}")
+
+    return {"detail": "CSV data uploaded and embedded successfully"}
+
+
+
+routes/diagnosis_routes.py)
+
+from fastapi import APIRouter, HTTPException
+from transformers import pipeline
+from utils.chromadb_client import collection
+from utils.embedding import embedding_function
+
+diagnosis_router = APIRouter()
+
+# Use distilgpt2 for generating text responses
+generator = pipeline('text-generation', model='distilgpt2', tokenizer='distilgpt2', device=-1)
+
+@diagnosis_router.post("/diagnosis/")
+async def diagnosis(query: str):
+    try:
+        # Generate the embedding for the query and convert it to a list
+        embedding_query = embedding_function([query])[0].tolist()
+
+        # Retrieve similar data from ChromaDB based on the query
+        results = collection.query(query_embeddings=[embedding_query], n_results=5, include=["documents", "metadatas"])
+
+        if not results.get('documents'):
+            raise HTTPException(status_code=404, detail="No relevant documents found.")
+
+        # Clean up and format the documents before passing them to the text generator
+        retrieved_text = ""
+        for doc, metadata in zip(results['documents'], results['metadatas']):
+            if isinstance(doc, str) and metadata:  # Ensure the document and metadata are valid
+                retrieved_text += f"Code: {metadata.get('Code', 'N/A')} - {doc}\n"
+
+        # Generate text based on the retrieved data
+        generated_text = generator(retrieved_text[:100], max_length=150, num_return_sequences=1, truncation=True)
+
+        # Return the generated output
+        return {"generated_paragraph": generated_text[0]['generated_text']}
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error generating text: {str(e)}")
+
+
+
+x routes/display_routes.py)
+
+from fastapi import APIRouter, HTTPException
+from utils.chromadb_client import collection
+
+display_router = APIRouter()
+
+@display_router.get("/display/")
+async def display():
+    try:
+        # Fetch all the data (documents, metadatas, embeddings) stored in the ChromaDB collection
+        all_data = collection.get(include=["documents", "metadatas", "embeddings"])
+
+        if not all_data or not all_data.get('documents'):
+            return {"detail": "No data in the collection"}
+
+        # Prepare the data to be displayed
+        table_data = []
+        for doc, metadata, vector in zip(all_data['documents'], all_data['metadatas'], all_data.get('embeddings', [])):
+            vector = vector.tolist() if vector is not None else "No vector"
+            table_data.append({
+                "document": doc,
+                "metadata": metadata,
+                "vector": vector
+            })
+
+        return {"data": table_data}
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error fetching data: {str(e)}")
+
+
+
+routes/clear_routes.py)
+
+from fastapi import APIRouter, HTTPException
+from utils.chromadb_client import chroma_client
+
+clear_router = APIRouter()
+
+@clear_router.delete("/clear-vectordb/")
+async def clear_vectordb():
+    try:
+        # Delete the entire collection from ChromaDB
+        chroma_client.delete_collection(name="csv_data")
+        return {"detail": "All data cleared from the collection"}
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error clearing data: {str(e)}")
+
+
+
+utils/chromadb_client.p)
+
+import chromadb
+
+# Initialize the Chroma client
+chroma_client = chromadb.Client()
+
+# Create or load the collection
+collection = chroma_client.get_or_create_collection(
+    name="csv_data"
+)
+utils/embedding.py)
+from sentence_transformers import SentenceTransformer
+
+# Load the model
+model = SentenceTransformer('all-MiniLM-L6-v2')
+
+# Embedding function
+def embedding_function(texts):
+    return model.encode(texts)
+
+
+utils/embedding.py)
+
+from sentence_transformers import SentenceTransformer
+
+model = SentenceTransformer('all-MiniLM-L6-v2')
+
+def embedding_function(texts):
+    return model.encode(texts)
