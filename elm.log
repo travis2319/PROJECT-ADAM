@@ -1,0 +1,24 @@
+2024-09-23 13:18:58,960  root       get_pty    DEBUG    Pty name: /dev/pts/4
+2024-09-23 13:18:58,961  root       run        INFO     
+
+ELM327 OBD-II adapter emulator v3.0.0 started on pseudo-tty port "/dev/pts/4".
+
+2024-09-23 19:34:13,903  root       handle_request DEBUG    Handling: "'/R'", header '7E0', ECU '7E0'
+2024-09-23 19:34:13,907  root       handle_request DEBUG    Instantiating ECU task "Default ECU Task module" for ECU "7E0"
+2024-09-23 19:34:13,914  root       handle_request INFO     Unknown ELM command: "'/R'", header=7E0
+2024-09-23 19:34:13,915  root       handle_response DEBUG    Processing: '<writeln>?</writeln>'
+2024-09-23 19:34:39,272  root       terminate  DEBUG    Start termination procedure.
+2024-09-23 19:34:40,376  root       set_defaults DEBUG    Stopping ECU task "Default ECU Task module", ECU="7E0", method=stop()
+2024-09-23 19:34:40,376  root       terminate  DEBUG    Terminated.
+2024-09-23 19:34:41,933  root       get_pty    DEBUG    Pty name: /dev/pts/4
+2024-09-23 19:34:41,934  root       run        INFO     
+
+ELM327 OBD-II adapter emulator v3.0.0 started on pseudo-tty port "/dev/pts/4".
+
+2024-09-23 20:18:07,080  root       terminate  DEBUG    Start termination procedure.
+2024-09-23 20:18:08,216  root       terminate  DEBUG    Terminated.
+2024-09-23 20:18:42,015  root       get_pty    DEBUG    Pty name: /dev/pts/4
+2024-09-23 20:18:42,016  root       run        INFO     
+
+ELM327 OBD-II adapter emulator v3.0.0 started on pseudo-tty port "/dev/pts/4".
+
