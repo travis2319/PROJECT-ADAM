@@ -22,10 +22,10 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     for cmd in &commands {
         write_command(&mut port, cmd)?;
         let response = read_response(&mut port)?;
-        println!("  [obd] read: '{}'", response.trim());
+        println!("[rust] read: '{}'", response.trim());
 
         if cmd == &"ATZ" {
-            thread::sleep(Duration::from_millis(400));
+            thread::sleep(Duration::from_millis(500));
         }
     }
 
@@ -42,7 +42,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 fn write_command(port: &mut Box<dyn SerialPort>, command: &str) -> io::Result<()> {
     let cmd = format!("{}\r\n", command);
     port.write_all(cmd.as_bytes())?;
-    println!("[rust] write: '{}'", command);
+    println!("[obd] write: '{}'", command);
     Ok(())
 }
 

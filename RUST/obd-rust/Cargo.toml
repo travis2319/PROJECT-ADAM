@@ -2,7 +2,9 @@
 name = "obd-rust"
 version = "0.1.0"
 edition = "2021"
+authors = ["Travis Fernandes <travisfernandes2327@gmail.com>"]
+description = "A serial library for OBD-II communication in Rust"
+license = "MIT"
 
 [dependencies]
 serialport = "4.5.1"
-
