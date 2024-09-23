@@ -22,3 +22,52 @@ ELM327 OBD-II adapter emulator v3.0.0 started on pseudo-tty port "/dev/pts/4".
 
 ELM327 OBD-II adapter emulator v3.0.0 started on pseudo-tty port "/dev/pts/4".
 
+2024-09-23 20:29:07,757  root       run        DEBUG    Received 'ATZ'
+2024-09-23 20:29:07,760  root       handle_request DEBUG    Handling: 'ATZ', header '7E0', ECU '7E0'
+2024-09-23 20:29:07,760  root       handle_request DEBUG    Instantiating ECU task "Default ECU Task module" for ECU "7E0"
+2024-09-23 20:29:07,769  root       handle_request DEBUG    Description: AT RESET, PID AT_RESET (ATZ)
+2024-09-23 20:29:07,769  root       reset      DEBUG    Resetting counters and sleeping for 0.5 seconds
+2024-09-23 20:29:08,270  root       <module>   DEBUG    Reset and sleep 0.5 seconds
+2024-09-23 20:29:08,270  root       handle_response DEBUG    Processing: '<writeln></writeln><writeln></writeln><writeln>ELM327 v1.5</writeln>'
+2024-09-23 20:29:08,273  root       handle_response DEBUG    Write: '\r\rELM327 v1.5\r\r>'
+2024-09-23 20:29:10,276  root       run        DEBUG    Received 'ATE0'
+2024-09-23 20:29:10,276  root       handle_request DEBUG    Handling: 'ATE0', header '7E0', ECU '7E0'
+2024-09-23 20:29:10,276  root       handle_request DEBUG    Description: AT ECHO, PID AT_ECHO (ATE0)
+2024-09-23 20:29:10,277  root       <module>   DEBUG    set ECHO ON/OFF : False
+2024-09-23 20:29:10,277  root       handle_response DEBUG    Processing: '<writeln>OK</writeln>'
+2024-09-23 20:29:10,277  root       handle_response DEBUG    Write: 'OK\r\r>'
+2024-09-23 20:29:11,279  root       run        DEBUG    Received 'ATH1'
+2024-09-23 20:29:11,279  root       handle_request DEBUG    Handling: 'ATH1', header '7E0', ECU '7E0'
+2024-09-23 20:29:11,279  root       handle_request DEBUG    Description: AT HEADERS, PID AT_USE_HEADERS (ATH1)
+2024-09-23 20:29:11,279  root       <module>   DEBUG    set HEADERS ON/OFF : True
+2024-09-23 20:29:11,280  root       handle_response DEBUG    Processing: '<writeln>OK</writeln>'
+2024-09-23 20:29:11,280  root       handle_response DEBUG    Write: 'OK\r\r>'
+2024-09-23 20:29:12,282  root       run        DEBUG    Received 'ATL0'
+2024-09-23 20:29:12,282  root       handle_request DEBUG    Handling: 'ATL0', header '7E0', ECU '7E0'
+2024-09-23 20:29:12,282  root       handle_request DEBUG    Description: AT LINEFEEDS, PID AT_LINEFEEDS (ATL0)
+2024-09-23 20:29:12,282  root       <module>   DEBUG    set LINEFEEDS ON/OFF : False
+2024-09-23 20:29:12,282  root       handle_response DEBUG    Processing: '<writeln>OK</writeln>'
+2024-09-23 20:29:12,283  root       handle_response DEBUG    Write: 'OK\r\r>'
+2024-09-23 20:29:13,284  root       run        DEBUG    Received 'ATSP6'
+2024-09-23 20:29:13,285  root       handle_request DEBUG    Handling: 'ATSP6', header '7E0', ECU '7E0'
+2024-09-23 20:29:13,285  root       handle_request DEBUG    Description: AT PROTO, PID AT_PROTO (ATSP6)
+2024-09-23 20:29:13,286  root       <module>   DEBUG    set PROTO 6
+2024-09-23 20:29:13,286  root       handle_response DEBUG    Processing: '<writeln>OK</writeln>'
+2024-09-23 20:29:13,286  root       handle_response DEBUG    Write: 'OK\r\r>'
+2024-09-23 20:29:14,288  root       run        DEBUG    Received '0100'
+2024-09-23 20:29:14,288  root       handle_request DEBUG    Handling: '0100', header '7E0', ECU '7E0'
+2024-09-23 20:29:14,288  root       handle_request DEBUG    Description: PIDS_A, PID ELM_PIDS_A (0100)
+2024-09-23 20:29:14,288  root       handle_response DEBUG    Processing: '<string>SEARCHING...</string><exec>time.sleep(3)</exec><writeln></writeln><header>7EA</header><size>06</size><data>41 00 98 3A 80 13</data><pos_answer>BE 3F A8 13</pos_answer>'
+2024-09-23 20:29:14,289  root       handle_response DEBUG    Write: 'SEARCHING...'
+2024-09-23 20:29:17,289  root       handle_response DEBUG    Evaluated command: time.sleep(3) -> None
+2024-09-23 20:29:17,290  root       handle_response DEBUG    Write: '\r7EA 06 41 00 98 3A 80 13 \r7E8 06 41 00 BE 3F A8 13 \r\r>'
+2024-09-23 20:29:17,290  root       run        DEBUG    Received '0120'
+2024-09-23 20:29:17,290  root       handle_request DEBUG    Handling: '0120', header '7E0', ECU '7E0'
+2024-09-23 20:29:17,290  root       handle_request DEBUG    Description: PIDS_B, PID ELM_PIDS_B (0120)
+2024-09-23 20:29:17,290  root       handle_response DEBUG    Processing: '<header>7EA</header><size>06</size><data>41 20 80 01 A0 01</data><pos_answer>90 15 B0 15</pos_answer>'
+2024-09-23 20:29:17,291  root       handle_response DEBUG    Write: '7EA 06 41 20 80 01 A0 01 \r7E8 06 41 20 90 15 B0 15 \r\r>'
+2024-09-23 20:29:17,291  root       run        DEBUG    Received '0140'
+2024-09-23 20:29:17,291  root       handle_request DEBUG    Handling: '0140', header '7E0', ECU '7E0'
+2024-09-23 20:29:17,291  root       handle_request DEBUG    Description: PIDS_C, PID ELM_PIDS_C (0140)
+2024-09-23 20:29:17,291  root       handle_response DEBUG    Processing: '<header>7EA</header><size>06</size><data>41 40 44 CC 00 21</data><pos_answer>7A 1C 80 00</pos_answer>'
+2024-09-23 20:29:17,291  root       handle_response DEBUG    Write: '7EA 06 41 40 44 CC 00 21 \r7E8 06 41 40 7A 1C 80 00 \r\r>'
