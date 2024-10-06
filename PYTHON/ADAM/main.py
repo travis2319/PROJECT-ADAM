@@ -12,7 +12,8 @@ gps_port = '/dev/ttyUSB0'  # for linux
 gps_baud_rate = 115200
 
 # OBD-II Configuration
-obd_connector = "/dev/ttyACM0"
+# obd_connector = "/dev/ttyACM0"
+obd_connector = '/dev/pts/2'
 
 # Dictionary mapping PID numbers to their descriptions
 pid_descriptions = {
