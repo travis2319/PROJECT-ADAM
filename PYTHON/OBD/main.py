@@ -346,7 +346,7 @@ def pid_data_callback(response):
             print(f"Warning: {command_name} not found in DataFrame columns")
 
 # Main loop function
-def main(obd_connector, sleep_interval=30):
+def main(obd_connector, sleep_interval):
     print("Starting OBD-II data collection cycle...")
     connection = obd.OBD(obd_connector) # auto-connects to USB or RF port
     # Initialize supported PIDs if not already done
@@ -401,6 +401,6 @@ def main(obd_connector, sleep_interval=30):
         print("Program terminated.")
 
 if __name__ == "__main__":
-    # obd_connector = "/dev/pts/2/  # Replace with your actual OBD-II port
-    obd_connector="/dev/ttyACM0"
+    obd_connector = "/dev/pts/5"  # Replace with your actual OBD-II port
+    # obd_connector="/dev/ttyACM0"
     main(obd_connector, sleep_interval=10)  # 30-second interval between cycles
