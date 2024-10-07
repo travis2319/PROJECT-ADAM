@@ -4,10 +4,10 @@ from OBD_HANDLER import (
     get_pid_names, setup_data_collection, start_data_collection,
     supported_pids, supported_mids
 )
-from GPS_HANDLER import gps_connection, collect_gps_data
+from GPS_HANDLER import gps_connection, read_gps_data,parse_gps_data
 from DATA_PROCESSING import data_processing
 
-def main(obd_connector, sleep_interval):
+def main(obd_connector,gps_connector, sleep_interval):
     print("Starting OBD-II data collection cycle...")
     
     # Use OBD connection to initialize supported PIDs and MIDs
@@ -28,7 +28,7 @@ def main(obd_connector, sleep_interval):
         print("Unable to establish asynchronous connection. Exiting...")
         return
     
-    gps_ser = gps_connection(gps_port)
+    gps_ser = gps_connection(gps_connector)
     if not gps_ser:
         print("Unable to establish GPS connection. Exiting...")
         return
@@ -40,7 +40,7 @@ def main(obd_connector, sleep_interval):
                 
                 obd_df = start_data_collection(async_conn, 5)  # Data collection period of 25 seconds
                 
-                gps_df = collect_gps_data(gps_ser, 25)  # 25 seconds of data collection
+                gps_df = read_gps_data(gps_ser, 25)  # 25 seconds of data collection
                 
                 combined_df = pd.merge(obd_df, gps_df, on='Timestamp', how='outer')
                 

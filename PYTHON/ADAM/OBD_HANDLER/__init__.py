@@ -3,7 +3,6 @@
 from .connection import obd_connection, async_connection
 from .pid_mapping import initialize_supported_pids, get_pid_names
 from .data_collection import setup_data_collection, start_data_collection
-from .data_processing import save_data_to_csv
 from .utils import supported_pids, supported_mids, df
 
 __all__ = [
@@ -13,7 +12,6 @@ __all__ = [
     'get_pid_names',
     'setup_data_collection',
     'start_data_collection',
-    'save_data_to_csv',
     'supported_pids',
     'supported_mids',
     'df'
