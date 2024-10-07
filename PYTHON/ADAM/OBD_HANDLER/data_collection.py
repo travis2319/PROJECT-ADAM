@@ -1,38 +1,47 @@
 import pandas as pd
 import numpy as np
 import obd
-from .utils import df
+from .utils import df  # Note: Importing df from utils might cause issues
+
+# Global variable
+df = None  # It's better to initialize this here
 
 def pid_data_callback(response):
     global df
     command_name = response.command.name
     value = response.value.magnitude if hasattr(response.value, 'magnitude') else response.value
 
-    if hasattr(response.value, 'MIL'):
-        print("MIL (Check Engine Light):", response.value.MIL)
-    if hasattr(response.value, 'DTC_count'):
-        print("DTC Count:", response.value.DTC_count)
-    if hasattr(response.value, 'ignition_type'):
-        print("Ignition Type:", response.value.ignition_type)
+    # Special attribute handling
+    attributes_to_check = {
+        'MIL': 'Check Engine Light',
+        'DTC_count': 'DTC Count',
+        'ignition_type': 'Ignition Type'
+    }
 
-    if command_name == df.columns[1]:  # First element in columns
-        # Create a new row with the PID name and value
+    for attr, display_name in attributes_to_check.items():
+        if hasattr(response.value, attr):
+            print(f"{display_name}:", getattr(response.value, attr))
+
+    if command_name == df.columns[1]:  # First PID in columns
+        # Create a new row
         new_row = {col: np.nan for col in df.columns}
-        new_row['Timestamp'] = response.time # Add current timestamp
+        new_row['Timestamp'] = response.time
         new_row[command_name] = value
         df = pd.concat([df, pd.DataFrame([new_row])], ignore_index=True)
     else:
-        # Update the last row with the current PID value
-        if command_name == df.columns[27]:
+        # Update existing row
+        if command_name == df.columns[27]:  # Why specifically column 27?
             print(df.iloc[-1])
+
         if not df.empty and command_name in df.columns:
-                    df.at[len(df) - 1, command_name] = value
+            df.at[len(df) - 1, command_name] = value
         else:
             print(f"Warning: {command_name} not found in DataFrame columns")
 
 def setup_data_collection(connection, supported_pid_names):
     global df
     df = pd.DataFrame(columns=['Timestamp'] + supported_pid_names)
+
     for pid in supported_pid_names:
         command = getattr(obd.commands, pid, None)
         if command:
@@ -46,4 +55,4 @@ def start_data_collection(connection, duration):
     import time
     time.sleep(duration)
     connection.stop()
-    return df  # Return the DataFrame after collection
+    return df

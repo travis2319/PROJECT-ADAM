@@ -4,13 +4,13 @@ from OBD_HANDLER import (
     get_pid_names, setup_data_collection, start_data_collection,
     supported_pids, supported_mids
 )
-from GPS_HANDLER import gps_connection, read_gps_data,parse_gps_data
-from DATA_PROCESSING import data_processing
+from GPS_HANDLER import gps_connection, read_gps_data, parse_gps_data, collect_gps_data
+from DATA_PROCESSING import save_data_to_csv
 
-def main(obd_connector,gps_connector, sleep_interval):
+def main(obd_connector, gps_connector, baud_rate, sleep_interval):
     print("Starting OBD-II data collection cycle...")
-    
-    # Use OBD connection to initialize supported PIDs and MIDs
+
+    # OBD Connection setup
     obd_conn = obd_connection(obd_connector)
     if not obd_conn:
         print("Unable to establish OBD connection. Exiting...")
@@ -18,38 +18,48 @@ def main(obd_connector,gps_connector, sleep_interval):
 
     initialize_supported_pids(obd_conn)
     supported_pid_names = get_pid_names(supported_pids)
-    
-    # # Close the OBD connection
-    # obd_conn.close()
 
-    # Now use Async connection for data collection
+    # Async OBD connection setup
     async_conn = async_connection(obd_connector)
     if not async_conn:
-        print("Unable to establish asynchronous connection. Exiting...")
+        print("Unable to establish asynchronous OBD connection. Exiting...")
         return
-    
-    gps_ser = gps_connection(gps_connector)
-    if not gps_ser:
-        print("Unable to establish GPS connection. Exiting...")
-        return
+
+    # GPS Connection setup - now optional
+    gps_serial = None
+    try:
+        gps_serial = gps_connection(gps_connector, baud_rate)
+        if not gps_serial:
+            print("GPS connection failed. Continuing with OBD data only...")
+    except Exception as e:
+        print(f"GPS connection error: {e}. Continuing with OBD data only...")
 
     try:
         while True:
             if supported_pid_names:
                 setup_data_collection(async_conn, supported_pid_names)
-                
-                obd_df = start_data_collection(async_conn, 5)  # Data collection period of 25 seconds
-                
-                gps_df = read_gps_data(gps_ser, 25)  # 25 seconds of data collection
-                
-                combined_df = pd.merge(obd_df, gps_df, on='Timestamp', how='outer')
-                
-                if not combined_df.empty:
-                    print(combined_df)
-                    save_data_to_csv(combined_df, 'check.csv')
-                    print(f"DataFrame saved to check.csv")
+                obd_df = start_data_collection(async_conn, 0.5)
+
+                gps_df = None
+                if gps_serial:
+                    try:
+                        gps_df = collect_gps_data(gps_serial, 0.2)
+                        if not gps_df.empty:
+                            print("GPS Data:", gps_df)
+                    except Exception as e:
+                        print(f"Error collecting GPS data: {e}")
+
+                if not obd_df.empty:
+                    print("OBD Data:", obd_df)
+
+                    if gps_df is not None and not gps_df.empty:
+                        # Both OBD and GPS data available
+                        save_data_to_csv(obd_df, gps_df, 'check.csv')
+                    else:
+                        # Only OBD data available
+                        save_data_to_csv(obd_df, pd.DataFrame(), 'check.csv')
                 else:
-                    print("No data collected in this cycle.")
+                    print("No OBD data collected in this cycle.")
             else:
                 print("No supported PIDs found.")
 
@@ -58,13 +68,15 @@ def main(obd_connector,gps_connector, sleep_interval):
 
     except KeyboardInterrupt:
         print("\nData collection stopped by user.")
+    finally:
         if async_conn:
-            async_conn.stop()  # Ensure the OBD connection is closed
-        if gps_ser:
-            gps_ser.close()
+            async_conn.stop()
+        if gps_serial:
+            gps_serial.close()
         print("Program terminated.")
 
 if __name__ == "__main__":
-    obd_connector = "/dev/pts/3"  # Replace with your actual OBD-II port
+    obd_connector = "/dev/pts/2"  # Replace with your actual OBD-II port
     gps_connector = '/dev/ttyUSB0'  # Replace with your actual GPS port
-    main(obd_connector,gps_connector, sleep_interval=10)  # 10-second interval between cycles
+    baud_rate = 115200
+    main(obd_connector, gps_connector, baud_rate, sleep_interval=1)

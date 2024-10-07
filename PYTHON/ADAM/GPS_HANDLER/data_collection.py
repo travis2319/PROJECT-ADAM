@@ -31,6 +31,6 @@ def collect_gps_data(ser, duration):
                     'Longitude': [lon]
                 })
                 df = pd.concat([df, new_row], ignore_index=True)
-        time.sleep(0.5)  # Read every 0.5 seconds
+        time.sleep(0.1)  # Read every 0.5 seconds
 
     return df
