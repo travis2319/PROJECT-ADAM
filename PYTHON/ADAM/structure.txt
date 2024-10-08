@@ -1,35 +1,16 @@
-.
-├── DATA_PROCESSING
-│   ├── data_processing.py
-│   ├── __init__.py
-│   └── __pycache__
-│       ├── data_processing.cpython-311.pyc
-│       └── __init__.cpython-311.pyc
-├── GPS_HANDLER
-│   ├── connection.py
-│   ├── data_collection.py
-│   ├── __init__.py
-│   └── __pycache__
-│       ├── connection.cpython-311.pyc
-│       ├── data_collection.cpython-311.pyc
-│       └── __init__.cpython-311.pyc
-├── main.py
-├── OBD_HANDLER
-│   ├── connection.py
-│   ├── data_collection.py
-│   ├── __init__.py
-│   ├── pid_mapping.py
-│   ├── __pycache__
-│   │   ├── connection.cpython-311.pyc
-│   │   ├── data_collection.cpython-311.pyc
-│   │   ├── data_processing.cpython-311.pyc
-│   │   ├── __init__.cpython-311.pyc
-│   │   ├── obdConnection.cpython-311.pyc
-│   │   ├── pid_mapping.cpython-311.pyc
-│   │   ├── supportedPids.cpython-311.pyc
-│   │   └── utils.cpython-311.pyc
-│   ├── supportedPids.py
-│   └── utils.py
-└── structure.txt
-
-7 directories, 26 files
+ADAM/
+    ├── DATA_PROCESSING
+    │   ├── data_processing.py
+    │   └── __init__.py
+    ├── GPS_HANDLER
+    │   ├── connection.py
+    │   ├── data_collection.py
+    │   └── __init__.py
+    ├── OBD_HANDLER
+    │   ├── connection.py
+    │   ├── data_collection.py
+    │   ├── __init__.py
+    │   ├── pid_mapping.py
+    │   ├── supportedPids.py
+    │   └── utils.py
+    └── main.py
