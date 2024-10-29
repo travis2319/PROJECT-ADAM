@@ -3,7 +3,7 @@ import numpy as np
 import obd
 import time
 
-connection = obd.Async('/dev/ttyACM0')
+connection = obd.Async('/dev/pts/3')
 df = pd.DataFrame(columns=["Start_Time", "SPEED", "Coolant Temp", "Engine Load", "Throttle_pos_b", "End_Time"])
 
 def new_rpm(responses):

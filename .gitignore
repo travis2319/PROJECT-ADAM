@@ -1,0 +1,76 @@
+# Dependencies
+**/node_modules
+**/.expo
+**/.expo-shared
+npm-debug.*
+*.jks
+*.p8
+*.p12
+*.key
+*.mobileprovision
+*.orig.*
+web-build/
+
+# Environment files
+.env
+.env.*
+.env.local
+.env.development
+.env.test
+.env.production
+
+# React Native / Expo
+.expo/
+dist/
+*.log
+*.test.js.snap
+.DS_Store
+.DS_Store?
+.idea/
+.vscode/
+
+# Rust
+debug/
+target/
+**/*.rs.bk
+Cargo.lock
+**/*.pdb
+**/*.exe
+**/*.dll
+**/*.so
+**/*.dylib
+
+# Golang
+# Binaries for programs and plugins
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# Go specific
+*.test
+*.out
+go.work
+
+# Build
+[Dd]ebug/
+[Rr]elease/
+build/
+bin/
+
+# IDE specific files
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS specific
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db

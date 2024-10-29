@@ -1,5 +1,6 @@
 import os
 import pandas as pd
+from DATA_TRANSMISSION import send_data_to_server
 
 def save_data_to_csv(obd_df, gps_df, file_path):
     try:
@@ -16,6 +17,7 @@ def save_data_to_csv(obd_df, gps_df, file_path):
                 if not gps_df.empty:
                     # Merge OBD and GPS dataframes on index
                     merged_df = pd.concat([obd_df, gps_df], axis=1)
+                    # send_data_to_server(merged_df)
             except Exception as e:
                 print(f"Error processing GPS data: {e}. Saving OBD data only.")
 
@@ -24,6 +26,7 @@ def save_data_to_csv(obd_df, gps_df, file_path):
 
         # Save merged dataframe to CSV
         merged_df.to_csv(file_path, mode='a', index=False, header=not file_exists)
+        merged_df.to_csv('temp.csv', index=False, header=not file_exists)
         print(f"DataFrame saved to {file_path}")
 
     except Exception as e:

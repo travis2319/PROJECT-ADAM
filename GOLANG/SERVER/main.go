@@ -29,6 +29,7 @@ func main() {
 		log.Fatal("Error connecting to the database:", err)
 	}
 	defer db.Close()
+	fmt.Println("Connected to the database")
 
 	// Create the table if it doesn't exist
 	_, err = db.Exec(`
@@ -84,7 +85,7 @@ CREATE TABLE IF NOT EXISTS sensor (
 		// Prepare the SQL statement
 		insertSQL := `
 			INSERT INTO sensor (
-				TIME, SENSOR1, SENSOR2, SENSOR3, SENSOR4, SENSOR5, 
+				TIME, SENSOR1, SENSOR2, SENSOR3, SENSOR4, SENSOR5,
 				SENSOR6, SENSOR7, SENSOR8, SENSOR9, SENSOR10, SENSOR11, SENSOR12
 			) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
 		`
@@ -132,6 +133,72 @@ CREATE TABLE IF NOT EXISTS sensor (
 		}
 
 		fmt.Fprintln(w, "CSV data uploaded and stored successfully!")
+	})
+	http.HandleFunc("/csvupload", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodPost {
+			http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+			return
+		}
+		// Get the file from the form
+		file, _, err := r.FormFile("file")
+		if err != nil {
+			fmt.Fprintln(w, "Error retrieving the file")
+			return
+		}
+		defer file.Close()
+
+		// Create a new CSV reader and read the file
+		reader := csv.NewReader(file)
+		for {
+			record, err := reader.Read()
+			if err != nil {
+				break
+			}
+
+			// Log each row in the console
+			fmt.Println("CSV Record:", record)
+		}
+
+		fmt.Fprintln(w, "File uploaded and logged successfully")
+
+	})
+	http.HandleFunc("/jsonupload", func(w http.ResponseWriter, r *http.Request) {
+		// Check if method is POST
+		if r.Method != http.MethodPost {
+			http.Error(w, "Only POST method is allowed", http.StatusMethodNotAllowed)
+			return
+		}
+		// Read the body
+		body, err := io.ReadAll(r.Body)
+		if err != nil {
+			http.Error(w, "Error reading request body", http.StatusInternalServerError)
+			return
+		}
+		defer r.Body.Close()
+
+		// Create a map to store the JSON data
+		var data interface{}
+
+		// Unmarshal JSON into the map
+		err = json.Unmarshal(body, &data)
+		if err != nil {
+			http.Error(w, "Error parsing JSON", http.StatusBadRequest)
+			return
+		}
+
+		// Pretty print the JSON
+		prettyJSON, err := json.MarshalIndent(data, "", "    ")
+		if err != nil {
+			http.Error(w, "Error formatting JSON", http.StatusInternalServerError)
+			return
+		}
+
+		// Print the received JSON
+		fmt.Printf("Received JSON:\n%s\n", string(prettyJSON))
+
+		// Send success response
+		w.WriteHeader(http.StatusOK)
+		w.Write([]byte("JSON received successfully"))
 	})
 
 	// View uploaded data

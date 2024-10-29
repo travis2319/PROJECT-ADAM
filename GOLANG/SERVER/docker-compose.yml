@@ -1,8 +1,6 @@
-version: '3.8' # Specify a suitable Docker Compose version
-
 services:
   app:
-    build: .  # Build the current directory containing your Go application
+    build: . # Build the current directory containing your Go application
     ports:
       - "8080:8080" # Map port 8080 from container to host
     depends_on:

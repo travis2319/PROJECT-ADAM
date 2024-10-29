@@ -6,6 +6,7 @@ from OBD_HANDLER import (
 )
 from GPS_HANDLER import gps_connection, read_gps_data, parse_gps_data, collect_gps_data
 from DATA_PROCESSING import save_data_to_csv
+from DATA_TRANSMISSION import send_data_to_server, send_csv_to_server
 
 def main(obd_connector, gps_connector, baud_rate, sleep_interval):
     print("Starting OBD-II data collection cycle...")
@@ -55,9 +56,13 @@ def main(obd_connector, gps_connector, baud_rate, sleep_interval):
                     if gps_df is not None and not gps_df.empty:
                         # Both OBD and GPS data available
                         save_data_to_csv(obd_df, gps_df, 'check.csv')
+                        # send_data_to_server(obd_df, gps_df)
+                        send_csv_to_server('temp.csv')
                     else:
                         # Only OBD data available
                         save_data_to_csv(obd_df, pd.DataFrame(), 'check.csv')
+                        # send_data_to_server(obd_df, None)
+                        send_csv_to_server('temp.csv')
                 else:
                     print("No OBD data collected in this cycle.")
             else:
