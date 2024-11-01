@@ -14,10 +14,10 @@ RUN go mod download
 COPY . .
 
 # Build your Go application
-RUN go build -o main .
+RUN go build -o test ./test.go
 
-# Expose the port your application listens on (change if needed)
+# Expose the port your application listens on (default is 8080 here)
 EXPOSE 8080
 
 # Command to run your application when the container starts
-CMD ["./main"]
+CMD ["./test"]
