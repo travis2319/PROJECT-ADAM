@@ -40,6 +40,11 @@ func main() {
     if err := db.Ping(); err != nil {
         log.Fatal("Database connection failed:", err)
     }
+    
+    http.HandleFunc("/status", func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+		fmt.Fprintln(w, "Server is live!")
+	})
 
     http.HandleFunc("/upload", func(w http.ResponseWriter, r *http.Request) {
         if r.Method != "POST" {
