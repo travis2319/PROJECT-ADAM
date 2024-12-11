@@ -10,7 +10,7 @@ const Explore = () => {
   const fetchData = async () => {
     try {
       console.log('Fetching data from localhost...');
-      const res = await axios.get('http://192.168.0.107:8080/data');
+      const res = await axios.get('http://192.168.124.63:8080/data');
       console.log('Data fetched:', res.data);
       setData(res.data);
     } catch (err) {
