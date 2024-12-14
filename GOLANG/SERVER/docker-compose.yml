@@ -19,6 +19,8 @@ services:
       - POSTGRES_DB=mydb # Set the same database name as used in the 'app' service
     volumes:
       - postgres_data:/var/lib/postgresql/data1 # Persist PostgreSQL data
+    ports:
+      - "5432:5432"
 
 volumes:
   postgres_data: # Named volume for PostgreSQL data persistence

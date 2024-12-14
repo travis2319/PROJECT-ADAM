@@ -26,7 +26,7 @@ def save_data_to_csv(obd_df, gps_df, file_path):
 
         # Save merged dataframe to CSV
         merged_df.to_csv(file_path, mode='a', index=False, header=not file_exists)
-        merged_df.to_csv('temp.csv', index=False, header=not file_exists)
+        merged_df.to_csv('temp.csv', index=False, header=True)
         print(f"DataFrame saved to {file_path}")
 
     except Exception as e:

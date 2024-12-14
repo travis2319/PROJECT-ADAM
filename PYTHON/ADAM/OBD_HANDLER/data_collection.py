@@ -25,7 +25,7 @@ def pid_data_callback(response):
     if command_name == df.columns[1]:  # First PID in columns
         # Create a new row
         new_row = {col: np.nan for col in df.columns}
-        new_row['Timestamp'] = response.time
+        new_row['Timestamp_OBD'] = response.time
         new_row[command_name] = value
         df = pd.concat([df, pd.DataFrame([new_row])], ignore_index=True)
     else:
@@ -40,7 +40,7 @@ def pid_data_callback(response):
 
 def setup_data_collection(connection, supported_pid_names):
     global df
-    df = pd.DataFrame(columns=['Timestamp'] + supported_pid_names)
+    df = pd.DataFrame(columns=['Timestamp_OBD'] + supported_pid_names)
 
     for pid in supported_pid_names:
         command = getattr(obd.commands, pid, None)

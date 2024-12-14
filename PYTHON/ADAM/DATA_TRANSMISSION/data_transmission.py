@@ -33,8 +33,9 @@ def send_data_to_server(obd_df, gps_df=None):
         return False
 
 def send_csv_to_server(file_path):
-    url = "http://localhost:8080/csvupload"  # Replace with your server's endpoint
-
+    url = "http://localhost:3000/upload"  # Replace with your server's endpoint
+    
+    # sending temp.csv to go server
     try:
         with open(file_path, 'rb') as file:
             files = {'file': file}

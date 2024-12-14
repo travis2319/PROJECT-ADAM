@@ -1,0 +1,52 @@
+package models
+
+import "time"
+
+type Vehicle struct {
+	UserId                 int
+	Timestamp              time.Time
+	Status                 string
+	FuelStatus             string
+	EngineLoad             float64
+	CoolantTemp            int
+	ShortFuelTrim1         float64
+	LongFuelTrim1          float64
+	IntakePressure         int
+	Rpm                    float64
+	Speed                  int
+	TimingAdvance          float64
+	IntakeTemp             int
+	Maf                    float64
+	ThrottlePos            float64
+	O2Sensor               string
+	O2B1S1                 float64
+	ObdCompliance          string
+	RunTime                int
+	PidsB                  string
+	DistanceWMil           int
+	O2_S1_WR_VOLTAGE       int
+	COMMANDED_EGR          int
+	EvaporativePurge       int
+	FuelLevel              float64
+	WarmupsSinceDtcClear   int
+	DistanceSinceDtcClear  int
+	BarometricPressure     int
+	O2S1WRCurrent          float64
+	CatalystTempB1S1       float64
+	CatalystTempB1S2       float64
+	PidsC                  string
+	StatusDriveCycle       string
+	ControlModuleVoltage   float64
+	AbsoluteLoad           float64
+	CommandedEquivRatio    float64
+	RelativeThrottlePos    float64
+	AmbiantAirTemp         int
+	ThrottlePosB           float64
+	AcceleratorPosD        float64
+	AcceleratorPosE        float64
+	ThrottleActuator       float64
+	RunTimeMil             int
+	TIME_SINCE_DTC_CLEARED int
+	FuelType               string
+	LongO2TrimB1           float64
+}

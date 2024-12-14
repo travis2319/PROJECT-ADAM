@@ -17,7 +17,7 @@ def parse_gps_data(gps_raw_data):
     return None, None
 
 def collect_gps_data(ser, duration):
-    df = pd.DataFrame(columns=['Timestamp', 'Latitude', 'Longitude'])
+    df = pd.DataFrame(columns=['Timestamp_GPS', 'Latitude', 'Longitude'])
     end_time = time.time() + duration
 
     while time.time() < end_time:
@@ -26,7 +26,7 @@ def collect_gps_data(ser, duration):
             lat, lon = parse_gps_data(gps_raw_data)
             if lat and lon:
                 new_row = pd.DataFrame({
-                    'Timestamp': [time.time()],
+                    'Timestamp_GPS': [time.time()],
                     'Latitude': [lat],
                     'Longitude': [lon]
                 })

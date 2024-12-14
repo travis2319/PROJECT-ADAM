@@ -1,4 +1,5 @@
 import time
+import pandas as pd
 from OBD_HANDLER import (
     obd_connection, async_connection, initialize_supported_pids,
     get_pid_names, setup_data_collection, start_data_collection,
@@ -7,6 +8,7 @@ from OBD_HANDLER import (
 from GPS_HANDLER import gps_connection, read_gps_data, parse_gps_data, collect_gps_data
 from DATA_PROCESSING import save_data_to_csv
 from DATA_TRANSMISSION import send_data_to_server, send_csv_to_server
+
 
 def main(obd_connector, gps_connector, baud_rate, sleep_interval):
     print("Starting OBD-II data collection cycle...")
@@ -81,7 +83,7 @@ def main(obd_connector, gps_connector, baud_rate, sleep_interval):
         print("Program terminated.")
 
 if __name__ == "__main__":
-    obd_connector = "/dev/pts/2"  # Replace with your actual OBD-II port
+    obd_connector = "/dev/pts/5"  # Replace with your actual OBD-II port
     gps_connector = '/dev/ttyUSB0'  # Replace with your actual GPS port
     baud_rate = 115200
     main(obd_connector, gps_connector, baud_rate, sleep_interval=1)
