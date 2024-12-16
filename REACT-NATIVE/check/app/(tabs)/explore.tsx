@@ -11,7 +11,7 @@ const Explore = () => {
   const fetchData = async () => {
     try {
       // Replace with your actual API endpoint
-      const response = await axios.get('http://192.168.0.107:3000/data');
+      const response = await axios.get('http://192.168.137.175:3000/data');
       
       setData(response.data.data);
       setError(null);
