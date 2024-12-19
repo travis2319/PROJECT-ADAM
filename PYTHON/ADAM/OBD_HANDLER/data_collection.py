@@ -30,9 +30,8 @@ def pid_data_callback(response):
         df = pd.concat([df, pd.DataFrame([new_row])], ignore_index=True)
     else:
         # Update existing row
-        if command_name == df.columns[27]:  # Why specifically column 27?
+        if len(df.columns) > 27 and command_name == df.columns[27]:
             print(df.iloc[-1])
-
         if not df.empty and command_name in df.columns:
             df.at[len(df) - 1, command_name] = value
         else:

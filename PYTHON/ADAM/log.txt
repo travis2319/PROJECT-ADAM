@@ -1,0 +1,189 @@
+Command Unknown is not supported.
+Check Engine Light: False
+DTC Count: 0
+Ignition Type: spark
+/mnt/hdd/DOCUMENTS/DEV/BE-PROJECT/PROJECT-ADAM/PYTHON/ADAM/OBD_HANDLER/data_collection.py:30: FutureWarning: The behavior of DataFrame concatenation with empty or all-NA entries is deprecated. In a future version, this will no longer exclude empty or all-NA columns when determining the result dtypes. To retain the old behavior, exclude the relevant entries before the concat operation.
+  df = pd.concat([df, pd.DataFrame([new_row])], ignore_index=True)
+Check Engine Light: False
+DTC Count: 0
+Ignition Type: spark
+Timestamp_OBD                                               1734342028.344023
+STATUS                      <obd.OBDResponse.Status object at 0x7ce2a052eab0>
+FUEL_STATUS                 (Open loop due to engine load OR fuel cut due ...
+ENGINE_LOAD                                                         21.568627
+COOLANT_TEMP                                                              100
+SHORT_FUEL_TRIM_1                                                         0.0
+LONG_FUEL_TRIM_1                                                          0.0
+INTAKE_PRESSURE                                                            38
+RPM                                                                     968.0
+SPEED                                                                    29.0
+TIMING_ADVANCE                                                           -5.5
+INTAKE_TEMP                                                                48
+THROTTLE_POS                                                        12.941176
+O2_SENSORS                  ((), (False, False, False, False), (False, Fal...
+O2_B1S2                                                                  0.06
+OBD_COMPLIANCE                                         India OBD II (IOBD II)
+RUN_TIME                                                                615.0
+PIDS_B                      (True, False, False, False, False, False, Fals...
+DISTANCE_W_MIL                                                            0.0
+EVAPORATIVE_PURGE                                                    0.392157
+FUEL_LEVEL                                                          77.647059
+WARMUPS_SINCE_DTC_CLEAR                                                 255.0
+DISTANCE_SINCE_DTC_CLEAR                                               2570.0
+BAROMETRIC_PRESSURE                                                       100
+O2_S1_WR_CURRENT                                                    -0.007812
+CATALYST_TEMP_B1S1                                                      520.5
+PIDS_C                      (True, True, True, True, True, True, True, Fal...
+STATUS_DRIVE_CYCLE                                                        NaN
+CONTROL_MODULE_VOLTAGE                                                    NaN
+ABSOLUTE_LOAD                                                             NaN
+COMMANDED_EQUIV_RATIO                                                     NaN
+RELATIVE_THROTTLE_POS                                                     NaN
+AMBIANT_AIR_TEMP                                                          NaN
+THROTTLE_POS_B                                                            NaN
+ACCELERATOR_POS_D                                                         NaN
+ACCELERATOR_POS_E                                                         NaN
+THROTTLE_ACTUATOR                                                         NaN
+FUEL_TYPE                                                                 NaN
+LONG_O2_TRIM_B1                                                           NaN
+Unknown                                                                   NaN
+Name: 0, dtype: object
+/mnt/hdd/DOCUMENTS/DEV/BE-PROJECT/PROJECT-ADAM/PYTHON/ADAM/GPS_HANDLER/data_collection.py:33: FutureWarning: The behavior of DataFrame concatenation with empty or all-NA entries is deprecated. In a future version, this will no longer exclude empty or all-NA columns when determining the result dtypes. To retain the old behavior, exclude the relevant entries before the concat operation.
+  df = pd.concat([df, new_row], ignore_index=True)
+GPS Data:    Timestamp_GPS   Latitude  Longitude
+0   1.734342e+09  15.305588  73.947985
+1   1.734342e+09  15.305588  73.947985
+OBD Data:    Timestamp_OBD                                             STATUS  ... LONG_O2_TRIM_B1 Unknown
+0   1.734342e+09  <obd.OBDResponse.Status object at 0x7ce2a052eab0>  ...             0.0     NaN
+
+[1 rows x 40 columns]
+DataFrame saved to check.csv
+CSV file sent successfully.
+Waiting for 1 seconds before the next cycle...
+Command Unknown is not supported.
+Check Engine Light: False
+DTC Count: 0
+Ignition Type: spark
+/mnt/hdd/DOCUMENTS/DEV/BE-PROJECT/PROJECT-ADAM/PYTHON/ADAM/OBD_HANDLER/data_collection.py:30: FutureWarning: The behavior of DataFrame concatenation with empty or all-NA entries is deprecated. In a future version, this will no longer exclude empty or all-NA columns when determining the result dtypes. To retain the old behavior, exclude the relevant entries before the concat operation.
+  df = pd.concat([df, pd.DataFrame([new_row])], ignore_index=True)
+Check Engine Light: False
+DTC Count: 0
+Ignition Type: spark
+Timestamp_OBD                                               1734342031.580088
+STATUS                      <obd.OBDResponse.Status object at 0x7ce2a053baa0>
+FUEL_STATUS                 (Closed loop, using oxygen sensor feedback to ...
+ENGINE_LOAD                                                         27.843137
+COOLANT_TEMP                                                              100
+SHORT_FUEL_TRIM_1                                                         0.0
+LONG_FUEL_TRIM_1                                                          0.0
+INTAKE_PRESSURE                                                            36
+RPM                                                                     927.5
+SPEED                                                                    17.0
+TIMING_ADVANCE                                                           -2.5
+INTAKE_TEMP                                                                49
+THROTTLE_POS                                                         12.54902
+O2_SENSORS                  ((), (False, False, False, False), (False, Fal...
+O2_B1S2                                                                 0.115
+OBD_COMPLIANCE                                         India OBD II (IOBD II)
+RUN_TIME                                                                619.0
+PIDS_B                      (True, False, False, False, False, False, Fals...
+DISTANCE_W_MIL                                                            0.0
+EVAPORATIVE_PURGE                                                    5.882353
+FUEL_LEVEL                                                          77.647059
+WARMUPS_SINCE_DTC_CLEAR                                                 255.0
+DISTANCE_SINCE_DTC_CLEAR                                               2570.0
+BAROMETRIC_PRESSURE                                                       100
+O2_S1_WR_CURRENT                                                    -0.234375
+CATALYST_TEMP_B1S1                                                      517.2
+PIDS_C                      (True, True, True, True, True, True, True, Fal...
+STATUS_DRIVE_CYCLE                                                        NaN
+CONTROL_MODULE_VOLTAGE                                                    NaN
+ABSOLUTE_LOAD                                                             NaN
+COMMANDED_EQUIV_RATIO                                                     NaN
+RELATIVE_THROTTLE_POS                                                     NaN
+AMBIANT_AIR_TEMP                                                          NaN
+THROTTLE_POS_B                                                            NaN
+ACCELERATOR_POS_D                                                         NaN
+ACCELERATOR_POS_E                                                         NaN
+THROTTLE_ACTUATOR                                                         NaN
+FUEL_TYPE                                                                 NaN
+LONG_O2_TRIM_B1                                                           NaN
+Unknown                                                                   NaN
+Name: 0, dtype: object
+/mnt/hdd/DOCUMENTS/DEV/BE-PROJECT/PROJECT-ADAM/PYTHON/ADAM/GPS_HANDLER/data_collection.py:33: FutureWarning: The behavior of DataFrame concatenation with empty or all-NA entries is deprecated. In a future version, this will no longer exclude empty or all-NA columns when determining the result dtypes. To retain the old behavior, exclude the relevant entries before the concat operation.
+  df = pd.concat([df, new_row], ignore_index=True)
+GPS Data:    Timestamp_GPS   Latitude  Longitude
+0   1.734342e+09  15.305588  73.947985
+1   1.734342e+09  15.305588  73.947985
+OBD Data:    Timestamp_OBD                                             STATUS  ... LONG_O2_TRIM_B1 Unknown
+0   1.734342e+09  <obd.OBDResponse.Status object at 0x7ce2a053baa0>  ...             0.0     NaN
+
+[1 rows x 40 columns]
+DataFrame saved to check.csv
+CSV file sent successfully.
+Waiting for 1 seconds before the next cycle...
+Command Unknown is not supported.
+Check Engine Light: False
+DTC Count: 0
+Ignition Type: spark
+/mnt/hdd/DOCUMENTS/DEV/BE-PROJECT/PROJECT-ADAM/PYTHON/ADAM/OBD_HANDLER/data_collection.py:30: FutureWarning: The behavior of DataFrame concatenation with empty or all-NA entries is deprecated. In a future version, this will no longer exclude empty or all-NA columns when determining the result dtypes. To retain the old behavior, exclude the relevant entries before the concat operation.
+  df = pd.concat([df, pd.DataFrame([new_row])], ignore_index=True)
+Check Engine Light: False
+DTC Count: 0
+Ignition Type: spark
+Timestamp_OBD                                               1734342034.673975
+STATUS                      <obd.OBDResponse.Status object at 0x7ce2a052cb00>
+FUEL_STATUS                 (Closed loop, using oxygen sensor feedback to ...
+ENGINE_LOAD                                                         16.078431
+COOLANT_TEMP                                                              100
+SHORT_FUEL_TRIM_1                                                     0.78125
+LONG_FUEL_TRIM_1                                                     -0.78125
+INTAKE_PRESSURE                                                            27
+RPM                                                                     935.0
+SPEED                                                                     3.0
+TIMING_ADVANCE                                                           -4.0
+INTAKE_TEMP                                                                49
+THROTTLE_POS                                                        11.764706
+O2_SENSORS                  ((), (False, False, False, False), (False, Fal...
+O2_B1S2                                                                 0.135
+OBD_COMPLIANCE                                         India OBD II (IOBD II)
+RUN_TIME                                                                622.0
+PIDS_B                      (True, False, False, False, False, False, Fals...
+DISTANCE_W_MIL                                                            0.0
+EVAPORATIVE_PURGE                                                   20.784314
+FUEL_LEVEL                                                          77.647059
+WARMUPS_SINCE_DTC_CLEAR                                                 255.0
+DISTANCE_SINCE_DTC_CLEAR                                               2570.0
+BAROMETRIC_PRESSURE                                                       100
+O2_S1_WR_CURRENT                                                    -0.246094
+CATALYST_TEMP_B1S1                                                      513.9
+PIDS_C                      (True, True, True, True, True, True, True, Fal...
+STATUS_DRIVE_CYCLE                                                        NaN
+CONTROL_MODULE_VOLTAGE                                                    NaN
+ABSOLUTE_LOAD                                                             NaN
+COMMANDED_EQUIV_RATIO                                                     NaN
+RELATIVE_THROTTLE_POS                                                     NaN
+AMBIANT_AIR_TEMP                                                          NaN
+THROTTLE_POS_B                                                            NaN
+ACCELERATOR_POS_D                                                         NaN
+ACCELERATOR_POS_E                                                         NaN
+THROTTLE_ACTUATOR                                                         NaN
+FUEL_TYPE                                                                 NaN
+LONG_O2_TRIM_B1                                                           NaN
+Unknown                                                                   NaN
+Name: 0, dtype: object
+/mnt/hdd/DOCUMENTS/DEV/BE-PROJECT/PROJECT-ADAM/PYTHON/ADAM/GPS_HANDLER/data_collection.py:33: FutureWarning: The behavior of DataFrame concatenation with empty or all-NA entries is deprecated. In a future version, this will no longer exclude empty or all-NA columns when determining the result dtypes. To retain the old behavior, exclude the relevant entries before the concat operation.
+  df = pd.concat([df, new_row], ignore_index=True)
+GPS Data:    Timestamp_GPS   Latitude  Longitude
+0   1.734342e+09  15.305588  73.947985
+1   1.734342e+09  15.305588  73.947985
+OBD Data:    Timestamp_OBD                                             STATUS  ... LONG_O2_TRIM_B1 Unknown
+0   1.734342e+09  <obd.OBDResponse.Status object at 0x7ce2a052cb00>  ...             0.0     NaN
+
+[1 rows x 40 columns]
+DataFrame saved to check.csv
+CSV file sent successfully.
+Waiting for 1 seconds before the next cycle...
+^C
+Data collection stopped by user.
+Program terminated.
