@@ -24,3 +24,6 @@ services:
 
 volumes:
   postgres_data: # Named volume for PostgreSQL data persistence
+
+
+# postgresql://postgres:mysecretpassword@db:5432/mydb
