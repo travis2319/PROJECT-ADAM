@@ -13,8 +13,9 @@
 **/dist/
 **/build/
 **/.ipynb_checkpoints/
-#**/.venv/
-#**/.env
+**/.venv/
+**/.env
+**/adam/
 **/.mypy_cache/
 **/.pytest_cache/
 # Python virtual environment in PYTHON/ADAM
