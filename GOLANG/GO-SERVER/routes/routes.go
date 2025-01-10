@@ -18,4 +18,7 @@ func RegisterRoutes(app *fiber.App) {
 
 	//Post routes
 	app.Post("/upload", upload.StoreHandler)
+
+	//expo routes
+	// app.Post("/auth/login", login.LoginHandler)
 }
