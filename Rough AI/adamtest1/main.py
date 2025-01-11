@@ -1,18 +1,17 @@
+
 import time
 from fastapi import FastAPI
 from routers.emissions import router as emissions_router
+from routers.engine_health import router as engine_health_router
 
 app = FastAPI(
-    title="Emissions Compliance API",
-    description="API for extracting data, preprocessing, training, and predicting emissions compliance.",
-    version="1.0.0"
+    title="Car Diagnostics API",
+    description="API for emissions compliance and engine health analysis.",
+    version="2.0.0"
 )
 
 @app.on_event("startup")
 async def startup_event():
-    """
-    Check the database connection on application startup.
-    """
     retries = 5
     while retries > 0:
         try:
@@ -30,10 +29,7 @@ async def startup_event():
 
 @app.get("/")
 def root():
-    """
-    Root endpoint to verify the API is running.
-    """
-    return {"message": "Welcome to the Emissions Compliance API"}
+    return {"message": "Welcome to the Car Diagnostics API"}
 
-# Include emissions router
 app.include_router(emissions_router)
+app.include_router(engine_health_router)
