@@ -1,11 +1,15 @@
-import { Stack } from "expo-router"
+import { Stack } from 'expo-router';
+import { FadeIn } from 'react-native-reanimated';
 
-export default function (){
-    return 
+
+export default function () {
+  return (
     <Stack>
-        <Stack.Screen name="index" options={{ headerShown: false }} />
-        <Stack.Screen name="signup" options={{
+      <Stack.Screen name="index" options={{ headerShown: false, animation: 'fade' }} />
+      <Stack.Screen name="signup" options={{
         headerShown: false, presentation: "modal",
         animation: 'fade'
-      }} />    </Stack>
+      }} />
+    </Stack>
+  );
 }
