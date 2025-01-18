@@ -198,4 +198,3 @@ class EngineHealthPredictor:
         img.seek(0)
         plt.close()
         return img
-

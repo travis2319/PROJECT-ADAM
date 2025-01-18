@@ -105,4 +105,3 @@ def visualize_engine_health_results():
     except Exception as e:
         logging.error("Error generating visualizations: %s", e)
         raise HTTPException(status_code=500, detail=f"Error generating visualizations: {e}")
-
