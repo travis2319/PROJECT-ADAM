@@ -1,45 +1,16 @@
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
-from sqlalchemy import create_engine
-from sqlalchemy.exc import SQLAlchemyError
 from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier
-from sklearn.model_selection import train_test_split
-from sklearn.metrics import roc_auc_score
+from sklearn.model_selection import train_test_split, cross_val_score
+from sklearn.metrics import accuracy_score, roc_auc_score, classification_report
 from sklearn.pipeline import Pipeline
-from sklearn.preprocessing import RobustScaler
+from sklearn.preprocessing import RobustScaler, LabelEncoder
 from sklearn.impute import SimpleImputer
 import os
 
-# Environment variables for database connection
-POSTGRES_HOST = os.getenv("POSTGRES_HOST", "localhost")
-POSTGRES_PORT = os.getenv("POSTGRES_PORT", "5432")
-POSTGRES_USER = os.getenv("POSTGRES_USER", "postgres")
-POSTGRES_PASSWORD = os.getenv("POSTGRES_PASSWORD", "mysecretpassword")
-POSTGRES_DB = os.getenv("POSTGRES_DB", "mydb")
-
-
-def fetch_emissions_data():
-    try:
-        print("Creating SQLAlchemy engine...")
-        # Create a SQLAlchemy engine
-        engine = create_engine(
-            f'postgresql+psycopg2://{POSTGRES_USER}:{POSTGRES_PASSWORD}@{POSTGRES_HOST}:{POSTGRES_PORT}/{POSTGRES_DB}')
-
-        print("Engine created successfully. Executing query...")
-        query = "SELECT * FROM obd_log;"  # Replace with your actual table name
-        df = pd.read_sql_query(query, engine)
-
-        print("Query executed successfully. Data fetched.")
-        return df
-
-    except SQLAlchemyError as e:
-        print(f"Error fetching data: {e}")
-        return pd.DataFrame()  # Return an empty DataFrame on error
-
-
 class EnhancedCarEmissionsMLModel:
-    def _init_(self, dataframe):
+    def __init__(self, dataframe):
         self.df = dataframe
         self.model = None
         self.features = [
@@ -64,13 +35,15 @@ class EnhancedCarEmissionsMLModel:
         }
 
     def advanced_preprocessing(self):
-        """Advanced data preprocessing with robust scaling and imputation."""
         for feature in self.features:
+            # Convert to numeric and handle non-numeric values
             self.df[feature] = pd.to_numeric(self.df[feature], errors='coerce')
 
+        # Check for missing values
         print("Missing values per feature:")
         print(self.df[self.features].isnull().sum())
 
+        # Replace missing values with median and scale
         preprocessor = Pipeline([
             ('imputer', SimpleImputer(strategy='median')),
             ('scaler', RobustScaler())
@@ -89,7 +62,6 @@ class EnhancedCarEmissionsMLModel:
         X_train, X_test, y_train, y_test = train_test_split(
             self.X, self.y, test_size=0.2, random_state=42, stratify=self.y
         )
-
         models = {
             'RandomForest': RandomForestClassifier(n_estimators=200, max_depth=10, random_state=42),
             'GradientBoosting': GradientBoostingClassifier(n_estimators=200, learning_rate=0.1, random_state=42)
@@ -100,6 +72,7 @@ class EnhancedCarEmissionsMLModel:
 
         for name, model in models.items():
             model.fit(X_train, y_train)
+            y_pred = model.predict(X_test)
             roc_auc = roc_auc_score(y_test, model.predict_proba(X_test)[:, 1])
 
             print(f"{name} ROC AUC Score: {roc_auc:.4f}")
@@ -117,25 +90,19 @@ class EnhancedCarEmissionsMLModel:
 
         plt.figure(figsize=(20, 10))
         importance = self.model.feature_importances_
-        plt.subplot(1, 1, 1)
         plt.barh(self.features, importance)
         plt.title("Feature Importance")
-        plt.xlabel("Importance")
         plt.show()
 
-
 def main():
-    emissions_data = fetch_emissions_data()
-
-    if emissions_data.empty:
-        print("No data retrieved. Exiting...")
-        return
+    # Fetch your data accordingly
+    # This assumes you have a DataFrame `emissions_data`
+    emissions_data = pd.DataFrame()  # Replace with actual data fetching function
 
     emissions_analysis = EnhancedCarEmissionsMLModel(emissions_data)
     emissions_analysis.advanced_preprocessing()
     emissions_analysis.train_optimized_model()
     emissions_analysis.visualize_comprehensive_report()
-
 
 if __name__ == "__main__":
     main()

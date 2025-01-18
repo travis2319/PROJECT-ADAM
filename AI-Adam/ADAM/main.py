@@ -1,23 +1,37 @@
-# main.py
+
+import time
 from fastapi import FastAPI
-from utils.database import Database
-from routers import emissions, engine_health, maintenance, chatbot, health
-from contextlib import asynccontextmanager
+from routers.emissions import router as emissions_router
+from routers.engine_health import router as engine_health_router
+from routers.predictive_maintenance import router as predictive_maintenance_router
 
-@asynccontextmanager
-async def lifespan(app: FastAPI):
-    # Startup: initialize the database pool
-    Database.initialize()
-    yield
-    # Shutdown: close all database connections
-    Database.close_all()
+app = FastAPI(
+    title="Car Diagnostics API",
+    description="API for emissions compliance and engine health analysis.",
+    version="2.0.0"
+)
 
-app = FastAPI(lifespan=lifespan)
+@app.on_event("startup")
+async def startup_event():
+    retries = 5
+    while retries > 0:
+        try:
+            from utils.database import connect_to_db
+            conn = connect_to_db()
+            conn.close()
+            print("Database connection established.")
+            break
+        except Exception as e:
+            print(f"Database connection failed. Retrying... {e}")
+            retries -= 1
+            time.sleep(5)
+    if retries == 0:
+        raise Exception("Failed to connect to the database.")
 
-# Include routers
-app.include_router(emissions.router)
-app.include_router(health.router)
-# app.include_router(engine_health.router)
-# app.include_router(maintenance.router)
-# app.include_router(chatbot.router)
+@app.get("/")
+def root():
+    return {"message": "Welcome to the Car Diagnostics API"}
 
+app.include_router(emissions_router)
+app.include_router(engine_health_router)
+app.include_router(predictive_maintenance_router)

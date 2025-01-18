@@ -1,81 +1,82 @@
-# routers/emissions.py
 from fastapi import APIRouter, HTTPException
-from utils.database import Database
-from typing import List, Dict, Any
-from datetime import datetime
-import pandas as pd
+from fastapi.responses import StreamingResponse
+from utils.database import connect_to_db
 from models.emissions import EnhancedCarEmissionsMLModel
+import pandas as pd
 
-router = APIRouter(prefix="/emissions", tags=["emissions"])
+router = APIRouter(
+    prefix="/emissions",
+    tags=["Emissions Compliance"]
+)
 
-# Global variable to hold the trained emissions model
-emissions_model: EnhancedCarEmissionsMLModel = None
+emissions_model = None  # To store the trained model
 
 @router.get("/data")
-def fetch_emissions_data() -> List[Dict[str, Any]]:
+def fetch_emissions_data():
+    """
+    Fetch emissions data from the database.
+    """
     try:
-        with Database.get_db() as conn:
-            with conn.cursor() as cur:
-                # Execute the query
-                cur.execute("SELECT * FROM obd_log ORDER BY timestamp_obd DESC LIMIT 100")
-                
-                # Get column names from cursor description
-                columns = [desc[0] for desc in cur.description]
-                
-                # Fetch all rows and convert to list of dictionaries
-                results = []
-                for row in cur.fetchall():
-                    # Convert each row to a dictionary
-                    row_dict = dict(zip(columns, row))
-                    
-                    # Convert datetime objects to string format if they exist
-                    for key, value in row_dict.items():
-                        if isinstance(value, datetime):
-                            row_dict[key] = value.isoformat()
-                            
-                    results.append(row_dict)
-                
-                return results
-                
+        conn = connect_to_db()
+        query = "SELECT * FROM obdtest;"
+        df = pd.read_sql(query, conn)
+        conn.close()
+
+        print("Raw Data:")
+        print(df.head())  # Log data to console
+        return {"columns": df.columns.tolist(), "rows": df.to_dict(orient="records")}
     except Exception as e:
-        print(f"Database error: {str(e)}")  # For debugging purposes
-        raise HTTPException(
-            status_code=500,
-            detail="Error fetching emissions data from database"
-        )
+        raise HTTPException(status_code=500, detail=f"Error fetching emissions data: {e}")
+
+@router.get("/preprocess")
+def preprocess_emissions_data():
+    """
+    Preprocess emissions data and log the results.
+    """
+    global emissions_model
+    try:
+        conn = connect_to_db()
+        query = "SELECT * FROM obdtest;"
+        df = pd.read_sql(query, conn)
+        conn.close()
+
+        emissions_model = EnhancedCarEmissionsMLModel(df)
+        emissions_model.advanced_preprocessing()
+
+        print("Preprocessed Data:")
+        print(emissions_model.X[:5])  # Log features
+        print("Compliance Labels:", emissions_model.y[:5])  # Log labels
+        return {"message": "Data preprocessing successful."}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error preprocessing emissions data: {e}")
 
 @router.post("/train")
 def train_emissions_model():
+    """
+    Train the emissions model.
+    """
     global emissions_model
-    try:
-        raw_data = fetch_emissions_data()  # Fetch raw data from the database
-        
-        if not raw_data:
-            raise HTTPException(status_code=404, detail="No data found in the database.")
-
-        # Convert raw data to a DataFrame for training
-        raw_data_df = pd.DataFrame(raw_data)
-
-        # Initialize and train the emissions model
-        emissions_model = EnhancedCarEmissionsMLModel(raw_data_df)
-        emissions_model.advanced_preprocessing()
-        emissions_model.train_optimized_model()
-
-        return {"message": "Emissions model trained successfully."}
-    
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Training failed: {str(e)}")
-
-@router.post("/predict")
-def predict_emissions(data: List[Dict[str, Any]]):
-    global emissions_model
-    
     if emissions_model is None:
-        raise HTTPException(status_code=400, detail="Model is not trained yet. Train the model first.")
+        raise HTTPException(status_code=400, detail="Preprocessing must be completed before training.")
 
     try:
-        predictions = emissions_model.predict(data)
-        return {"predictions": predictions.tolist()}
-    
+        emissions_model.train_optimized_model()
+        print("Model Training Complete")
+        return {"message": "Model training successful."}
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Prediction failed: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Error training emissions model: {e}")
+
+@router.get("/results")
+def get_model_results():
+    """
+    Get test results and serve the confusion matrix as an image.
+    """
+    global emissions_model
+    if emissions_model is None:
+        raise HTTPException(status_code=400, detail="No trained model available.")
+    try:
+        # Generate the visualization
+        img = emissions_model.generate_visualization()
+        return StreamingResponse(img, media_type="image/png")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error fetching model results: {e}")
