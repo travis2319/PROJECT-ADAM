@@ -3,23 +3,23 @@
 *.sqlite3
 .DS_Store
 
-# Python
-**/__pycache__/
-**/*.py[cod]
-**/*.pyo
-**/*.pyd
-**/*.egg
-**/*.egg-info/
-**/dist/
-**/build/
-**/.ipynb_checkpoints/
-**/.venv/
-**/.env
-**/adam/
-**/.mypy_cache/
-**/.pytest_cache/
-# Python virtual environment in PYTHON/ADAM
-PYTHON/ADAM/adam/
+# Python  
+**/__pycache__/  
+**/*.py[cod]  
+**/*.pyo  
+**/*.pyd  
+**/*.egg  
+**/*.egg-info/  
+**/dist/  
+**/build/  
+**/.ipynb_checkpoints/  
+# **/.venv/        # Comment this line out  
+**/.env  
+**/adam/  
+**/.mypy_cache/  
+**/.pytest_cache/  
+# Python virtual environment in PYTHON/ADAM  
+PYTHON/ADAM/adam/  
 PYTHON/OBD/test/
 
 # Go
