@@ -1,20 +1,4 @@
-├── main.py                  # Entry point of the application.
-├── routers/
-│   ├── chatbot.py
-│   ├── emissions.py
-│   ├── engine_health.py
-│   └── predictive_maintenance.py
-├── utils/
-│   ├── database.py          # Database connection utility.
-│   ├── dtc_summary.py
-│   ├── nlp_handler.py
-│   ├── preprocessing.py
-├── models/
-│   ├── emissions.py
-│   ├── engine_health.py
-│   └── predictive_maintenance.py
-├── logging.py               # Logging utility.
-├── authentication.py        # Authentication module (commented out).
+
 
 #####################################################################################################################################
 
