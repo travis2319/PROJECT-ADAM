@@ -1,82 +1,156 @@
-# Vehicle Diagnostic System
+# ADAM - Vehicle Diagnostic System
 
 ## Overview
-The Vehicle Diagnostic System is a comprehensive solution for real-time vehicle data collection, analysis, and monitoring. The system creates a seamless data pipeline from vehicle ECU data collection through OBD-II ports to final user visualization in a mobile application.
+A comprehensive vehicle diagnostic system that integrates OBD-II data collection, GPS tracking, and real-time analysis through multiple components including Go, Python, FastAPI, and React Native.
 
-## System Architecture
+## Project Structure
 ```
-Vehicle ECU → OBD-II Port → Go Server → FastAPI Server → Mobile App
+.
+├── ADAM/           # Core Go implementation
+├── ARDUINO/        # GPS NodeMCU implementations
+├── DATASET/        # Training and test datasets
+├── DOCUMENTATION/  # Performance test data
+├── FASTAPI/       # Backend API server
+├── GOLANG/        # Additional Go servers
+├── PYTHON/        # Python implementations
+├── REACT-NATIVE/  # Mobile application
+└── RUST/          # Rust implementations
 ```
-
-### Data Flow
-1. **Vehicle Data Collection**: Raw data is collected from vehicle's ECU via OBD-II port
-2. **Go Server Processing**: Initial data processing and buffering
-3. **FastAPI Backend**: Advanced analytics and API endpoints
-4. **Mobile Application**: User interface and real-time monitoring
-
-## Features
-- **Real-time Data Collection**: Continuous monitoring of vehicle parameters through OBD-II
-- **Advanced Analytics**:
-  - Engine Health Monitoring
-  - Emissions Analysis
-  - Predictive Maintenance
-- **AI-Powered Chatbot**: Interactive diagnostic assistance
-- **Mobile App Integration**: Real-time data visualization and alerts
-
-## Technical Stack
-- **OBD Communication**: ELM327 Protocol
-- **Intermediate Server**: Go
-- **Backend**: FastAPI (Python)
-- **Database**: [Specify your database]
-- **Mobile App**: [Specify your mobile platform]
 
 ## Setup Instructions
-1. **Hardware Requirements**:
-   - OBD-II Scanner compatible with ELM327
-   - Vehicle with OBD-II port (typically 1996 or newer)
 
-2. **Software Setup**:
-   ```bash
-   # Clone the repository
-   git clone [repository-url]
+### 1. Go Implementation (ADAM)
+```bash
+cd ADAM
+# Install dependencies
+go mod download
+# Run the main server
+go run main.go
+```
 
-   # Install dependencies
-   pip install -r requirements.txt
+### 2. FastAPI Backend
+```bash
+cd FASTAPI
+# Create virtual environment
+python -m venv venv
+source venv/bin/activate  # Unix
+# or
+.\venv\Scripts\activate  # Windows
 
-   # Start the FastAPI server
-   uvicorn main:app --reload
-   ```
+# Install requirements
+pip install -r requirements.txt
 
-3. **Go Server Setup**:
-   ```bash
-   # Navigate to Go server directory
-   cd go-server
+# Start the FastAPI server
+python main.py
+```
 
-   # Run the server
-   go run main.go
-   ```
+### 3. Python Modules
+```bash
+cd PYTHON/ADAM
+# Create virtual environment
+python -m venv venv
+source venv/bin/activate  # Unix
+# or
+.\venv\Scripts\activate  # Windows
+
+# Install necessary packages
+pip install pandas numpy scikit-learn
+
+# For GPS module
+cd ../GPS
+python -m venv venv
+source venv/bin/activate
+# Install GPS-specific requirements
+```
+
+### 4. React Native Mobile App
+```bash
+cd REACT-NATIVE/app
+# Install dependencies
+npm install
+
+# Start the development server
+npm start
+
+# Run on Android
+npm run android
+
+# Run on iOS
+npm run ios
+```
+
+### 5. Arduino Setup (Optional - for GPS)
+1. Open Arduino IDE
+2. Load `ARDUINO/gps-nodemcu.ino` or `gps_print_115200.ino`
+3. Select appropriate board and port
+4. Upload to device
+
+### 6. Rust Components (Optional)
+```bash
+cd RUST/obd-rust
+# Build the project
+cargo build
+
+# Run tests
+cargo test
+
+# Run the application
+cargo run
+```
+
+## Development
+
+### Prerequisites
+- Go 1.19+
+- Python 3.8+
+- Node.js 14+
+- Rust (latest stable)
+- Arduino IDE (for GPS module)
+- React Native CLI
+
+### Dataset Usage
+Training data is available in the DATASET directory:
+- `kai1.csv`
+- `obd_data.csv`
+- `real_car.csv`
+- `real_car_2.csv`
+
+Performance test data is in the DOCUMENTATION directory, categorized by speed ranges.
 
 ## API Documentation
-Access the API documentation at `http://localhost:8000/docs` after starting the server.
+FastAPI automatically generates documentation at:
+```
+http://localhost:8000/docs
+```
 
-## Core Functionality
-- **Engine Diagnostics**: Real-time monitoring of engine parameters
-- **Emissions Monitoring**: Track and analyze vehicle emissions
-- **Predictive Maintenance**: AI-driven maintenance predictions
-- **Interactive Chatbot**: Natural language interface for vehicle diagnostics
-- **Data Processing**: Advanced preprocessing and analysis of vehicle data
+## Testing
+```bash
+# Go tests
+cd ADAM
+go test ./...
 
-## Security
-- Basic authentication required for API access
-- Secure data transmission protocols
-- [Additional security features]
+# Python tests
+cd PYTHON/ADAM
+python -m pytest
+
+# React Native tests
+cd REACT-NATIVE/app
+npm test
+```
 
 ## Contributing
 1. Fork the repository
-2. Create a feature branch
-3. Commit changes
-4. Push to the branch
-5. Create a Pull Request
+2. Create a feature branch (`git checkout -b feature/YourFeature`)
+3. Commit changes (`git commit -m 'Add YourFeature'`)
+4. Push to branch (`git push origin feature/YourFeature`)
+5. Open a Pull Request
+
+## Research References
+Research papers are available in the RESEARCH PAPER directory, covering:
+- Vehicle Black Box implementations
+- OBD-II fleet management
+- Traffic accident prediction
+- Driving behavior analysis
 
 ## License
 [Specify your license]
@@ -84,10 +158,5 @@ Access the API documentation at `http://localhost:8000/docs` after starting the 
 ## Contact
 [Your contact information]
 
-## Acknowledgments
-- List any third-party libraries
-- Credits to contributors
-- Special thanks
-
 ---
-**Note**: This project is under active development. For the latest updates, please check the repository regularly.
+**Note**: This project is under active development. Check for updates regularly.
