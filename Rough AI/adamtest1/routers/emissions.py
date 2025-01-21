@@ -18,7 +18,7 @@ def fetch_emissions_data():
     """
     try:
         conn = connect_to_db()
-        query = "SELECT * FROM obdtest;"
+        query = "SELECT * FROM obd_log;"
         df = pd.read_sql(query, conn)
         conn.close()
 
@@ -36,7 +36,7 @@ def preprocess_emissions_data():
     global emissions_model
     try:
         conn = connect_to_db()
-        query = "SELECT * FROM obdtest;"
+        query = "SELECT * FROM obd_log;"
         df = pd.read_sql(query, conn)
         conn.close()
 

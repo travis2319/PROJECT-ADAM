@@ -14,7 +14,8 @@
 **/build/  
 **/.ipynb_checkpoints/  
 # **/.venv/        # Comment this line out  
-**/.env  
+**/.env
+**/venv/  
 **/adam/  
 **/.mypy_cache/  
 **/.pytest_cache/  

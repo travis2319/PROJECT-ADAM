@@ -83,7 +83,7 @@ def main(obd_connector, gps_connector, baud_rate, sleep_interval):
         print("Program terminated.")
 
 if __name__ == "__main__":
-    obd_connector = "/dev/ttyACM0"  # Replace with your actual OBD-II port
+    obd_connector = "/dev/pts/4"  # Replace with your actual OBD-II port
     gps_connector = '/dev/ttyUSB0'  # Replace with your actual GPS port
     baud_rate = 115200
     main(obd_connector, gps_connector, baud_rate, sleep_interval=1)
