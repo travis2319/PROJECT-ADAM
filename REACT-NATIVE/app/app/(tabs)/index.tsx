@@ -2,24 +2,26 @@ import React from 'react';
 import { Image, Text, View, StatusBar, ScrollView, TouchableOpacity } from 'react-native';
 import { Ionicons,MaterialCommunityIcons,FontAwesome } from '@expo/vector-icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useAuth } from '@/providers/AuthProvider';
 
-export default function HomeScreen() {
+export default function Home() {
+  const {user} = useAuth();
   return (
     <>
       <StatusBar
         backgroundColor="#f4f1de"
-        barStyle="dark-content"
+        barStyle="dark-content"  // This makes status bar elements black
       />
       <SafeAreaView className="flex-1">
         <ScrollView className="bg-[#f4f1de] px-5 flex-1">
           {/* Header Section */}
           <View className="flex flex-row items-center mt-5 mb-5">
             <Image
-              source={require('../../assets/images/profile.jpeg')} // Replace with avatar image URL
+              source={require('../../assets/images/profile.jpeg')}
               className="w-10 h-10 rounded-full mr-2"
             />
             <View>
-              <Text className="text-lg font-bold text-black">Hello, Travis</Text>
+              <Text className="text-lg font-bold text-black">Hello, {user?.name}</Text>
               <Text className="text-sm text-gray-600">Today 12 Jan.</Text>
             </View>
             <TouchableOpacity className="ml-auto w-5 h-5">
@@ -94,31 +96,9 @@ export default function HomeScreen() {
               </View>
             </View>
 
-          {/* Add more sections here if needed */}
         </ScrollView>
       </SafeAreaView>
+    
     </>
   );
 }
-
-
-
-// import React from 'react';
-// import { Image, StyleSheet, Platform,Text, View ,StatusBar} from 'react-native';
-// import { SafeAreaView } from 'react-native-safe-area-context';
-
-// export default function HomeScreen() {
-//   return (
-//     <>
-//     <StatusBar
-//         backgroundColor="#f4f1de"
-//         barStyle="dark-content"  // This makes status bar elements black
-//       />
-//     <SafeAreaView>
-//       <View className='flex justify-center items-center h-screen bg-[#f4f1de]'>
-//         <Text className='text-4xl font-bold text-black'>Home</Text>
-//       </View>
-//     </SafeAreaView>
-//     </>
-//   );
-// }

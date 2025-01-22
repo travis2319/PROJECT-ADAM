@@ -9,7 +9,7 @@ export default function TabBar({ state, descriptors, navigation }: BottomTabBarP
   
   const icon: { [key: string]: (props: any) => JSX.Element } = {
     index: (props: any) => <Feather name='home' size={24} color={props.color} />,
-    explore: (props: any) => <FontAwesome5 name='robot' size={24} color={props.color} />,
+    analysis: (props: any) => <FontAwesome5 name='robot' size={24} color={props.color} />,
     chat: (props: any) => <Feather name='message-square' size={24} color={props.color} />,
     profile: (props: any) => <Feather name='user' size={24} color={props.color} />,
   }

@@ -1,7 +1,7 @@
 import { StyleSheet, View, Text, Image, Platform } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-export default function Ai() {
+export default function Analysis() {
   const statusCards = [
     {
       title: 'Engine Health',
@@ -23,7 +23,7 @@ export default function Ai() {
   return (
     <SafeAreaView>
       <View className="flex justify-center items-center min-h-screen bg-[#f4f1de] px-4">
-        <Text className="text-4xl font-bold text-black mb-8">AI</Text>
+        <Text className="text-4xl font-bold text-black mb-8">Analysis</Text>
         
         <View className="w-full max-w-md gap-4">
           {statusCards.map((card, index) => (

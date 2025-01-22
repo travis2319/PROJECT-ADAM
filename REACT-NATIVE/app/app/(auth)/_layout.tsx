@@ -7,8 +7,7 @@ export default function () {
     <Stack>
       <Stack.Screen name="index" options={{ headerShown: false, animation: 'fade' }} />
       <Stack.Screen name="signup" options={{
-        headerShown: false, presentation: "modal",
-        animation: 'fade'
+        headerShown: false, presentation: "modal"
       }} />
     </Stack>
   );
