@@ -16,7 +16,7 @@
 # **/.venv/        # Comment this line out  
 **/.env
 **/venv/  
-**/adam/  
+# **/adam/  
 **/.mypy_cache/  
 **/.pytest_cache/  
 # Python virtual environment in PYTHON/ADAM  
