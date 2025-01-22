@@ -1,0 +1,1694 @@
+
+
+#####################################################################################################################################
+
+├── main.py
+
+import time
+from fastapi import FastAPI
+from routers.emissions import router as emissions_router
+from routers.engine_health import router as engine_health_router
+from routers.predictive_maintenance import router as predictive_maintenance_router
+from routers.chatbot import router as chatbot_router
+
+app = FastAPI(
+    title="Car Diagnostics API",
+    description="API for emissions compliance and engine health analysis.",
+    version="2.0.0"
+)
+
+@app.on_event("startup")
+async def startup_event():
+    retries = 5
+    while retries > 0:
+        try:
+            from utils.database import connect_to_db
+            conn = connect_to_db()
+            conn.close()
+            print("Database connection established.")
+            break
+        except Exception as e:
+            print(f"Database connection failed. Retrying... {e}")
+            retries -= 1
+            time.sleep(5)
+    if retries == 0:
+        raise Exception("Failed to connect to the database.")
+
+@app.get("/")
+def root():
+    return {"message": "Welcome to the Car Diagnostics API"}
+
+app.include_router(emissions_router)
+app.include_router(engine_health_router)
+app.include_router(predictive_maintenance_router)
+app.include_router(chatbot_router)
+
+#########################################################################################################################################
+├── routers/
+│   ├── chatbot.py
+│   ├── emissions.py
+│   ├── engine_health.py
+│   └── predictive_maintenance.py
+
+routers/
+│   ├── chatbot.py
+
+from fastapi import APIRouter, HTTPException, Request
+from fastapi.responses import JSONResponse
+from utils.database import connect_to_db
+from utils.dtc_summary import DTCAnalyzer, summarize_dtc_columns, DTCAnalyzerConfig
+from utils.nlp_handler import safe_analyze_with_retries, APIConfig
+from models.predictive_maintenance import VehicleMaintenance
+import pandas as pd
+import numpy as np
+import json
+import logging
+from datetime import datetime
+from typing import Dict, Any, Union, List
+
+# Configure logging with user context
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s - User: %(user)s - %(levelname)s - %(message)s",
+    datefmt="%Y-%m-%d %H:%M:%S"
+)
+
+logger = logging.getLogger(__name__)
+logger = logging.LoggerAdapter(logger, {'user': 'VOID-001'})
+
+router = APIRouter(
+    prefix="/chatbot",
+    tags=["Chatbot"]
+)
+
+
+def safe_convert_to_python_type(obj: Any) -> Any:
+    """Safely convert numpy types to Python native types."""
+    if isinstance(obj, dict):
+        return {key: safe_convert_to_python_type(value) for key, value in obj.items()}
+    elif isinstance(obj, list):
+        return [safe_convert_to_python_type(item) for item in obj]
+    elif isinstance(obj, (np.int8, np.int16, np.int32, np.int64,
+                          np.uint8, np.uint16, np.uint32, np.uint64)):
+        return int(obj)
+    elif isinstance(obj, (np.float16, np.float32, np.float64)):
+        return float(obj)
+    elif isinstance(obj, np.ndarray):
+        return obj.tolist()
+    elif isinstance(obj, (np.bool_)):
+        return bool(obj)
+    return obj
+
+
+class CustomJSONEncoder(json.JSONEncoder):
+    """Custom JSON encoder for numpy types."""
+
+    def default(self, obj):
+        try:
+            return safe_convert_to_python_type(obj)
+        except:
+            return super().default(obj)
+
+
+def fetch_predictive_maintenance_summary():
+    """Fetch predictive maintenance reports and calculate summaries."""
+    try:
+        conn = connect_to_db()
+        query = "SELECT * FROM obdtest;"
+        df = pd.read_sql(query, conn)
+        conn.close()
+
+        if df.empty:
+            raise ValueError("No data found in the database.")
+
+        # Convert timestamp to numeric first and handle errors
+        df['timestamp_obd'] = pd.to_numeric(df['timestamp_obd'], errors='coerce')
+
+        reports = []
+        for _, row in df.iterrows():
+            try:
+                # Clean and convert the data
+                vehicle_data = {}
+
+                # Handle numeric conversions with error checking
+                numeric_fields = {
+                    'distance_w_mil': 0,
+                    'speed': 0,
+                    'engine_load': 50,
+                    'coolant_temp': 90,
+                    'run_time': 0,
+                    'throttle_pos': 0,
+                    'control_module_voltage': 12.5,
+                    'fuel_level': 50,
+                    'short_fuel_trim_1': 0,
+                    'long_fuel_trim_1': 0,
+                    'ambiant_air_temp': 25,
+                    'catalyst_temp_b1s1': 350,
+                    'o2_sensors': 0.5
+                }
+
+                for field, default in numeric_fields.items():
+                    try:
+                        value = row.get(field)
+                        if isinstance(value, str) and value.strip():
+                            vehicle_data[field] = float(value)
+                        else:
+                            vehicle_data[field] = float(default)
+                    except (ValueError, TypeError):
+                        vehicle_data[field] = float(default)
+
+                # Special handling for timestamp conversion
+                try:
+                    timestamp = float(row.get("timestamp_obd", 31536000))
+                    vehicle_data['time_in_years'] = timestamp / (365 * 24 * 60 * 60)
+                except (ValueError, TypeError):
+                    vehicle_data['time_in_years'] = 1.0
+
+                vehicle = VehicleMaintenance(**vehicle_data)
+                report = vehicle.generate_report()
+                if report:
+                    reports.append(report)
+
+            except Exception as e:
+                logger.error(f"Error processing row data: {e}\nRow data: {row.to_dict()}")
+                continue
+
+        if not reports:
+            default_report = {
+                'Distance Traveled': 0.0,
+                'Time in Years': 0.0,
+                'Speed': 0.0,
+                'Engine Load': 50.0,
+                'Coolant Temperature': 90.0,
+                'Engine Runtime': 0.0,
+                'Fuel Level': 50.0,
+                'Battery Status': 'Unknown',
+                'Spark Plug Status': 'Unknown',
+                'Coolant Status': 'Unknown',
+                'Oil Change Needed': 'Unknown',
+                'Brake Pad Wear': 0.0,
+                'Air Filter Status': 'Unknown',
+                'Exhaust System Status': 'Unknown',
+                'Suspension Status': 'Unknown',
+                'Wheel Alignment Status': 'Unknown',
+                'Fuel Economy': 'Unknown',
+                'Evaporative Emission System Status': 'Unknown'
+            }
+            return pd.DataFrame([default_report]), df
+
+        return pd.DataFrame(reports), df
+
+    except Exception as e:
+        logger.error(f"Error fetching predictive maintenance summary: {e}")
+        raise
+
+
+@router.get("/ask")
+async def ask_mechanic(
+        query: str,
+        user_id: str = "VOID-001",
+        current_time: str = "2025-01-18 11:43:30"
+):
+    """Enhanced chatbot endpoint that incorporates maintenance report DataFrame and DTC analysis."""
+    try:
+        maintenance_df, raw_df = fetch_predictive_maintenance_summary()
+
+        numerical_summary = maintenance_df.select_dtypes(include=['int64', 'float64']).agg(['mean', 'min', 'max'])
+        numerical_summary_dict = safe_convert_to_python_type(numerical_summary.to_dict())
+
+        status_counts = {
+            col: safe_convert_to_python_type(maintenance_df[col].value_counts().to_dict())
+            for col in maintenance_df.select_dtypes(include=['object']).columns
+        }
+
+        dtc_analysis = safe_convert_to_python_type(summarize_dtc_columns(raw_df, user_id))
+
+        context = f"""
+        Vehicle Maintenance Analysis Summary:
+        Timestamp: {current_time}
+        User ID: {user_id}
+
+        1. Key Metrics (averages):
+        - Distance Traveled: {numerical_summary_dict.get('Distance Traveled', {}).get('mean', 'N/A')} miles
+        - Engine Load: {numerical_summary_dict.get('Engine Load', {}).get('mean', 'N/A')}%
+        - Coolant Temperature: {numerical_summary_dict.get('Coolant Temperature', {}).get('mean', 'N/A')}°C
+        - Fuel Level: {numerical_summary_dict.get('Fuel Level', {}).get('mean', 'N/A')}%
+
+        2. DTC Information:
+        - Health Score: {dtc_analysis.get('overall_health_score', 'N/A')}/100
+        - Number of DTCs: {len(dtc_analysis.get('categorical_analysis', {}))}
+        - System Status: {json.dumps(dtc_analysis.get('metadata', {}), indent=2)}
+
+        3. Maintenance Status:
+        {json.dumps(status_counts, indent=2)}
+
+        4. Additional Vehicle Metrics:
+        - Maximum Engine Load: {numerical_summary_dict.get('Engine Load', {}).get('max', 'N/A')}%
+        - Minimum Fuel Level: {numerical_summary_dict.get('Fuel Level', {}).get('min', 'N/A')}%
+        - Maximum Speed: {numerical_summary_dict.get('Speed', {}).get('max', 'N/A')} km/h
+
+        User Query: {query}
+        """
+
+        logger.info(f"Sending context to GPT for user {user_id}")
+
+        gpt_response = safe_analyze_with_retries(context, user_id)
+
+        if not gpt_response["success"]:
+            logger.error(f"GPT analysis failed for user {user_id}")
+            gpt_response["analysis"] = (
+                "I apologize, but I'm having trouble analyzing the data right now. Here's a basic summary:\n\n"
+                f"- Vehicle Health Score: {dtc_analysis.get('overall_health_score', 'N/A')}/100\n"
+                "Please check the maintenance metrics directly or try again later for a more detailed analysis."
+            )
+
+        response_data = {
+            "timestamp": current_time,
+            "user_id": user_id,
+            "query": query,
+            "response": gpt_response["analysis"],
+            "maintenance_summary": {
+                "numerical_metrics": numerical_summary_dict,
+                "status_distribution": status_counts,
+                "dtc_analysis": dtc_analysis
+            },
+            "gpt_metadata": {
+                "success": gpt_response["success"],
+                "attempt": gpt_response["attempt"]
+            }
+        }
+
+        response_json = json.dumps(response_data, cls=CustomJSONEncoder)
+
+        return JSONResponse(
+            content=json.loads(response_json),
+            status_code=200
+        )
+
+    except Exception as e:
+        error_message = f"Unexpected error: {str(e)}"
+        logger.error(f"Error in chatbot endpoint for user {user_id}: {error_message}")
+        response_data = {
+            "timestamp": current_time,
+            "user_id": user_id,
+            "success": False,
+            "error": error_message,
+            "query": query
+        }
+        return JSONResponse(
+            content=json.loads(json.dumps(response_data)),
+            status_code=500
+        )
+
+├── routers/
+│   ├── emissions.py
+
+from fastapi import APIRouter, HTTPException
+from fastapi.responses import StreamingResponse
+from utils.database import connect_to_db
+from models.emissions import EnhancedCarEmissionsMLModel
+import pandas as pd
+
+router = APIRouter(
+    prefix="/emissions",
+    tags=["Emissions Compliance"]
+)
+
+emissions_model = None  # To store the trained model
+
+@router.get("/data")
+def fetch_emissions_data():
+    """
+    Fetch emissions data from the database.
+    """
+    try:
+        conn = connect_to_db()
+        query = "SELECT * FROM obdtest;"
+        df = pd.read_sql(query, conn)
+        conn.close()
+
+        print("Raw Data:")
+        print(df.head())  # Log data to console
+        return {"columns": df.columns.tolist(), "rows": df.to_dict(orient="records")}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error fetching emissions data: {e}")
+
+@router.get("/preprocess")
+def preprocess_emissions_data():
+    """
+    Preprocess emissions data and log the results.
+    """
+    global emissions_model
+    try:
+        conn = connect_to_db()
+        query = "SELECT * FROM obdtest;"
+        df = pd.read_sql(query, conn)
+        conn.close()
+
+        emissions_model = EnhancedCarEmissionsMLModel(df)
+        emissions_model.advanced_preprocessing()
+
+        print("Preprocessed Data:")
+        print(emissions_model.X[:5])  # Log features
+        print("Compliance Labels:", emissions_model.y[:5])  # Log labels
+        return {"message": "Data preprocessing successful."}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error preprocessing emissions data: {e}")
+
+@router.post("/train")
+def train_emissions_model():
+    """
+    Train the emissions model.
+    """
+    global emissions_model
+    if emissions_model is None:
+        raise HTTPException(status_code=400, detail="Preprocessing must be completed before training.")
+
+    try:
+        emissions_model.train_optimized_model()
+        print("Model Training Complete")
+        return {"message": "Model training successful."}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error training emissions model: {e}")
+
+@router.get("/results")
+def get_model_results():
+    """
+    Get test results and serve the confusion matrix as an image.
+    """
+    global emissions_model
+    if emissions_model is None:
+        raise HTTPException(status_code=400, detail="No trained model available.")
+    try:
+        # Generate the visualization
+        img = emissions_model.generate_visualization()
+        return StreamingResponse(img, media_type="image/png")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error fetching model results: {e}")
+
+├── routers/
+│   ├── engine_health.py
+
+from fastapi import APIRouter, HTTPException
+from fastapi.responses import StreamingResponse
+from utils.database import connect_to_db
+from models.engine_health import EngineHealthPredictor
+import pandas as pd
+import logging
+
+# Configure logging
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
+
+router = APIRouter(
+    prefix="/engine-health",
+    tags=["Engine Health"]
+)
+
+engine_health_model = None  # Global variable to hold the model instance
+
+
+@router.get("/data")
+def fetch_engine_health_data():
+    """
+    Fetch engine health data from the database.
+    """
+    try:
+        logging.info("Fetching engine health data from the database.")
+        conn = connect_to_db()
+        query = "SELECT * FROM obdtest;"
+        df = pd.read_sql(query, conn)
+        conn.close()
+        logging.info("Fetched data successfully. Sample rows:\n%s", df.head().to_string())
+        return {"columns": df.columns.tolist(), "rows": df.to_dict(orient="records")}
+    except Exception as e:
+        logging.error("Error fetching engine health data: %s", e)
+        raise HTTPException(status_code=500, detail=f"Error fetching engine health data: {e}")
+
+
+@router.get("/preprocess")
+def preprocess_engine_health_data():
+    """
+    Preprocess engine health data and log the results.
+    """
+    global engine_health_model
+    try:
+        logging.info("Starting preprocessing of engine health data.")
+        conn = connect_to_db()
+        query = "SELECT * FROM obdtest;"
+        df = pd.read_sql(query, conn)
+        conn.close()
+
+        engine_health_model = EngineHealthPredictor()
+        processed_data = engine_health_model.preprocess_data(df)
+
+        logging.info("Data preprocessing successful. Processed data sample:\n%s", processed_data.head().to_string())
+        return {"message": "Data preprocessing successful."}
+    except ValueError as ve:
+        logging.error("Preprocessing error: %s", ve)
+        raise HTTPException(status_code=400, detail=str(ve))
+    except Exception as e:
+        logging.error("Unexpected error during preprocessing: %s", e)
+        raise HTTPException(status_code=500, detail=f"Error preprocessing engine health data: {e}")
+
+
+@router.post("/train")
+def train_engine_health_model():
+    """
+    Train the engine health model.
+    """
+    global engine_health_model
+    if engine_health_model is None:
+        raise HTTPException(status_code=400, detail="Preprocessing must be completed before training.")
+
+    try:
+        logging.info("Starting training of engine health model.")
+        X_train, X_test, y_train, y_test = engine_health_model.prepare_data(engine_health_model.df)
+        engine_health_model.train_model(X_train, y_train)
+        cm = engine_health_model.evaluate_model(X_test, y_test)
+
+        logging.info("Model training successful.")
+        return {"message": "Model training successful.", "confusion_matrix": cm.tolist()}
+    except ValueError as ve:
+        logging.error("Training error: %s", ve)
+        raise HTTPException(status_code=400, detail=str(ve))
+    except Exception as e:
+        logging.error("Unexpected error during training: %s", e)
+        raise HTTPException(status_code=500, detail=f"Error training engine health model: {e}")
+
+
+@router.get("/visualize")
+def visualize_engine_health_results():
+    """
+    Visualize engine health model results.
+    """
+    global engine_health_model
+    if engine_health_model is None or engine_health_model.X_test is None:
+        raise HTTPException(
+            status_code=400,
+            detail="No trained model or test data available. Please ensure training is completed successfully."
+        )
+
+    try:
+        logging.info("Generating visualizations for engine health model.")
+        cm = engine_health_model.evaluate_model(engine_health_model.X_test, engine_health_model.y_test)
+        img_cm = engine_health_model.visualize_confusion_matrix(cm)
+        return StreamingResponse(img_cm, media_type="image/png")
+    except Exception as e:
+        logging.error("Error generating visualizations: %s", e)
+        raise HTTPException(status_code=500, detail=f"Error generating visualizations: {e}")
+
+├── routers/
+│   └── predictive_maintenance.py
+
+from fastapi import APIRouter, HTTPException
+from fastapi.responses import StreamingResponse
+from utils.database import connect_to_db
+from utils.preprocessing import preprocess_data
+from models.predictive_maintenance import VehicleMaintenance
+import pandas as pd
+import matplotlib.pyplot as plt
+import logging
+import io
+
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
+
+router = APIRouter(
+    prefix="/predictive-maintenance",
+    tags=["Predictive Maintenance"]
+)
+
+# Global variables to store processed data and results
+maintenance_reports = None
+visualization_image = None
+
+
+@router.get("/data")
+def fetch_maintenance_data():
+    """
+    Fetch raw maintenance data from the database.
+    """
+    try:
+        logging.info("Connecting to the database to fetch maintenance data.")
+        conn = connect_to_db()
+        query = "SELECT * FROM obdtest;"  # Table name
+        df = pd.read_sql(query, conn)
+        conn.close()
+
+        logging.info("Successfully fetched maintenance data. Sample:\n%s", df.head().to_string())
+        return {"columns": df.columns.tolist(), "rows": df.to_dict(orient="records")}
+    except Exception as e:
+        logging.error(f"Error fetching maintenance data: {e}")
+        raise HTTPException(status_code=500, detail=f"Error fetching maintenance data: {e}")
+
+
+@router.get("/preprocess")
+def preprocess_maintenance_data():
+    """
+    Preprocess maintenance data and generate reports.
+    """
+    global maintenance_reports
+
+    try:
+        logging.info("Fetching data for preprocessing.")
+        conn = connect_to_db()
+        query = "SELECT * FROM obdtest;"  # Table name
+        df = pd.read_sql(query, conn)
+        conn.close()
+
+        if df.empty:
+            raise ValueError("No data found in the database.")
+
+        logging.info("Starting preprocessing.")
+        df = preprocess_data(df)
+
+        # Generate maintenance reports
+        reports = []
+        for _, row in df.iterrows():
+            try:
+                vehicle = VehicleMaintenance(
+                    distance_w_mil=row["distance_w_mil"],
+                    time_in_years=row["time_in_years"],
+                    speed=row["speed"],
+                    engine_load=row["engine_load"],
+                    coolant_temp=row["coolant_temp"],
+                    run_time=row["run_time"],
+                    throttle_pos=row["throttle_pos"],
+                    control_module_voltage=row["control_module_voltage"],
+                    fuel_level=row["fuel_level"],
+                    short_fuel_trim_1=row["short_fuel_trim_1"],
+                    long_fuel_trim_1=row["long_fuel_trim_1"],
+                    ambiant_air_temp=row["ambiant_air_temp"],
+                    o2_sensors=row["o2_sensors"],
+                    catalyst_temp_b1s1=row["catalyst_temp_b1s1"]
+                )
+                reports.append(vehicle.generate_report())
+            except Exception as e:
+                logging.error(f"Error processing row: {e}")
+
+        if not reports:
+            raise ValueError("No reports were generated. Check preprocessing logic.")
+
+        maintenance_reports = pd.DataFrame(reports)
+        logging.info("Preprocessing completed successfully.")
+        return {"message": "Preprocessing completed successfully.", "sample_reports": maintenance_reports.head().to_dict(orient="records")}
+    except Exception as e:
+        logging.error(f"Error during preprocessing: {e}")
+        raise HTTPException(status_code=500, detail=f"Error preprocessing maintenance data: {e}")
+
+
+def visualize_vehicle_maintenance(maintenance_df, counts):
+    """
+    Visualize vehicle maintenance metrics.
+    """
+    plt.figure(figsize=(20, 15))
+    cols = 3
+    rows = (len(counts) + cols - 1) // cols
+
+    for i, (title, data) in enumerate(counts.items(), start=1):
+        plt.subplot(rows, cols, i)
+        plt.bar(data.keys(), data.values(), color="skyblue")
+        plt.title(title)
+        plt.xticks(rotation=45)
+        plt.tight_layout()
+
+    img = io.BytesIO()
+    plt.savefig(img, format="png", dpi=100, bbox_inches="tight")
+    img.seek(0)
+    plt.close()
+    return img
+
+
+from collections import defaultdict
+
+@router.get("/reports")
+def get_maintenance_reports():
+    """
+    Retrieve the generated maintenance reports with averages and counts.
+    """
+    global maintenance_reports
+
+    if maintenance_reports is None or maintenance_reports.empty:
+        raise HTTPException(status_code=400, detail="No reports available. Run preprocessing first.")
+
+    try:
+        # Initialize sums and counts
+        sums = {
+            "Distance Traveled": 0,
+            "Time in Years": 0,
+            "Speed": 0,
+            "Engine Load": 0,
+            "Coolant Temperature": 0,
+            "Engine Runtime": 0,
+            "Fuel Level": 0,
+            "Brake Pad Wear": 0,
+            "Count": len(maintenance_reports)  # Total counts for averaging
+        }
+
+        # Initialize status tracking
+        status_counts = {
+            "Spark Plug Status": defaultdict(int),
+            "Coolant Status": defaultdict(int),
+            "Oil Change Needed": defaultdict(int),
+            "Battery Status": defaultdict(int),
+            "Fuel System Status": defaultdict(int),
+            "Air Filter Status": defaultdict(int),
+            "Exhaust System Status": defaultdict(int),
+            "Suspension Status": defaultdict(int),
+            "Wheel Alignment Status": defaultdict(int),
+            "Fuel Economy": defaultdict(int),
+            "Evaporative Emission System Status": defaultdict(int),
+        }
+
+        # Calculate sums and counts
+        for index, row in maintenance_reports.iterrows():
+            report_dict = row.to_dict()
+            for key in sums.keys():
+                if key in report_dict and isinstance(report_dict[key], (int, float)):
+                    sums[key] += report_dict[key]
+
+            # Count statuses
+            for key in status_counts.keys():
+                if key in report_dict:
+                    status_counts[key][report_dict[key]] += 1
+
+        # Calculate averages
+        averages = {key: (value / sums["Count"]) if key != "Count" else value for key, value in sums.items()}
+
+        # Prepare final summary with status counts
+        final_summary = {**averages}
+
+        # Add status counts to final summary
+        for key, counts in status_counts.items():
+            final_summary[key] = dict(counts)
+
+        logging.info("Returning a summarized maintenance report.")
+        return final_summary
+    except Exception as e:
+        logging.error(f"Error retrieving reports: {e}")
+        raise HTTPException(status_code=500, detail=f"Error retrieving reports: {e}")
+
+################################################################################################33######################################
+├── utils/
+│   ├── database.py          # Database connection utility.
+│   ├── dtc_summary.py
+│   ├── nlp_handler.py
+│   ├── preprocessing.py
+
+├── utils/
+│   ├── database.py
+
+import os
+from sqlalchemy import create_engine
+from sqlalchemy.exc import SQLAlchemyError
+
+POSTGRES_HOST = os.getenv("POSTGRES_HOST", "localhost")
+POSTGRES_PORT = os.getenv("POSTGRES_PORT", "5432")
+POSTGRES_USER = os.getenv("POSTGRES_USER", "postgres")
+POSTGRES_PASSWORD = os.getenv("POSTGRES_PASSWORD", "mysecretpassword")
+POSTGRES_DB = os.getenv("POSTGRES_DB", "mydb")
+
+def connect_to_db():
+    try:
+        db_url = f"postgresql+psycopg2://{POSTGRES_USER}:{POSTGRES_PASSWORD}@{POSTGRES_HOST}:{POSTGRES_PORT}/{POSTGRES_DB}"
+        engine = create_engine(db_url)
+        conn = engine.connect()
+        print("Database connection successful.")
+        return conn
+    except SQLAlchemyError as e:
+        raise Exception(f"Database connection failed: {e}")
+
+├── utils/
+│   ├── dtc_summary.py
+
+import pandas as pd
+import numpy as np
+import logging
+from typing import Dict, List, Union, Tuple
+from collections import defaultdict
+from datetime import datetime
+
+# Configure logging with user context
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - User: %(user)s - %(levelname)s - %(message)s',
+    datefmt='%Y-%m-%d %H:%M:%S'
+)
+
+logger = logging.getLogger(__name__)
+logger = logging.LoggerAdapter(logger, {'user': 'VOID-001'})
+
+
+class DTCAnalyzerConfig:
+    """Configuration for DTC Analyzer"""
+    CURRENT_UTC_TIME = "2025-01-18 11:16:25"
+    CURRENT_USER = "VOID-001"
+    DTC_HEALTH_THRESHOLDS = {
+        'critical': 30,
+        'warning': 60,
+        'good': 100
+    }
+
+
+class DTCAnalyzer:
+    """A comprehensive analyzer for Diagnostic Trouble Codes (DTC) data."""
+
+    def __init__(self, df: pd.DataFrame, user_id: str = DTCAnalyzerConfig.CURRENT_USER):
+        """Initialize the DTC Analyzer with DataFrame and user context."""
+        self.df = df
+        self.user_id = user_id
+        self.timestamp = DTCAnalyzerConfig.CURRENT_UTC_TIME
+        self.dtc_columns = [col for col in df.columns if "dtc" in col.lower()]
+        self.numeric_dtc = {}
+        self.categorical_dtc = {}
+        self._categorize_columns()
+        logger.info(f"Initialized DTCAnalyzer for user {self.user_id} at {self.timestamp}")
+
+    def _safe_convert_to_float(self, value) -> float:
+        """Safely convert various types to float."""
+        try:
+            if isinstance(value, (np.float16, np.float32, np.float64)):
+                return float(value)
+            elif isinstance(value, str):
+                return float(value.strip())
+            elif isinstance(value, (int, float)):
+                return float(value)
+            return 0.0
+        except (ValueError, TypeError):
+            return 0.0
+
+    def _categorize_columns(self):
+        """Separate numeric and categorical DTC columns."""
+        try:
+            for col in self.dtc_columns:
+                try:
+                    if pd.api.types.is_numeric_dtype(self.df[col]):
+                        self.numeric_dtc[col] = self.df[col].apply(self._safe_convert_to_float)
+                    else:
+                        self.categorical_dtc[col] = self.df[col]
+                except Exception as e:
+                    logger.error(f"Error processing column {col}: {e}")
+                    continue
+
+            logger.info(
+                f"Categorized {len(self.numeric_dtc)} numeric and {len(self.categorical_dtc)} categorical columns")
+        except Exception as e:
+            logger.error(f"Error in column categorization for user {self.user_id}: {e}")
+
+    def analyze_numeric_dtc(self) -> Dict[str, Dict[str, Union[float, Dict]]]:
+        """Analyze numeric DTC columns with detailed statistics."""
+        try:
+            numeric_analysis = {}
+            for col, series in self.numeric_dtc.items():
+                try:
+                    clean_series = pd.to_numeric(series, errors='coerce')
+                    analysis = {
+                        'statistics': {
+                            'mean': float(clean_series.mean() or 0.0),
+                            'median': float(clean_series.median() or 0.0),
+                            'std': float(clean_series.std() or 0.0),
+                            'min': float(clean_series.min() or 0.0),
+                            'max': float(clean_series.max() or 0.0),
+                            'q1': float(clean_series.quantile(0.25) or 0.0),
+                            'q3': float(clean_series.quantile(0.75) or 0.0)
+                        },
+                        'outliers': self._detect_outliers(clean_series),
+                        'frequency': {str(k): float(v) for k, v in clean_series.value_counts().to_dict().items()},
+                        'missing_values': int(clean_series.isna().sum()),
+                        'timestamp': self.timestamp
+                    }
+                    numeric_analysis[col] = analysis
+                except Exception as e:
+                    logger.error(f"Error analyzing column {col}: {e}")
+                    continue
+            return numeric_analysis
+        except Exception as e:
+            logger.error(f"Error in numeric analysis for user {self.user_id}: {e}")
+            return {}
+
+    def _detect_outliers(self, series: pd.Series) -> Dict[str, List[float]]:
+        """Detect outliers using IQR method with enhanced error handling."""
+        try:
+            clean_series = pd.to_numeric(series, errors='coerce')
+            Q1 = clean_series.quantile(0.25)
+            Q3 = clean_series.quantile(0.75)
+            IQR = Q3 - Q1
+            lower_bound = Q1 - 1.5 * IQR
+            upper_bound = Q3 + 1.5 * IQR
+
+            outliers = {
+                'low': [float(x) for x in clean_series[clean_series < lower_bound].tolist()],
+                'high': [float(x) for x in clean_series[clean_series > upper_bound].tolist()]
+            }
+            return outliers
+        except Exception as e:
+            logger.error(f"Error detecting outliers for user {self.user_id}: {e}")
+            return {'low': [], 'high': []}
+
+    def analyze_categorical_dtc(self) -> Dict[str, Dict[str, Union[Dict, int]]]:
+        """Analyze categorical DTC columns with pattern recognition."""
+        try:
+            categorical_analysis = {}
+            for col, series in self.categorical_dtc.items():
+                try:
+                    analysis = {
+                        'value_counts': {str(k): int(v) for k, v in series.value_counts().to_dict().items()},
+                        'unique_count': int(series.nunique()),
+                        'missing_values': int(series.isna().sum()),
+                        'common_patterns': self._identify_patterns(series),
+                        'error_codes': self._extract_error_codes(series),
+                        'timestamp': self.timestamp
+                    }
+                    categorical_analysis[col] = analysis
+                except Exception as e:
+                    logger.error(f"Error analyzing categorical column {col}: {e}")
+                    continue
+            return categorical_analysis
+        except Exception as e:
+            logger.error(f"Error in categorical analysis for user {self.user_id}: {e}")
+            return {}
+
+    def _identify_patterns(self, series: pd.Series) -> Dict[str, int]:
+        """Identify common patterns in categorical DTC data."""
+        try:
+            patterns = defaultdict(int)
+            for value in series.dropna():
+                if isinstance(value, str):
+                    if value.startswith('P'):
+                        patterns['Powertrain'] += 1
+                    elif value.startswith('B'):
+                        patterns['Body'] += 1
+                    elif value.startswith('C'):
+                        patterns['Chassis'] += 1
+                    elif value.startswith('U'):
+                        patterns['Network'] += 1
+            return dict(patterns)
+        except Exception as e:
+            logger.error(f"Error identifying patterns for user {self.user_id}: {e}")
+            return {}
+
+    def _extract_error_codes(self, series: pd.Series) -> Dict[str, int]:
+        """Extract and categorize specific error codes."""
+        try:
+            error_codes = defaultdict(int)
+            for value in series.dropna():
+                if isinstance(value, str):
+                    code_match = ''.join(filter(str.isdigit, value))
+                    if code_match:
+                        error_codes[code_match] += 1
+            return dict(error_codes)
+        except Exception as e:
+            logger.error(f"Error extracting error codes for user {self.user_id}: {e}")
+            return {}
+
+    def _calculate_health_score(self) -> float:
+        """Calculate an overall vehicle health score based on DTC data."""
+        try:
+            score = 100.0
+
+            # Reduce score based on number of DTCs
+            for _, series in self.categorical_dtc.items():
+                unique_dtcs = series.nunique()
+                score -= min(float(unique_dtcs * 5), 30.0)
+
+            # Reduce score based on numeric anomalies
+            for _, series in self.numeric_dtc.items():
+                clean_series = pd.to_numeric(series, errors='coerce')
+                outliers = self._detect_outliers(clean_series)
+                score -= min(len(outliers['high']) * 2.0, 20.0)
+
+            return max(0.0, min(100.0, score))
+        except Exception as e:
+            logger.error(f"Error calculating health score for user {self.user_id}: {e}")
+            return 0.0
+
+    def generate_summary(self) -> Dict:
+        """Generate a comprehensive summary of all DTC analysis."""
+        try:
+            if not self.dtc_columns:
+                return {
+                    "error": "No DTC-related columns found.",
+                    "timestamp": self.timestamp,
+                    "user_id": self.user_id
+                }
+
+            summary = {
+                "metadata": {
+                    "total_dtc_columns": len(self.dtc_columns),
+                    "numeric_columns": len(self.numeric_dtc),
+                    "categorical_columns": len(self.categorical_dtc),
+                    "timestamp": self.timestamp,
+                    "user_id": self.user_id
+                },
+                "numeric_analysis": self.analyze_numeric_dtc(),
+                "categorical_analysis": self.analyze_categorical_dtc(),
+                "overall_health_score": self._calculate_health_score()
+            }
+            logger.info(f"Successfully generated DTC summary for user {self.user_id}")
+            return summary
+        except Exception as e:
+            logger.error(f"Error generating DTC summary for user {self.user_id}: {e}")
+            return {
+                "error": f"Error generating summary: {str(e)}",
+                "timestamp": self.timestamp,
+                "user_id": self.user_id
+            }
+
+
+def summarize_dtc_columns(
+        df: pd.DataFrame,
+        user_id: str = DTCAnalyzerConfig.CURRENT_USER
+) -> Dict:
+    """Enhanced function to summarize DTC-related columns from the database."""
+    try:
+        analyzer = DTCAnalyzer(df, user_id)
+        summary = analyzer.generate_summary()
+        logger.info(f"Successfully generated DTC summary for user {user_id}")
+        return summary
+    except Exception as e:
+        logger.error(f"Error in DTC summary generation for user {user_id}: {e}")
+        return {
+            "error": f"Failed to generate DTC summary: {str(e)}",
+            "timestamp": DTCAnalyzerConfig.CURRENT_UTC_TIME,
+            "user_id": user_id
+        }
+
+├── utils/
+│   ├── nlp_handler.py
+
+from openai import OpenAI
+import logging
+import json
+from typing import Dict, Any, Optional
+from datetime import datetime
+
+# Configure logging with timestamp and user context
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - User: %(user)s - %(levelname)s - %(message)s',
+    datefmt='%Y-%m-%d %H:%M:%S'
+)
+
+# Add user info to logger
+logger = logging.getLogger(__name__)
+logger = logging.LoggerAdapter(logger, {'user': 'VOID-001'})
+
+
+class APIConfig:
+    """API Configuration and Key Management"""
+    PRIMARY_API_KEY = "ADD OPEN AI KEY"
+    CURRENT_UTC_TIME = "2025-01-18 11:08:51"
+    CURRENT_USER = "VOID-001"
+
+
+# Initialize OpenAI client
+client = OpenAI(api_key=APIConfig.PRIMARY_API_KEY)
+
+
+def prepare_system_prompt() -> str:
+    return """You are an experienced automotive diagnostic expert analyzing vehicle maintenance data.
+    Your role is to:
+    1. Interpret maintenance metrics and diagnostic trouble codes (DTCs)
+    2. Identify potential issues and maintenance needs
+    3. Provide clear, actionable recommendations
+    4. Explain technical findings in user-friendly language
+    5. Prioritize safety-critical issues in your response
+
+    Please provide concise, practical advice based on the data provided."""
+
+
+def analyze_with_gpt(
+        context: str,
+        user_id: str = APIConfig.CURRENT_USER,
+        model: str = "gpt-3.5-turbo",
+        temperature: float = 0.7,
+        max_tokens: int = 500
+) -> str:
+    try:
+        messages = [
+            {"role": "system", "content": prepare_system_prompt()},
+            {"role": "user", "content": context}
+        ]
+
+        response = client.chat.completions.create(
+            model=model,
+            messages=messages,
+            temperature=temperature,
+            max_tokens=max_tokens
+        )
+
+        analysis = response.choices[0].message.content
+        logger.info(f"Successfully generated GPT analysis for user {user_id}")
+        return analysis
+
+    except Exception as e:
+        logger.error(f"Error in GPT analysis for user {user_id}: {str(e)}")
+        return f"Failed to process your query. Error: {str(e)}"
+
+
+def safe_analyze_with_retries(
+        context: str,
+        user_id: str = APIConfig.CURRENT_USER,
+        max_retries: int = 3
+) -> Dict[str, Any]:
+    for attempt in range(max_retries):
+        try:
+            analysis = analyze_with_gpt(context, user_id)
+            timestamp = APIConfig.CURRENT_UTC_TIME
+
+            return {
+                "success": True,
+                "analysis": analysis,
+                "attempt": attempt + 1,
+                "timestamp": timestamp,
+                "user_id": user_id
+            }
+        except Exception as e:
+            logger.warning(f"Attempt {attempt + 1} failed for user {user_id}: {str(e)}")
+            if attempt == max_retries - 1:
+                return {
+                    "success": False,
+                    "error": str(e),
+                    "attempt": attempt + 1,
+                    "timestamp": APIConfig.CURRENT_UTC_TIME,
+                    "user_id": user_id,
+                    "analysis": "Analysis failed after multiple attempts"
+                }
+
+├── utils/
+│   ├── preprocessing.py
+
+import pandas as pd
+import logging
+
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
+
+def preprocess_data(df):
+    """
+    Preprocess data from the database for predictive maintenance.
+    """
+    logging.info("Starting preprocessing of data.")
+    try:
+        # Standardize column names
+        df.columns = [col.lower().replace(' ', '_') for col in df.columns]
+
+        # Select required columns
+        required_columns = [
+            "timestamp_obd", "engine_load", "coolant_temp", "short_fuel_trim_1",
+            "long_fuel_trim_1", "intake_pressure", "rpm", "speed",
+            "throttle_pos", "control_module_voltage", "fuel_level", "ambiant_air_temp",
+            "o2_sensors", "catalyst_temp_b1s1", "distance_w_mil", "run_time"
+        ]
+
+        missing_columns = [col for col in required_columns if col not in df.columns]
+        if missing_columns:
+            raise ValueError(f"Missing required columns: {missing_columns}")
+
+        # Clean and preprocess each column
+        for col in required_columns:
+            df[col] = pd.to_numeric(df[col], errors="coerce")
+            df[col].fillna(df[col].median(), inplace=True)
+
+        # Add derived columns
+        df["time_in_years"] = (df["timestamp_obd"].max() - df["timestamp_obd"]) / (365 * 24 * 60 * 60)
+        df["time_in_years"].fillna(1, inplace=True)
+
+        logging.info("Preprocessing completed successfully.")
+        return df
+    except Exception as e:
+        logging.error(f"Error during preprocessing: {e}")
+        raise
+
+########################################################################################################################################
+├── models/
+│   ├── emissions.py
+│   ├── engine_health.py
+│   └── predictive_maintenance.py
+
+├── models/
+│   ├── emissions.py
+
+from sklearn.model_selection import train_test_split
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.metrics import accuracy_score, roc_auc_score, confusion_matrix, ConfusionMatrixDisplay
+from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import RobustScaler
+from sklearn.impute import SimpleImputer
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+import io
+
+class EnhancedCarEmissionsMLModel:
+    def __init__(self, dataframe):
+        self.df = dataframe
+        self.features = [
+            'o2_s1_wr_current', 'o2_b1s2', 'short_fuel_trim_1',
+            'long_fuel_trim_1', 'engine_load', 'coolant_temp',
+            'throttle_pos', 'rpm'
+        ]
+        self.indian_emission_norms = {  # Define acceptable emission norms
+            'o2_s1_wr_current': {'min': 0.1, 'max': 0.9},
+            'o2_b1s2': {'min': 0.1, 'max': 0.9},
+            'short_fuel_trim_1': {'min': -10, 'max': 10},
+            'long_fuel_trim_1': {'min': -10, 'max': 10},
+            'engine_load': {'min': 20, 'max': 80},
+            'coolant_temp': {'min': 80, 'max': 110},
+            'throttle_pos': {'min': 0, 'max': 100},
+            'rpm': {'min': 600, 'max': 4000}
+        }
+        self.model = None
+        self.X_test = None
+        self.y_test = None
+
+    def advanced_preprocessing(self):
+        try:
+            for feature in self.features:
+                self.df[feature] = pd.to_numeric(self.df[feature], errors='coerce')
+
+            print("Missing values per feature:")
+            print(self.df[self.features].isnull().sum())
+
+            preprocessor = Pipeline([
+                ('imputer', SimpleImputer(strategy='median')),
+                ('scaler', RobustScaler())
+            ])
+            self.X = preprocessor.fit_transform(self.df[self.features])
+            self.y = self._create_compliance_labels()
+
+        except Exception as e:
+            raise Exception(f"Error during preprocessing: {e}")
+
+    def _create_compliance_labels(self):
+        try:
+            compliance = np.zeros(len(self.df), dtype=int)  # Start with all vehicles as non-compliant
+            for sensor, norm in self.indian_emission_norms.items():
+                compliance[(self.df[sensor] >= norm['min']) & (self.df[sensor] <= norm['max'])] = 1  # Mark as compliant
+
+            unique, counts = np.unique(compliance, return_counts=True)
+            print(f"Compliance label distribution: {dict(zip(unique, counts))}")
+
+            if len(unique) < 2:
+                raise ValueError("Target variable contains only a single class after preprocessing.")
+
+            return compliance
+        except Exception as e:
+            raise Exception(f"Error creating compliance labels: {e}")
+
+    def train_optimized_model(self):
+        try:
+            X_train, self.X_test, y_train, self.y_test = train_test_split(
+                self.X, self.y, test_size=0.2, random_state=42, stratify=self.y
+            )
+
+            print("Training set class distribution:")
+            print(pd.Series(y_train).value_counts())
+
+            model = RandomForestClassifier(n_estimators=200, random_state=42)
+            model.fit(X_train, y_train)
+
+            y_pred = model.predict(self.X_test)
+            roc_auc = roc_auc_score(self.y_test, model.predict_proba(self.X_test)[:, 1])
+            print(f"Model Accuracy: {accuracy_score(self.y_test, y_pred):.4f}")
+            print(f"ROC AUC: {roc_auc:.4f}")
+
+            self.model = model
+
+        except Exception as e:
+            raise Exception(f"Error training emissions model: {e}")
+
+    def generate_visualization(self):
+        """
+        Generate a confusion matrix visualization.
+        """
+        if self.model is None or self.X_test is None:
+            raise Exception("Model is not trained or no test data is available.")
+
+        # Predict the test data
+        predictions = self.model.predict(self.X_test)
+        cm = confusion_matrix(self.y_test, predictions, labels=[0, 1])
+
+        # Create confusion matrix plot
+        disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=["Non-Compliant", "Compliant"])
+        disp.plot(cmap=plt.cm.Blues)
+
+        # Save the plot to an in-memory file
+        img = io.BytesIO()
+        plt.savefig(img, format="png")
+        img.seek(0)
+        plt.close()
+        return img
+
+├── models/
+│   ├── engine_health.py
+
+import pandas as pd
+import numpy as np
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
+from sklearn.ensemble import GradientBoostingClassifier
+from sklearn.metrics import classification_report, confusion_matrix, accuracy_score
+import matplotlib.pyplot as plt
+import seaborn as sns
+import io
+import logging
+
+# Configure logging
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
+
+class OBDDataPreprocessor:
+    @staticmethod
+    def extract_numeric_value(value):
+        """
+        Safely convert values to numeric types, handling strings and missing data.
+        """
+        if isinstance(value, (int, float)):
+            return value
+        if isinstance(value, str):
+            try:
+                numeric_str = ''.join(char for char in value if char.isdigit() or char in '.-')
+                return float(numeric_str) if numeric_str else np.nan
+            except ValueError:
+                return np.nan
+        return np.nan
+
+class EngineHealthPredictor:
+    def __init__(self):
+        self.model = None
+        self.scaler = StandardScaler()
+        self.df = None
+        self.X_test = None
+        self.y_test = None
+        self.single_class_mode = False
+        logging.info("EngineHealthPredictor initialized.")
+
+    def preprocess_data(self, df):
+        """
+        Preprocess the data to prepare it for ML training.
+        """
+        logging.info("Starting data preprocessing.")
+        self.df = df.copy()
+
+        # Standardize column names to lowercase and replace spaces with underscores
+        self.df.columns = [col.lower().replace(' ', '_') for col in self.df.columns]
+        logging.info("Normalized column names: %s", self.df.columns.tolist())
+
+        # List of required features
+        required_features = ['engine_load', 'coolant_temp', 'short_fuel_trim_1',
+                             'long_fuel_trim_1', 'intake_pressure', 'rpm']
+
+        # Check for missing required columns
+        missing_features = [col for col in required_features if col not in self.df.columns]
+        if missing_features:
+            available_columns = self.df.columns.tolist()
+            logging.error("Missing required columns: %s", missing_features)
+            logging.info("Available columns: %s", available_columns)
+            raise ValueError(
+                f"Required columns are missing in the dataset: {missing_features}. Available columns: {available_columns}"
+            )
+
+        # Extract numeric values and handle missing data
+        for feature in required_features:
+            self.df[feature] = self.df[feature].apply(OBDDataPreprocessor.extract_numeric_value)
+            logging.debug("Processed column '%s'. Sample values: %s", feature, self.df[feature].head().tolist())
+
+        # Handle missing values
+        self.df = self.df[required_features].fillna(self.df[required_features].median())
+        logging.info("Missing values filled with median for required features.")
+
+        logging.info("Preprocessed data sample: %s", self.df.head().to_dict(orient="records"))
+        return self.df
+
+    def prepare_data(self, df):
+        """
+        Prepare the dataset for training and testing.
+        """
+        logging.info("Preparing data for training and testing.")
+        processed_df = self.preprocess_data(df)
+        features = ['engine_load', 'coolant_temp', 'short_fuel_trim_1',
+                    'long_fuel_trim_1', 'intake_pressure', 'rpm']
+        X = processed_df[features]
+        y = self._create_health_labels(processed_df)
+
+        # Log label distribution
+        unique_labels = y.value_counts()
+        logging.info("Label distribution:\n%s", unique_labels)
+
+        # Allow single-class training
+        if len(unique_labels) < 2:
+            logging.warning("Dataset contains only one class. The model will always predict this class.")
+            self.single_class_mode = True
+        else:
+            self.single_class_mode = False
+
+        X_train, self.X_test, y_train, self.y_test = train_test_split(X, y, test_size=0.2, random_state=42, stratify=y)
+        logging.info("Data split completed. Scaling features.")
+        X_train_scaled = self.scaler.fit_transform(X_train)
+        self.X_test_scaled = self.scaler.transform(self.X_test)
+        return X_train_scaled, self.X_test_scaled, y_train, self.y_test
+
+    def _create_health_labels(self, df):
+        """
+        Create health labels based on diagnostic parameters.
+        """
+        logging.info("Creating engine health labels.")
+
+        def classify_health(row):
+            conditions = [
+                row.get('engine_load', 0) > 70,  # Adjusted threshold
+                row.get('coolant_temp', 0) > 95,  # Adjusted threshold
+                abs(row.get('short_fuel_trim_1', 0)) > 8,  # Adjusted threshold
+                abs(row.get('long_fuel_trim_1', 0)) > 12,  # Adjusted threshold
+                row.get('intake_pressure', 0) < 60 or row.get('intake_pressure', 0) > 140,  # Expanded range
+                row.get('rpm', 0) > 4500 or row.get('rpm', 0) < 600,  # Adjusted RPM thresholds
+            ]
+            issue_count = sum(conditions)
+            if issue_count > 2:
+                return 'Needs Attention'
+            else:
+                return 'Good'
+
+        labels = df.apply(classify_health, axis=1)
+
+        # Log label distribution
+        label_distribution = labels.value_counts()
+        logging.info("Generated label distribution: %s", label_distribution.to_dict())
+
+        return labels
+
+    def train_model(self, X_train, y_train):
+        """
+        Train the Gradient Boosting model.
+        """
+        if self.single_class_mode:
+            logging.info("Single-class mode detected. Training a dummy model.")
+            self.model = lambda x: np.full(len(x), y_train.iloc[0])  # Always predict the first class
+            return
+
+        logging.info("Training the Gradient Boosting model.")
+        self.model = GradientBoostingClassifier(n_estimators=100, learning_rate=0.1, max_depth=3, random_state=42)
+        self.model.fit(X_train, y_train)
+        logging.info("Model training completed.")
+
+    def evaluate_model(self, X_test, y_test):
+        """
+        Evaluate the model's performance and return the confusion matrix.
+        """
+        if self.single_class_mode:
+            logging.info("Single-class mode: Skipping evaluation metrics.")
+            return np.array([[len(y_test), 0], [0, 0]])  # Dummy confusion matrix for single class
+
+        logging.info("Evaluating model performance.")
+        y_pred = self.model.predict(X_test)
+        accuracy = accuracy_score(y_test, y_pred)
+        logging.info("Model Accuracy: %.2f%%", accuracy * 100)
+        logging.info("Classification Report:\n%s", classification_report(y_test, y_pred))
+        cm = confusion_matrix(y_test, y_pred)
+        return cm
+
+    def visualize_confusion_matrix(self, cm):
+        """
+        Generate and return a confusion matrix visualization or summary for single-class mode.
+        """
+        if self.single_class_mode:
+            logging.info("Single-class mode: Visualizing summary of predictions.")
+            total_good = len(self.X_test)  # All predictions are "Good" in single-class mode
+
+            plt.figure(figsize=(8, 6))
+            plt.bar(['Good'], [total_good], color='green', alpha=0.7)
+            plt.title('Prediction Summary: Single-Class Mode')
+            plt.xlabel('Predicted Class')
+            plt.ylabel('Count')
+            plt.tight_layout()
+
+            img = io.BytesIO()
+            plt.savefig(img, format="png")
+            img.seek(0)
+            plt.close()
+            return img
+
+        # For normal mode, plot the confusion matrix
+        logging.info("Generating confusion matrix visualization.")
+        plt.figure(figsize=(10, 7))
+        sns.heatmap(cm, annot=True, fmt='d', cmap='Blues', xticklabels=['Good', 'Needs Attention'],
+                    yticklabels=['Good', 'Needs Attention'])
+        plt.title('Confusion Matrix')
+        plt.xlabel('Predicted Label')
+        plt.ylabel('True Label')
+        plt.tight_layout()
+
+        img = io.BytesIO()
+        plt.savefig(img, format="png")
+        img.seek(0)
+        plt.close()
+        return img
+
+├── models/
+│   └── predictive_maintenance.py
+
+import numpy as np
+import logging
+import matplotlib.pyplot as plt
+
+
+class VehicleMaintenance:
+    def __init__(self, **kwargs):
+        # Initialize vehicle parameters
+        self.distance_traveled = kwargs.get("distance_w_mil", 0)
+        self.time_in_years = kwargs.get("time_in_years", 1)
+        self.speed = kwargs.get("speed", 0)
+        self.engine_load = kwargs.get("engine_load", 50)
+        self.coolant_temp = kwargs.get("coolant_temp", 90)
+        self.engine_runtime = kwargs.get("run_time", 0)
+        self.service_interval = 10000
+        self.throttle_pos = kwargs.get("throttle_pos", 0)
+        self.fuel_level = kwargs.get("fuel_level", 50)
+        self.short_fuel_trim = kwargs.get("short_fuel_trim_1", 0)
+        self.long_fuel_trim = kwargs.get("long_fuel_trim_1", 0)
+        self.ambient_air_temp = kwargs.get("ambient_air_temp", 25)
+        self.o2_sensor_reading = kwargs.get("o2_sensors", 0.5)
+        self.catalyst_temp = kwargs.get("catalyst_temp_b1s1", 350)
+
+    def estimate_tire_wear(self) -> float:
+        """Estimate tire wear based on distance traveled and vehicle age."""
+        try:
+            # Simple tire wear estimation logic
+            wear_rate = 0.1  # Arbitrary wear rate per 1000 miles
+            tire_wear = self.distance_traveled * wear_rate / 1000
+            # Ensure tire wear does not exceed 100%
+            return min(tire_wear, 100)
+        except Exception as e:
+            logging.error(f"Error estimating tire wear: {e}")
+            return 0.0
+
+    def predict_spark_plug_replacement(self) -> str:
+        try:
+            age_factor = self.time_in_years / 2  # Typical 2-year replacement interval
+            distance_factor = self.distance_traveled / 100000
+            wear_threshold = 1.0  # Summation of factors that would suggest replacement
+            if age_factor + distance_factor > wear_threshold:
+                return "Replace spark plugs soon."
+            return "Spark plugs in good condition."
+        except Exception as e:
+            logging.error(f"Error predicting spark plug replacement: {e}")
+            return "Unable to assess spark plug condition."
+
+    def predict_coolant_condition(self) -> str:
+        try:
+            if self.coolant_temp >= 100:
+                return "Coolant condition is poor; consider changing."
+            return "Coolant condition is acceptable."
+        except Exception as e:
+            logging.error(f"Error predicting coolant condition: {e}")
+            return "Unable to assess coolant condition."
+
+    def estimate_oil_change(self) -> str:
+        try:
+            if self.engine_runtime >= 5000:
+                return "Oil change needed soon."
+            return "Oil condition is acceptable."
+        except Exception as e:
+            logging.error(f"Error estimating oil change: {e}")
+            return "Unable to assess oil condition."
+
+    def estimate_brake_pad_wear(self) -> float:
+        # Placeholder for brake pad wear estimation logic
+        return 90.0  # Assume 90% remaining life for demonstration
+
+    def assess_battery_health(self) -> str:
+        try:
+            if self.control_module_voltage < 12.0:
+                return "Battery health is poor; consider replacement."
+            return "Battery healthy."
+        except Exception as e:
+            logging.error(f"Error assessing battery health: {e}")
+            return "Unable to determine battery health."
+
+    def fuel_system_maintenance(self) -> str:
+        try:
+            short_trim_issue = abs(self.short_fuel_trim) > 10
+            long_trim_issue = abs(self.long_fuel_trim) > 10
+            low_fuel = self.fuel_level < 15
+
+            if short_trim_issue and long_trim_issue and low_fuel:
+                return "Fuel system needs immediate service."
+            elif (short_trim_issue or long_trim_issue) and low_fuel:
+                return "Fuel system needs inspection soon."
+            elif short_trim_issue or long_trim_issue:
+                return "Monitor fuel system performance."
+            return "Fuel system operating normally."
+        except Exception as e:
+            logging.error(f"Error checking fuel system: {e}")
+            return "Unable to determine fuel system condition."
+
+    def air_filter_replacement(self) -> str:
+        try:
+            distance_factor = self.distance_traveled / 10000
+            temp_stress = max(0, (self.ambient_air_temp - 25) / 30)
+            load_factor = self.engine_load / 75
+            condition_score = distance_factor * (1 + temp_stress) * load_factor
+
+            if condition_score > 1.5:
+                return "Replace air filter immediately."
+            elif condition_score > 1.2:
+                return "Replace air filter very soon."
+            elif condition_score > 1.0:
+                return "Replace air filter soon."
+            return "Air filter condition good."
+        except Exception as e:
+            logging.error(f"Error checking air filter: {e}")
+            return "Unable to determine air filter condition."
+
+    def exhaust_system_check(self) -> str:
+        try:
+            o2_reading = float(self.o2_sensor_reading)
+            cat_temp = float(self.catalyst_temp)
+            o2_sensor_issue = o2_reading < 0.5 or o2_reading > 1.5
+            cat_temp_issue = cat_temp < 300 or cat_temp > 900
+
+            if o2_sensor_issue and cat_temp_issue:
+                return "Exhaust system needs immediate inspection."
+            elif o2_sensor_issue:
+                return "O2 sensor may need replacement."
+            elif cat_temp_issue:
+                return "Catalytic converter may need inspection."
+            return "Exhaust system operating normally."
+        except ValueError:
+            return "Invalid exhaust sensor readings."
+        except Exception as e:
+            logging.error(f"Error checking exhaust system: {e}")
+            return "Unable to determine exhaust system condition."
+
+    def suspension_system_maintenance(self) -> str:
+        try:
+            distance_factor = self.distance_traveled / 20000
+            speed_stress = max(0, (self.speed - 80) / 100)
+            load_stress = self.throttle_pos / 75
+            wear_score = distance_factor * (1 + speed_stress + load_stress)
+
+            if wear_score > 1.5:
+                return "Suspension needs immediate inspection."
+            elif wear_score > 1.2:
+                return "Suspension needs inspection soon."
+            elif wear_score > 1.0:
+                return "Monitor suspension condition."
+            return "Suspension system okay."
+        except Exception as e:
+            logging.error(f"Error checking suspension: {e}")
+            return "Unable to determine suspension condition."
+
+    def wheel_alignment(self) -> str:
+        try:
+            distance_factor = self.distance_traveled / 15000
+            tire_wear = (100 - self.estimate_tire_wear()) / 100
+            alignment_score = distance_factor + tire_wear
+
+            if alignment_score > 1.5:
+                return "Wheel alignment needed immediately."
+            elif alignment_score > 1.2:
+                return "Wheel alignment needed very soon."
+            elif alignment_score > 1.0:
+                return "Consider wheel alignment check."
+            return "Wheel alignment okay."
+        except Exception as e:
+            logging.error(f"Error checking wheel alignment: {e}")
+            return "Unable to determine alignment condition."
+
+    def fuel_economy_monitoring(self) -> str:
+        try:
+            low_fuel = self.fuel_level < 10
+            high_load = self.engine_load > 80
+            trim_issues = abs(self.short_fuel_trim) > 10 or abs(self.long_fuel_trim) > 10
+
+            if low_fuel and high_load and trim_issues:
+                return "Significant fuel economy issues detected."
+            elif (low_fuel and high_load) or trim_issues:
+                return "Possible fuel economy issues."
+            elif low_fuel or high_load:
+                return "Monitor fuel economy."
+            return "Fuel economy normal."
+        except Exception as e:
+            logging.error(f"Error monitoring fuel economy: {e}")
+            return "Unable to determine fuel economy status."
+
+    def evaporative_emission_system_check(self) -> str:
+        """Check the evaporative emission system for potential issues."""
+        try:
+            # Simple checks for evap system based on fuel level and ambient temperature
+            low_fuel = self.fuel_level < 10
+            temp_stress = self.ambient_air_temp > 30
+            system_stress = abs(self.short_fuel_trim) > 10
+
+            if low_fuel and temp_stress and system_stress:
+                return "Evap system needs immediate inspection."
+            elif (low_fuel and temp_stress) or system_stress:
+                return "Monitor evap system condition."
+            elif low_fuel or temp_stress:
+                return "Evap system may need future inspection."
+            return "Evap system operating normally."
+        except Exception as e:
+            logging.error(f"Error checking evap system: {e}")
+            return "Unable to determine evap system condition."
+
+    def visualize_vehicle_maintenance(self):
+        """Visualize vehicle maintenance metrics as bar charts."""
+        try:
+            labels = ['Fuel Level', 'Tire Wear', 'Engine Load']
+            # Collect data for visualization
+            data = [self.fuel_level, self.estimate_tire_wear(), self.engine_load]
+            plt.bar(labels, data)
+            plt.title('Vehicle Maintenance Metrics')
+            plt.ylabel('Percentage / Value')
+            plt.ylim([0, 100])
+            plt.show()
+        except Exception as e:
+            logging.error(f"Error during visualization: {e}")
+
+    def generate_report(self) -> dict:
+        """
+        Generate a maintenance report summarizing the vehicle's status.
+        """
+        report = {
+            "Distance Traveled": self.distance_traveled,
+            "Time in Years": self.time_in_years,
+            "Speed": self.speed,
+            "Engine Load": self.engine_load,
+            "Coolant Temperature": self.coolant_temp,
+            "Engine Runtime": self.engine_runtime,
+            "Fuel Level": self.fuel_level,
+            "Spark Plug Status": self.predict_spark_plug_replacement(),
+            "Coolant Status": self.predict_coolant_condition(),
+            "Oil Change Needed": self.estimate_oil_change(),
+            "Brake Pad Wear": self.estimate_brake_pad_wear(),
+            "Battery Status": self.assess_battery_health(),
+            "Fuel System Status": self.fuel_system_maintenance(),
+            "Air Filter Status": self.air_filter_replacement(),
+            "Exhaust System Status": self.exhaust_system_check(),
+            "Suspension Status": self.suspension_system_maintenance(),
+            "Wheel Alignment Status": self.wheel_alignment(),
+            "Fuel Economy": self.fuel_economy_monitoring(),
+            "Evaporative Emission System Status": self.evaporative_emission_system_check(),
+        }
+
+        return report
+
+#####################################################################################################################################
