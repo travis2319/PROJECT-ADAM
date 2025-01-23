@@ -24,7 +24,7 @@ export default function Home() {
               <Text className="text-lg font-bold text-black">Hello, {user?.name}</Text>
               <Text className="text-sm text-gray-600">Today 12 Jan.</Text>
             </View>
-            <TouchableOpacity className="ml-auto w-5 h-5">
+            <TouchableOpacity className='ml-auto'>
               <Ionicons name="search" size={24} color="black" />
             </TouchableOpacity>
           </View>
