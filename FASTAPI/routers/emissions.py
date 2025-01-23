@@ -2,6 +2,8 @@ from fastapi import APIRouter, HTTPException
 from fastapi.responses import StreamingResponse
 from utils.database import connect_to_db
 from models.emissions import EnhancedCarEmissionsMLModel
+from fastapi.responses import JSONResponse
+from datetime import datetime
 import pandas as pd
 import numpy as np
 
@@ -84,11 +86,11 @@ def get_model_results():
         raise HTTPException(status_code=500, detail=f"Error fetching model results: {e}")
 
 
-@router.get("/compliance")
-def generate_compliance_report():
+@router.get("/compliance-and-plot-data")
+def generate_compliance_and_plot_data():
     """
-    Automated endpoint that runs all steps and generates a compliance report.
-    Returns the report as a DataFrame and stores it for future access.
+    Combined endpoint that runs all steps to generate a compliance report and provides data for plots.
+    Returns the report and plot data as JSON.
     """
     global emissions_model, compliance_report
 
@@ -101,6 +103,35 @@ def generate_compliance_report():
         conn.close()
         print("✓ Data fetched successfully")
 
+        # Ensure timestamps are properly converted to datetime
+        if 'timestamp_obd' in df.columns:
+            df['timestamp_obd'] = pd.to_datetime(df['timestamp_obd'], unit='s', errors='coerce')
+            valid_timestamps = df['timestamp_obd'].dropna()
+            if not valid_timestamps.empty:
+                start_timestamp = valid_timestamps.min().strftime('%Y-%m-%d %H:%M:%S')
+                start_unix_timestamp = int(valid_timestamps.min().timestamp())
+                end_timestamp = valid_timestamps.max().strftime('%Y-%m-%d %H:%M:%S')
+                end_unix_timestamp = int(valid_timestamps.max().timestamp())
+            else:
+                start_timestamp = "N/A"
+                start_unix_timestamp = "N/A"
+                end_timestamp = "N/A"
+                end_unix_timestamp = "N/A"
+        else:
+            start_timestamp = "N/A"
+            start_unix_timestamp = "N/A"
+            end_timestamp = "N/A"
+            end_unix_timestamp = "N/A"
+
+        # Ensure speed is numeric
+        df['speed'] = pd.to_numeric(df['speed'], errors='coerce')
+
+        # Calculate distance traveled
+        df['time_diff'] = df['timestamp_obd'].diff().dt.total_seconds()
+        df['distance'] = df['speed'] * (df['time_diff'] / 3600)
+        df['distance'] = df['distance'].fillna(0)
+        total_distance = df['distance'].sum()
+
         # Step 2: Preprocess
         print("\n[2/4] Preprocessing data...")
         emissions_model = EnhancedCarEmissionsMLModel(df)
@@ -112,8 +143,8 @@ def generate_compliance_report():
         emissions_model.train_optimized_model()
         print("✓ Model training complete")
 
-        # Step 4: Generate Report
-        print("\n[4/4] Generating compliance report...")
+        # Step 4: Generate Report and Plot Data
+        print("\n[4/4] Generating compliance report and plot data...")
 
         # Get predictions for all data
         predictions = emissions_model.model.predict(emissions_model.X)
@@ -128,7 +159,8 @@ def generate_compliance_report():
             'Coolant_Temp': df['coolant_temp'],
             'O2_Sensor': df['o2_s1_wr_current'],
             'Short_Fuel_Trim': df['short_fuel_trim_1'],
-            'Long_Fuel_Trim': df['long_fuel_trim_1']
+            'Long_Fuel_Trim': df['long_fuel_trim_1'],
+            'Distance': df['distance']
         })
 
         # Add overall metrics
@@ -141,22 +173,45 @@ def generate_compliance_report():
         print(f"Compliant Vehicle values: {compliant_vehicles}")
         print(f"Non-Compliant Vehicles values: {total_vehicles_values - compliant_vehicles}")
         print(f"Overall Compliance Rate: {compliance_rate:.2f}%")
+        print(f"Total Distance Traveled: {total_distance:.2f} km")
 
-        # Return the first few rows and summary statistics
-        return {
-            "summary": {
-                "total_vehicle_values": total_vehicles_values,
-                "compliant_vehicle_values": int(compliant_vehicles),
-                "non_compliant_vehicle_values": int(total_vehicles_values - compliant_vehicles),
-                "compliance_rate": float(compliance_rate)
-            },
-            "report_preview": compliance_report.head(10).to_dict(orient="records"),
-            "timestamp": "2025-01-19 07:39:50",
-            # "user": "VOID-001"
+        # Create summary
+        summary = {
+            "total_vehicle_values": total_vehicles_values,
+            "compliant_vehicle_values": int(compliant_vehicles),
+            "non_compliant_vehicle_values": int(total_vehicles_values - compliant_vehicles),
+            "compliance_rate": float(compliance_rate),
+            "start_timestamp": start_timestamp,
+            "start_unix_timestamp": start_unix_timestamp,
+            "end_timestamp": end_timestamp,
+            "end_unix_timestamp": end_unix_timestamp,
+            "total_distance_traveled": total_distance
         }
+
+        # Handle NaN values and ensure proper formatting for timestamps in plot data
+        compliance_report.fillna(0, inplace=True)
+        if 'Timestamp' in compliance_report.columns:
+            compliance_report['Timestamp'] = compliance_report['Timestamp'].apply(
+                lambda x: x.strftime('%Y-%m-%d %H:%M:%S') if isinstance(x, datetime) else 'N/A'
+            )
+
+        # Create DataFrames for plotting
+        df1 = compliance_report[['Timestamp', 'Engine_Load', 'Coolant_Temp', 'O2_Sensor']]
+        df2 = compliance_report[['Timestamp', 'Short_Fuel_Trim', 'Long_Fuel_Trim', 'Compliance_Probability']]
+        df3 = compliance_report[['Timestamp', 'Compliance_Status', 'Distance']]
+
+        # Convert DataFrames to JSON
+        plot_data = {
+            "df1": df1.to_dict(orient="records"),
+            "df2": df2.to_dict(orient="records"),
+            "df3": df3.to_dict(orient="records"),
+        }
+
+        # Return combined summary and plot data
+        return JSONResponse(content={"summary": summary, "plot_data": plot_data})
 
     except Exception as e:
         raise HTTPException(
             status_code=500,
-            detail=f"Error generating compliance report: {str(e)}"
+            detail=f"Error generating compliance report and plot data: {str(e)}"
         )

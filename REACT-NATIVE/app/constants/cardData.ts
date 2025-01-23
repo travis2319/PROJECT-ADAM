@@ -1,6 +1,6 @@
 const cardData = [
     {
-      bgColor: '#C4E3FA',
+      bgColor: `#C4E3FA`,
       iconBgColor: '#54B0E3',
       title: 'Engine Health Monitoring',
       titleIconType: 'MaterialCommunityIcons',

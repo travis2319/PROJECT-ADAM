@@ -7,7 +7,7 @@ import React, {
 } from "react";
 import { supabase } from "@/utils/supabase";
 import { useRouter } from "expo-router";
-import { Session,User as SupabaseUser } from "@supabase/supabase-js";
+import { User as SupabaseUser } from "@supabase/supabase-js";
 
 interface User {
   id: string;
@@ -19,8 +19,8 @@ interface User {
 
 interface AuthContextType {
   user: User | null;
-  session: Session | null;
-  loading: boolean;
+  // session: Session | null;
+  // loading: boolean;
   signIn: (email: string, password: string) => Promise<void>;
   signUp: (username: string, email: string, password: string) => Promise<void>;
   // completeOnboarding: ()=> Promise<void>;
@@ -33,8 +33,8 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const [user, setUser] = useState<User | null>(null);
-  const [session, setSession] = useState<Session | null>(null);
-  const [loading, setLoading] = useState(true);
+  // const [session, setSession] = useState<Session | null>(null);
+  // const [loading, setLoading] = useState(true);
   const router = useRouter();
 
     const transformUser = async (supabaseUser: SupabaseUser | null) => {
@@ -50,22 +50,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   useEffect(() => {
-    supabase.auth.getSession().then(async ({ data: { session } }) => {
-      setSession(session);
-      const transformedUser = await transformUser(session?.user ?? null);
-      setUser(transformedUser);
-      setLoading(false);
-    });
+    // supabase.auth.getSession().then(async ({ data: { session } }) => {
+    //   setSession(session);
+    //   const transformedUser = await transformUser(session?.user ?? null);
+    //   setUser(transformedUser);
+    //   setLoading(false);
+    // });
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (_event, session) => {
-        setSession(session);
-        const transformedUser = await transformUser(session?.user ?? null);
-        setUser(transformedUser);
-      }
-    );
+    const { data: authData } = supabase.auth.onAuthStateChange((event, session) => {
+        if(!session) return router.push("/(auth)");
+        getUser(session.user.id);
+      });
 
-    return () => subscription.unsubscribe();
+    return () => authData.subscription.unsubscribe();
   }, []);
 
   const getUser = async (id: string) => {
@@ -76,6 +73,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       .single();
 
     if (error) return console.error("Error fetching user:", error);
+
     setUser(data);
     console.log(data);
     
@@ -161,8 +159,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
    const value = {
     user,
-    session,
-    loading,
+    // session,
+    // loading,
     signUp,
     signIn,
     signOut,

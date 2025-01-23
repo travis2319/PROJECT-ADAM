@@ -1,8 +1,2 @@
-fastapi
-uvicorn
-pandas
-psycopg2-binary
-scikit-learn
-sqlalchemy
-matplotlib
+pip install fastapi uvicorn pandas psycopg2-binary scikit-learn sqlalchemy matplotlib
 
