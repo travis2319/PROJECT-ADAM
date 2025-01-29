@@ -1,4 +1,3 @@
-
 generator client {
   provider        = "prisma-client-js"
   previewFeatures = ["postgresqlExtensions"]
@@ -12,9 +11,45 @@ datasource db {
 }
 
 model User {
-  id        String   @id @default(uuid())
-  email     String   @unique
-  name      String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime  @default(now()) @updatedAt
+  id          String          @id @default(uuid())
+  email       String          @unique
+  name        String?
+  phoneNumber String?
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @default(now()) @updatedAt
+
+  vehicleDetails VehicleDetails[] // Relation to VehicleDetails
+
+  GPSData GPSData[]
+}
+
+model VehicleDetails {
+  id                 String   @id @default(uuid())
+  userId             String
+  user               User     @relation(fields: [userId], references: [id])
+  vehicleNumber      String   @unique
+  carAge             Int
+  vehicleModel       String
+  fuelType           String
+  registeredRTO      String
+  insuranceCompany   String
+  policyNumber       String
+  insuranceExpiry    DateTime
+  licenseImage       String   // Path or URL for license image
+  pucImage           String   // Path or URL for PUC image
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @default(now()) @updatedAt
+}
+
+model GPSData {
+  id         String   @id @default(uuid())
+  userId     String
+  user       User     @relation(fields: [userId], references: [id])
+  latitude   Float    // Latitude of the GPS location
+  longitude  Float    // Longitude of the GPS location
+  altitude   Float?   // Altitude (optional)
+  speed      Float?   // Speed (optional, in km/h or mph)
+  timestamp  DateTime @default(now()) // Time of the GPS data recording
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @default(now()) @updatedAt
 }

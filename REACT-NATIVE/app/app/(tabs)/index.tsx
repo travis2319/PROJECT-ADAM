@@ -1,11 +1,13 @@
 import React from 'react';
 import { Image, Text, View, StatusBar, ScrollView, TouchableOpacity } from 'react-native';
-import { Ionicons,MaterialCommunityIcons,FontAwesome } from '@expo/vector-icons';
+import { Ionicons,MaterialCommunityIcons,FontAwesome, Feather } from '@expo/vector-icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useAuth } from '@/providers/AuthProvider';
+import { Link, router } from 'expo-router';
 
 export default function Home() {
   const {user} = useAuth();
+  let currentDate = new Date();
   return (
     <>
       <StatusBar
@@ -22,10 +24,20 @@ export default function Home() {
             />
             <View>
               <Text className="text-lg font-bold text-black">Hello, {user?.name}</Text>
-              <Text className="text-sm text-gray-600">Today 12 Jan.</Text>
+                <Text className="text-sm text-gray-600">
+                {currentDate.toLocaleDateString('en-GB', {
+                  day: '2-digit',
+                  month: 'short',
+                  year: 'numeric',
+                })}
+                </Text>
             </View>
-            <TouchableOpacity className='ml-auto'>
+            {/* <TouchableOpacity className='ml-auto'>
               <Ionicons name="search" size={24} color="black" />
+            </TouchableOpacity> */}
+            {/* <Link href="../maps/1">maps</Link> */}
+            <TouchableOpacity className='ml-auto' onPress={() => router.push('../maps/1')}>
+              <Feather name="map-pin" size={24} color="black" />
             </TouchableOpacity>
           </View>
 

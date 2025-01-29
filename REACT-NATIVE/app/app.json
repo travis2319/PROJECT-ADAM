@@ -40,6 +40,11 @@
         {
           "iosUrlScheme": "com.googleusercontent.apps.147227486207-42fig99gceke5mvvan1sc24ajvi37be2"
         }
+      ],[
+        "expo-location",
+        {
+          "isAndroidBackgroundLocationEnabled": "Allow $(PRODUCT_NAME) to use your location."
+        }
       ]
     ],
     "experiments": {
