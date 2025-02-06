@@ -3,7 +3,7 @@ import { Image, Text, View, StatusBar, ScrollView, TouchableOpacity } from 'reac
 import { Ionicons,MaterialCommunityIcons,FontAwesome, Feather } from '@expo/vector-icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useAuth } from '@/providers/AuthProvider';
-import { Link, router } from 'expo-router';
+import { Link, router, useRouter } from 'expo-router';
 
 export default function Home() {
   const {user} = useAuth();

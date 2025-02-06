@@ -2,7 +2,7 @@ import { Tabs } from 'expo-router';
 import React from 'react';
 
 import TabBar from '@/components/tabBar/TabBar';
-import { Ionicons } from '@expo/vector-icons';
+import { Feather, FontAwesome5, Ionicons } from '@expo/vector-icons';
 
 export default function TabLayout() {
 
@@ -21,7 +21,7 @@ export default function TabLayout() {
         //   default: {},
         // }),
       }}
-      tabBar={props => <TabBar{...props}/>}
+      // tabBar={props => <TabBar{...props}/>}
       >
       <Tabs.Screen
         name="index"
@@ -34,21 +34,21 @@ export default function TabLayout() {
         name="analysis"
         options={{
           title: 'Analysis',
-          tabBarIcon: ({ color }) => <Ionicons size={28} name="home" color={color} />,
+          tabBarIcon: ({ color }) => <FontAwesome5 size={28} name="robot" color={color} />,
         }}
       />
       <Tabs.Screen
         name="chat"
         options={{
-          title: 'chat',
-          tabBarIcon: ({ color }) => <Ionicons size={28} name="home" color={color} />,
+          title: 'Chat',
+          tabBarIcon: ({ color }) => <Feather size={28} name="message-square" color={color} />,
         }}
       />
       <Tabs.Screen
-        name="profile"
+        name="(profile)"
         options={{
-          title: 'profile',
-          tabBarIcon: ({ color }) => <Ionicons size={28} name="home" color={color} />,
+          title: 'Profile',
+          tabBarIcon: ({ color }) => <Feather size={28} name="user" color={color} />,
         }}
       />
     </Tabs>

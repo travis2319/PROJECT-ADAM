@@ -2,7 +2,7 @@ import { View, Text, TextInput, TouchableOpacity, Image } from 'react-native';
 import React, { useState } from 'react';
 import { useRouter } from 'expo-router';
 import { useColorScheme } from 'react-native';
-import { useAuth } from '@/providers/AuthProvider';
+// import { useAuth } from '@/providers/AuthProvider';
 import useForm from '@/hooks/useForm';
 
 const Login = () => {
@@ -10,17 +10,17 @@ const Login = () => {
   const colorScheme = useColorScheme();
   const isDarkMode = colorScheme === 'dark';
 
-  const { signIn } = useAuth(); // Get signIn function from AuthProvider
+  // const { signIn } = useAuth(); // Get signIn function from AuthProvider
 
   const [formData, handleChange] = useForm({ email: "", password: "" });
 
   const handleSignIn = () => {
-    signIn(formData.email, formData.password);
+    // signIn(formData.email, formData.password);
   };
 
 
   return (
-    <View className={`flex-1 justify-center items-center ${isDarkMode ? 'bg-gray-900' : 'bg-yellow-50'} px-6`}>
+    <View className={` justify-center items-center ${isDarkMode ? 'bg-gray-900' : 'bg-blue-500'} px-6`}>
       <View className={`w-full max-w-sm p-6 rounded-lg shadow-lg ${isDarkMode ? 'bg-gray-800' : 'bg-white'}`}>
         <Text className={`text-2xl font-bold text-center ${isDarkMode ? 'text-white' : 'text-black'}`}>
           Sports Buddy
@@ -68,17 +68,11 @@ const Login = () => {
 
         {/* Social Buttons */}
         <View className="flex-row space-x-4 gap-4">
-          <TouchableOpacity 
-            className={`flex-1 border py-3 rounded-lg flex-row items-center justify-center ${isDarkMode ? 'border-gray-500' : 'border-gray-300'}`}
-            onPress={()=>{console.log('Google Sign In');}}
-          >
+          <TouchableOpacity className={`flex-1 border py-3 rounded-lg flex-row items-center justify-center ${isDarkMode ? 'border-gray-500' : 'border-gray-300'}`}>
             <Image source={require('@/assets/images/google.png')} className="w-6 h-6 mr-2" />
             <Text className={`${isDarkMode ? 'text-white' : 'text-black'} text-center`}>Google</Text>
           </TouchableOpacity>
-          <TouchableOpacity 
-            className={`flex-1 border py-3 rounded-lg flex-row items-center justify-center ${isDarkMode ? 'border-gray-500' : 'border-gray-300'}`}
-            onPress={()=>{console.log('Facebook Sign In');}}
-          >
+          <TouchableOpacity className={`flex-1 border py-3 rounded-lg flex-row items-center justify-center ${isDarkMode ? 'border-gray-500' : 'border-gray-300'}`}>
             <Image source={require('@/assets/images/meta.png')} className="w-6 h-6 mr-2" />
             <Text className={`${isDarkMode ? 'text-white' : 'text-black'} text-center`}>Facebook</Text>
           </TouchableOpacity>
