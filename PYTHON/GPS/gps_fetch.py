@@ -1,11 +1,11 @@
-import serial
+from serial import Serial
 import time
 import re
-port = 'COM7' #for windows
-# port = '/dev/ttyUSB0' #for linux
+# port = 'COM7' #for windows
+port = '/dev/ttyUSB0' #for linux
 # Function to read GPS data from the serial port
 def read_gps_data():
-    with serial.Serial(port, 115200, timeout=1) as ser:  # Replace with your correct port
+    with Serial(port, 115200, timeout=1) as ser:  # Replace with your correct port
         while True:
             if ser.in_waiting > 0:
                 data = ser.readline().decode('utf-8', errors='ignore').strip()  # Ignore invalid characters
