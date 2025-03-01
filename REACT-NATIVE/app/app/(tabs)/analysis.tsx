@@ -69,11 +69,13 @@ const Analysis = () => {
   
   const [predictiveMaintenanceData, setPredictiveMaintenanceData] = useState<PredictiveMaintenanceData | null>(null);
 
+  const baseURL = 'http://192.168.251.63:8000';
+
   const fetchEmissionsData = async () => {
     setLoadingEmissions(true);
     setEmissionsDisabled(true);
     try {
-      const response = await axios.get('http://172.16.9.66:8000/emissions/compliance-and-plot-data', {
+      const response = await axios.get(`${baseURL}/emissions/compliance-and-plot-data`, {
         auth: {
           username: 'user',
           password: 'password'
@@ -93,7 +95,7 @@ const Analysis = () => {
     setLoadingHealthMonitoring(true);
     setHealthMonitoringDisabled(true);
     try {
-      const response = await axios.get('http://172.16.9.66:8000/engine-health/diagnose', {
+      const response = await axios.get(`${baseURL}/engine-health/diagnose`, {
         auth: {
           username: 'user',
           password: 'password'
@@ -113,7 +115,7 @@ const Analysis = () => {
     setLoadingPredictiveMaintenance(true);
     setPredictiveMaintenanceDisabled(true);
     try {
-      const response = await axios.get('http://172.16.9.66:8000/predictive-maintenance/diagnose', {
+      const response = await axios.get(`${baseURL}/predictive-maintenance/diagnose`, {
         auth: {
           username: 'user',
           password: 'password'
@@ -128,7 +130,6 @@ const Analysis = () => {
       setPredictiveMaintenanceDisabled(false);
     }
   };
-  
   return (
     <SafeAreaView className="flex-1 bg-[#f1f4de]">
       <ScrollView>

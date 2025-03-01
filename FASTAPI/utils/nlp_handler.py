@@ -3,7 +3,10 @@ import logging
 import json
 from typing import Dict, Any, Optional
 from datetime import datetime
+from dotenv import load_dotenv
+import os
 
+load_dotenv()
 # Configure logging with timestamp and user context
 logging.basicConfig(
     level=logging.INFO,
@@ -18,7 +21,7 @@ logger = logging.LoggerAdapter(logger, {'user': 'VOID-001'})
 
 class APIConfig:
     """API Configuration and Key Management"""
-    PRIMARY_API_KEY = "Add the api key here"
+    PRIMARY_API_KEY = os.getenv("OPENAI_API_KEY")
     CURRENT_UTC_TIME = "2025-01-19 11:08:51"
     CURRENT_USER = "VOID-001"
 
