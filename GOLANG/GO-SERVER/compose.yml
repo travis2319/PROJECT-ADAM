@@ -1,29 +1,58 @@
 services:
   app:
-    build: . # Build the current directory containing your Go application
+    build: . # Build the Go application
     ports:
-      - "3000:3000" # Map port 8080 from container to host
+      - "3000:3000" # Corrected port mapping
     depends_on:
-      - db # Ensure the 'db' service starts before 'app'
+      - db # Ensure PostgreSQL starts before the app
     environment:
-      - POSTGRES_HOST=db # Set the PostgreSQL host for your app
-      - POSTGRES_PORT=5432 # Set the PostgreSQL port for your app
-      - POSTGRES_USER=postgres # Set the PostgreSQL user for your app
-      - POSTGRES_PASSWORD=mysecretpassword # Set a strong password for your PostgreSQL user
-      - POSTGRES_DB=mydb # Set the PostgreSQL database name for your app
+      - POSTGRES_HOST=db
+      - POSTGRES_PORT=5432
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=mysecretpassword
+      - POSTGRES_DB=mydb
 
   db:
-    image: postgres:latest # Use the latest official PostgreSQL image
+    image: postgres:alpine
+    restart: always
     environment:
-      - POSTGRES_PASSWORD=mysecretpassword # Set the same password as used in the 'app' service
-      - POSTGRES_DB=mydb # Set the same database name as used in the 'app' service
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=mysecretpassword
+      - POSTGRES_DB=mydb
     volumes:
-      - postgres_data:/var/lib/postgresql/data1 # Persist PostgreSQL data
+      - postgres_data:/var/lib/postgresql/data # Fixed volume mount path
     ports:
       - "5432:5432"
 
 volumes:
   postgres_data: # Named volume for PostgreSQL data persistence
+
+# services:
+#   app:
+#     build: . # Build the current directory containing your Go application
+#     ports:
+#       - "3000:3000" # Map port 8080 from container to host
+#     depends_on:
+#       - db # Ensure the 'db' service starts before 'app'
+#     environment:
+#       - POSTGRES_HOST=db # Set the PostgreSQL host for your app
+#       - POSTGRES_PORT=5432 # Set the PostgreSQL port for your app
+#       - POSTGRES_USER=postgres # Set the PostgreSQL user for your app
+#       - POSTGRES_PASSWORD=mysecretpassword # Set a strong password for your PostgreSQL user
+#       - POSTGRES_DB=mydb # Set the PostgreSQL database name for your app
+
+#   db:
+#     image: postgres:latest # Use the latest official PostgreSQL image
+#     environment:
+#       - POSTGRES_PASSWORD=mysecretpassword # Set the same password as used in the 'app' service
+#       - POSTGRES_DB=mydb # Set the same database name as used in the 'app' service
+#     volumes:
+#       - postgres_data:/var/lib/postgresql/data1 # Persist PostgreSQL data
+#     ports:
+#       - "5432:5432"
+
+# volumes:
+#   postgres_data: # Named volume for PostgreSQL data persistence
 
 
 # postgresql://postgres:mysecretpassword@db:5432/mydb
