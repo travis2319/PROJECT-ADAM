@@ -1,5 +1,5 @@
 import os
-import pandas as pd
+import pandas as pd # type: ignore
 from DATA_TRANSMISSION import send_data_to_server
 
 def save_data_to_csv(obd_df, gps_df, file_path):

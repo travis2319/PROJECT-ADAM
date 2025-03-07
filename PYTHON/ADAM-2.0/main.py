@@ -1,5 +1,5 @@
 import time
-import pandas as pd
+import pandas as pd # type: ignore
 from OBD_HANDLER import ( # type: ignore
     obd_connection, async_connection, initialize_supported_pids,
     get_pid_names, setup_data_collection, start_data_collection,

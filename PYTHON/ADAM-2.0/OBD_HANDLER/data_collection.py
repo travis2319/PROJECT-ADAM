@@ -1,6 +1,6 @@
-import pandas as pd
-import numpy as np
-import obd
+import pandas as pd # type: ignore
+import numpy as np # type: ignore
+import obd # type: ignore
 from .utils import df  # Note: Importing df from utils might cause issues
 
 # Global variable
