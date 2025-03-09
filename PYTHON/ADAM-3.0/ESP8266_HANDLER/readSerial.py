@@ -4,7 +4,7 @@ import re
 
 def read_serial(conn):
     data_list = []  # Store data before writing to DataFrame
-    for _ in range(2):  # Read two lines
+    for _ in range(3):  # Read two lines
         try:
             line = conn.readline().decode('utf-8', errors='ignore').strip()
             if line:
@@ -44,8 +44,8 @@ def read_serial(conn):
             print(f"Error reading serial data: {e}")
             return None
 
-    df = pd.DataFrame(data_list, columns=["Timestamp", "GPS_Status", "Latitude", "Longitude", "Acc_X", "Acc_Y", "Acc_Z",
-                                        "Gyro_X", "Gyro_Y", "Gyro_Z", "Vibration_Status"])
+    df = pd.DataFrame(data_list, columns=["TIMESTAMP_EPS8266", "GPS_STATUS", "LATITUDE", "LONGITUDE", "ACC_X", "ACC_Y", "ACC_Z",
+                                        "GYRO_X", "GYRO_Y", "GYRO_Z", "VIBRATION_STATUS"])
     return df
 
 

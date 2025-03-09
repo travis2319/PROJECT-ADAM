@@ -18,7 +18,7 @@ func FetchHandler(c *fiber.Ctx) error {
 	}
 	defer conn.Release()
 
-	query := `SELECT * FROM obdtest`
+	query := `SELECT * FROM jesus`
 	rows, err := conn.Query(context.Background(), query)
 	if err != nil {
 		log.Printf("Failed to query data: %v", err)

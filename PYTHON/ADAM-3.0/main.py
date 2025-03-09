@@ -12,14 +12,16 @@ from OBD_HANDLER import (
 ) # type: ignore
 
 from TRANSMISSION import (
-    sendToServer,
+    upload_to_server
 )
 from ESP8266_HANDLER import (
     Esp8266_conn,
     read_serial,
 ) # type: ignore
 
-from Utils.config import read_config
+from Utils import (
+    read_config,
+    )
 
 # Global flag to control the main loop
 running = True
@@ -27,7 +29,7 @@ running = True
 Async_conn = None
 esp_conn = None
 
-def signal_handler(sig, frame):
+def signal_handler(sig, frame, Async_conn, esp_conn):
     """Handle keyboard interrupt (Ctrl+C)"""
     global running
     print("\nCtrl+C detected. Stopping data collection...")
@@ -60,12 +62,12 @@ def collect_obd_data(conn, interval, sensor_file, result_dict):
 def collect_serial_data(conn, result_dict):
     print("Starting ESP8266 data collection thread")
     try:
-        start_time = time.time()
+        # start_time = time.time()
         serial_df = read_serial(conn)
-        end_time = time.time()
+        # end_time = time.time()
         result_dict['serial_df'] = serial_df
-        result_dict['serial_time'] = end_time - start_time
-        print(f"Serial data collection completed in {result_dict['serial_time']} seconds")
+        # result_dict['serial_time'] = end_time - start_time
+        # print(f"Serial data collection completed in {result_dict['serial_time']} seconds")
     except Exception as e:
         print(f"Error in ESP8266 data collection: {e}")
         result_dict['serial_df'] = pd.DataFrame()
@@ -78,8 +80,8 @@ def merge_dataframes(obd_df, serial_df):
     
     # Add timestamp columns
     timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    obd_df["timestamp_obd"] = timestamp
-    serial_df["timestamp_esp8266"] = timestamp
+    obd_df["MERGED_TIMESTAMP"] = timestamp
+    # serial_df["Timestamp_Esp8266"] = timestamp
     
     # Concatenate DataFrames horizontally
     combined_df = pd.concat([obd_df, serial_df], axis=1)
@@ -182,7 +184,7 @@ def main():
                     print(f"Data successfully appended to {data_csv_path}")
                 
                 # Upload temp.csv to remote server
-                upload_result = sendToServer(temp_csv_path, server_url)
+                upload_result = upload_to_server(temp_csv_path, server_url)
                 if upload_result:
                     print("File successfully uploaded to server")
                 

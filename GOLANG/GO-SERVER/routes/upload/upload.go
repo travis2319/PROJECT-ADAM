@@ -61,7 +61,7 @@ func StoreHandler(c *fiber.Ctx) error {
 	}
 
 	// Build a dynamic SQL query to create a table
-	tableName := "obdtest" // Use a dynamic name if needed
+	tableName := "jesus" // Use a dynamic name if needed
 	columns := make([]string, len(header))
 	for i, col := range header {
 		columns[i] = fmt.Sprintf("%s TEXT", strings.ToLower(strings.ReplaceAll(col, " ", "_")))

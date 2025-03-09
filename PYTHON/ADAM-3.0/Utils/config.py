@@ -11,4 +11,9 @@ def read_config(config_file="config.txt"):
     esp8266_baud = config.get('Ports', 'esp8266_baud', fallback='115200')
     sensor_file = config.get('Files', 'sensor_file', fallback='sensor_names.txt')
     
-    return obd_port, esp8266_port, esp8266_baud, sensor_file
+    # Add new parameters with default values as fallback
+    temp_csv_path = config.get('Files', 'temp_csv_path', fallback='temp.csv')
+    data_csv_path = config.get('Files', 'data_csv_path', fallback='data.csv')
+    server_url = config.get('Server', 'server_url', fallback='http://127.0.0.1:3000/upload')
+    
+    return obd_port, esp8266_port, esp8266_baud, sensor_file, temp_csv_path, data_csv_path, server_url

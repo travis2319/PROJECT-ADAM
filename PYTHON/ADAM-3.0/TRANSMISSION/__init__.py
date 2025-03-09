@@ -1,7 +1,7 @@
 
 
-from sendToServer import sendToServer
+from .sendToServer import upload_to_server
 
 __all__ = [
-    "sendToServer"
+    "upload_to_server"
 ]
