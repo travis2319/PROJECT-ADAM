@@ -3,7 +3,7 @@ import React, { useState } from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import axios from 'axios'
 import { MaterialCommunityIcons, FontAwesome5, FontAwesome6, FontAwesome } from '@expo/vector-icons'
-import cardData from '../../constants/cardData'
+import cardData from '@/constants/cardData'
 
 const Analysis = () => {
   interface EmissionsData {
