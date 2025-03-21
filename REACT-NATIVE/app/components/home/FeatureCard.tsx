@@ -34,7 +34,7 @@ export const FeatureCard: React.FC<FeatureCardProps> = ({
       >
         <Text className="text-xl font-bold text-gray-800 z-10">{title}</Text>
         
-        <Image source={icon} className="w-12 h-12 self-end z-10" />
+        <Image source={icon} className="w-10 h-12 self-end z-10" />
         
         {backgroundIcon && (
           <Image

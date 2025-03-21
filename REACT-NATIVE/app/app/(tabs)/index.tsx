@@ -31,17 +31,17 @@ export default function Home() {
           speed={{ value: 26, unit: 'km/h' }}
         />
         
-        <View className="px-4 mt-4">
+        <View className="px-6 mt-6">
           <SectionTitle title="Features" />
         </View>
         
         <FeatureGrid 
           features={FEATURES_DATA}
-          cardHeight={Math.min(height * 0.18, 140)}
+          cardHeight={Math.min(height * 0.18, 200)}
         />
         
         {/* Added bottom padding for scrolling comfort */}
-        <View className="h-4" />
+        <View className="h-8" />
       </ScrollView>
     </SafeAreaView>
   );
