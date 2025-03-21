@@ -13,19 +13,48 @@ services:
       - POSTGRES_DB=mydb
 
   db:
-    image: postgres:alpine
+    image: ankane/pgvector:latest # PostgreSQL with pgvector extension
     restart: always
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=mysecretpassword
       - POSTGRES_DB=mydb
     volumes:
-      - postgres_data:/var/lib/postgresql/data # Fixed volume mount path
+      - postgres_data:/var/lib/postgresql/data # Persist PostgreSQL data
     ports:
       - "5432:5432"
 
 volumes:
   postgres_data: # Named volume for PostgreSQL data persistence
+
+# services:
+#   app:
+#     build: . # Build the Go application
+#     ports:
+#       - "3000:3000" # Corrected port mapping
+#     depends_on:
+#       - db # Ensure PostgreSQL starts before the app
+#     environment:
+#       - POSTGRES_HOST=db
+#       - POSTGRES_PORT=5432
+#       - POSTGRES_USER=postgres
+#       - POSTGRES_PASSWORD=mysecretpassword
+#       - POSTGRES_DB=mydb
+
+#   db:
+#     image: postgres:alpine
+#     restart: always
+#     environment:
+#       - POSTGRES_USER=postgres
+#       - POSTGRES_PASSWORD=mysecretpassword
+#       - POSTGRES_DB=mydb
+#     volumes:
+#       - postgres_data:/var/lib/postgresql/data # Fixed volume mount path
+#     ports:
+#       - "5432:5432"
+
+# volumes:
+#   postgres_data: # Named volume for PostgreSQL data persistence
 
 # services:
 #   app:
