@@ -27,7 +27,7 @@ export const FEATURES_DATA: FeatureType[] = [
     title: 'Car Profile',
     icon: icon,
     backgroundColor: '#93c6e7',
-    navigateTo: '',
+    navigateTo: '/(profile)',
   },
   {
     title: 'Locations',

@@ -2,11 +2,11 @@ import { View, ScrollView } from 'react-native';
 import React from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { MaterialCommunityIcons, FontAwesome5 } from '@expo/vector-icons';
-import DataCard from '../../components/analysis/DataCard';
+import DataCard from '@/components/analysis/DataCard';
 import { HealthMonitoringDisplay, EmissionsDisplay, PredictiveMaintenanceDisplay } from '@/components/analysis/DataDisplay';
-import { useFetch } from '../../hooks/useFetch';
-import { analysisService } from '../../services/api';
-import { cardThemes } from '../../constants/cardThemes';
+import { useFetch } from '@/hooks/useFetch';
+import { analysisService } from '@/services/api';
+import { cardThemes } from '@/constants/cardThemes';
 
 const Analysis = () => {
   const { 

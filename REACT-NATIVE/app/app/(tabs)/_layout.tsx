@@ -21,7 +21,7 @@ export default function TabLayout() {
         //   default: {},
         // }),
       }}
-      // tabBar={props => <TabBar{...props}/>}
+      tabBar={props => <TabBar{...props}/>}
       >
       <Tabs.Screen
         name="index"
