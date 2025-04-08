@@ -1,12 +1,12 @@
 [Ports]
-obd_port=/dev/pts/3
+obd_port=/dev/ttyACM0
 esp8266_port=/dev/ttyUSB0
 esp8266_baud=115200
 
 [Files]
 sensor_file=sensor_names.txt
 temp_csv_path=temp.csv
-data_csv_path=data.csv
+data_csv_path=cansaulim_creta_test_new.csv
 
 [Server]
 server_url=http://127.0.0.1:3000/upload
