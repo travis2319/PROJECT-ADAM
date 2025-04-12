@@ -7,3 +7,4 @@ sqlalchemy
 matplotlib
 seaborn
 openai
+dotenv
