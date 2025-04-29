@@ -6,7 +6,7 @@ esp8266_baud=115200
 [Files]
 sensor_file=sensor_names.txt
 temp_csv_path=temp.csv
-data_csv_path=cansaulim_creta_test_new.csv
+data_csv_path=v3_Kushaq_new-28.csv
 
 [Server]
 server_url=http://127.0.0.1:3000/upload
