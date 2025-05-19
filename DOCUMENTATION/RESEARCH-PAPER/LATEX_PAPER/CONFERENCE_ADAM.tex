@@ -1,19 +1,17 @@
 \documentclass[conference]{IEEEtran}
 \IEEEoverridecommandlockouts
-% The preceding line is only needed to identify funding in the first footnote. If that is unneeded, please comment it out.
 \usepackage{cite}
 \usepackage{amsmath,amssymb,amsfonts}
 \usepackage{algorithmic}
 \usepackage{graphicx}
 \usepackage{textcomp}
 \usepackage{xcolor}
+\usepackage[hidelinks]{hyperref}
 \def\BibTeX{{\rm B\kern-.05em{\sc i\kern-.025em b}\kern-.08em
     T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
 \begin{document}
 
 \title{AUTOMOTIVE DIAGNOSTIC AND ACTIVITY MONITORING\\
-% {\footnotesize \textsuperscript{*}Note: Sub-titles are not captured in Xplore and
-% should not be used}
 }
 
 \author{\IEEEauthorblockN{Travis Samson Fernandes}
@@ -45,34 +43,39 @@ Verna,Goa \\
 \maketitle
 
 \begin{abstract}
-The Automotive Diagnostic and Activity Monitoring system helps owners to know about their 4 wheeler vehicle engine health and also offers blackbox for forensic purposes. The ADAM system is a collections of various modules such as the GLOBAL POSITIONING SYSTEM (GPS), GYROSCOPE and ACCELEROMETER (MPU6050), VIBRATION SENSOR (SW-420) along with this it monitors the ELECTRONIC CONTROLLER UNIT (ECU) using communication interface called ON-Board Diagnostic (OBD) port.This adam system collects and monitors all the sensor data and store it securely in sd card. The collected data is stored in postgres database and accessed by machine learning models 1.Engine Health Monitoring 2. Fuel Economy 3. Driver Behaviour 4. Predictive Maintaenance . All this models result is reflected on a dedicated mobile application which visualise in terms of graph and charts along with this we implemented an interactive chatbot that helps find user queries and provides neccessary actions to performs.
+The Automotive Diagnostic and Activity Monitoring (ADAM) System is an integrated solution designed to provide real-time insights into the health and behavior of four-wheeled vehicles. Acting as both a diagnostic tool and a forensic black box, ADAM harmonizes multiple sensing modules—including a Global Positioning System (GPS), a gyroscope and accelerometer (MPU6050), and a vibration sensor (SW-420)—to observe vehicular dynamics. At its core, the system interfaces with the vehicle’s Electronic Control Unit (ECU) via the On-Board Diagnostics (OBD) port, enabling deep access to engine parameters and fault codes.Sensor data is continuously collected, securely stored on an SD card, and synchronized with a PostgreSQL database. This rich dataset fuels a suite of machine learning models tailored for four key objectives: (1) Engine Health Monitoring, (2) Fuel Economy Analysis, (3) Driver Behavior Profiling, and (4) Predictive Maintenance. Insights derived from these models are visually rendered through an intuitive mobile application that presents the information via dynamic graphs and charts.To further enhance user engagement, the system incorporates an interactive AI-powered chatbot capable of responding to user queries and guiding necessary actions. Together, these components form a cohesive ecosystem—bridging vehicle intelligence with user accessibility, and paving the way for smarter, safer, and more informed driving experiences.
+
 \end{abstract}
 
 \begin{IEEEkeywords}
-raspberry pi 5, elm327, mpu6050, sw-420, neo 6m, Nodemcu
+Raspberry pi 5, On Board Diagnostic(OBD), Global Positioning System(GPS), ECU(Electronic Control Unit)
 \end{IEEEkeywords}
 
 \section{Introduction}
-This document is a model and instructions for \LaTeX.
-Please observe the conference page limits. 
+Over the last couple of years, vehicle monitoring has been a necessary measure to make vehicles and drivers safe, cut down on emissions to tackle climate change , and provide optimal performance. The significance of protecting human life and the necessity to obtain genuine information at the time of accidents for forensic analysis reinforce the importance of efficient monitoring systems. To serve this purpose, we created a vehicle monitoring logger on the basis of On-Board Diagnostics (OBD-II) port. The OBD-II port is a 16-pin standardized connector found in every contemporary vehicle,developed in the United States Of America in 1996, by the  Society of Automotive Engineers (SAE). It was imposed to enable regulation  of vehicle emission so as to ensure Environmental Protection Agency(EPA) standards are met. It is a diagnostic port used to monitor real-time readings of vehicle sensors and the Diagnostic Trouble Codes (DTCs) from the Electronic Control Unit (ECU), making it a valuable resource for monitoring vehicle performance.Ecu is a the main controller of the vehicle where all controls and actions are done.
 
-\section{Ease of Use}
+OBD II port supports communication protocols such as ISO15765-4 (CAN-BUS), ISO14230-4 (KWP2000), ISO 9141-2, SAE J1850 VPW, and SAE J1850 PWM.  This study is centered on the ISO 15765-4 (CAN-BUS) protocol that has been required on vehicles manufactured from 1996.
+The message request is send in a hexadecimal to the protocols and it gets interpreted according  to one of the five OBD II protocols and sends back a hexadecimal response.Obd II uses two types of codes to request ECU data that are Diagnostic Trouble Code (DTCs) and Parameter Identifiers (PIDs).DTC are used to diagnostic malfunctions in various subsystem of the vehicle and PIDs are used to measure real time parameters 
 
-\subsection{Maintaining the Integrity of the Specifications}
 
-The IEEEtran class file is used to format your paper and style the text. All margins, 
-column widths, line spaces, and text fonts are prescribed; please do not 
-alter them. You may note peculiarities. For example, the head margin
-measures proportionately more than is customary. This measurement 
-and others are deliberate, using specifications that anticipate your paper 
-as one part of the entire proceedings, and not as an independent document. 
-Please do not revise any of the current designations.
+\section{Literature Review:}
+In Recent years, there has been advancements in design and development of On board Diagnostic and also there are machine learning algorithms for predicting engine performance , fuel consumption and anomaly detection. In this section, we review the literature on design and development of OBD boards and developed machine learning algorithms.Additionally, we identify gaps in recent literature
+\subsection{Design and Development of On-Boards Diagnostic circuits}
+
+The study [1] contributes to the design of On Board Diagnostic systems that provides real-time information about a vehicle, such as engine speed, coolant temperature, pressure, and Diagnostic Trouble Codes (DTCs).Data Collection of OBD Using a keaz128 microcontroller.
+This paper [2] designs an Diagnostic system that has various data collection sources like gps,imu,camera and  OBD port and stores locally for every  100 ms. Using BeagleBoard-XM with TI OMAP3530 processor logs the data.
+This paper [3] designs of Diagnostic system that collect obd data using  ELM327 microcontroller along with gps .The data is transmitted to remote server and stored in sql database and transmit data using Carambola2 WiFi module.
+
+\subsection{Review of Machine Learning Algorithms}
+
+This study [4] is a detailed survey of machine learning methods used in engine performance, control, and fault diagnosis. It emphasizes the employment of Artificial Neural Networks (ANN), Support Vector Machines (SVM), Random Forests (RF), and neuro-fuzzy models such as ANFIS for improving fuel economy and emission control. The review also discusses the use of AI in engine control with a special focus on reinforcement learning (RL) and deep reinforcement learning (DRL) for enhanced adaptability, efficiency, and real-time decision-making in sophisticated engine operations.
+
 
 \section{Prepare Your Paper Before Styling}
 Before you begin to format your paper, first write and save the content as a 
 separate text file. Complete all content and organizational editing before 
-formatting. Please note sections \ref{AA}--\ref{SCM} below for more information on 
-proofreading, spelling and grammar.
+% formatting. Please note sections \ref{AA}--\ref{SCM} below for more information on 
+% proofreading, spelling and grammar.
 
 Keep your text and graphic files separate until after the text has been 
 formatted and styled. Do not number text heads---{\LaTeX} will do that 
@@ -251,24 +254,13 @@ abstract or reference list. Use letters for table footnotes.
 Unless there are six authors or more give all authors' names; do not use 
 ``et al.''. Papers that have not been published, even if they have been 
 submitted for publication, should be cited as ``unpublished'' \cite{b4}. Papers 
-that have been accepted for publication should be cited as ``in press'' \cite{b5}. 
-Capitalize only the first word in a paper title, except for proper nouns and 
-element symbols.
 
-For papers published in translation journals, please give the English 
-citation first, followed by the original foreign-language citation \cite{b6}.
 
 \begin{thebibliography}{00}
-\bibitem{b1} G. Eason, B. Noble, and I. N. Sneddon, ``On certain integrals of Lipschitz-Hankel type involving products of Bessel functions,'' Phil. Trans. Roy. Soc. London, vol. A247, pp. 529--551, April 1955.
-\bibitem{b2} J. Clerk Maxwell, A Treatise on Electricity and Magnetism, 3rd ed., vol. 2. Oxford: Clarendon, 1892, pp.68--73.
-\bibitem{b3} I. S. Jacobs and C. P. Bean, ``Fine particles, thin films and exchange anisotropy,'' in Magnetism, vol. III, G. T. Rado and H. Suhl, Eds. New York: Academic, 1963, pp. 271--350.
-\bibitem{b4} K. Elissa, ``Title of paper if known,'' unpublished.
-\bibitem{b5} R. Nicole, ``Title of paper with only first word capitalized,'' J. Name Stand. Abbrev., in press.
-\bibitem{b6} Y. Yorozu, M. Hirano, K. Oka, and Y. Tagawa, ``Electron spectroscopy studies on magneto-optical media and plastic substrate interface,'' IEEE Transl. J. Magn. Japan, vol. 2, pp. 740--741, August 1987 [Digests 9th Annual Conf. Magnetics Japan, p. 301, 1982].
-\bibitem{b7} M. Young, The Technical Writer's Handbook. Mill Valley, CA: University Science, 1989.
-\end{thebibliography}
-\vspace{12pt}
-\color{red}
-IEEE conference templates contain guidance text for composing and formatting conference papers. Please ensure that all template text is removed from your conference paper prior to submission to the conference. Failure to remove the template text from your paper may result in your paper not being published.
+\bibitem{b1} P. R. Sawant and Y. B. Mane, ``Design and Development of On-Board Diagnostic (OBD) Device for Cars,'' in \textit{Proc. 4th Int. Conf. on Computing Communication Control and Automation (ICCUBEA)}, Pune, India, 2018, pp. 1--4, doi: \href{https://doi.org/10.1109/ICCUBEA.2018.8697833}{10.1109/ICCUBEA.2018.8697833}.
+\bibitem{b2} D. L. Nguyen, M. E. Lee, and A. Lensky, ``The design and implementation of new Vehicle Black Box using the OBD information,'' in \textit{Proc. 7th Int. Conf. on Computing and Convergence Technology (ICCCT)}, 2012, pp. 1281--1284.
+\bibitem{b3} R. Malekian, N. R. Moloisane, L. Nair, B. T. Maharaj, and U. A. K. Chude-Okonkwo, ``Design and Implementation of a Wireless OBD II Fleet Management System,'' \textit{IEEE Sensors Journal}, vol. 17, no. 4, pp. 1154--1164, Feb. 15, 2017, doi: \href{https://doi.org/10.1109/JSEN.2016.2631542}{10.1109/JSEN.2016.2631542}.
+\bibitem{b4} L. F. I. Havugimana, B. Liu, F. Liu, J. Zhang, B. Li, and P. Wan, ``Review of Artificial Intelligent Algorithms for Engine Performance, Control, and Diagnosis,'' \textit{Energies}, vol. 16, no. 3, art. no. 1206, 2023, doi: \href{https://doi.org/10.3390/en16031206}{10.3390/en16031206}.
 
+\end{thebibliography}
 \end{document}
