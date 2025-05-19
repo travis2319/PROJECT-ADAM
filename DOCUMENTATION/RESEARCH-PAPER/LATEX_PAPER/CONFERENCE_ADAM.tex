@@ -2,7 +2,8 @@
 \IEEEoverridecommandlockouts
 \usepackage{cite}
 \usepackage{amsmath,amssymb,amsfonts}
-\usepackage{algorithmic}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
 \usepackage{graphicx}
 \usepackage{textcomp}
 \usepackage{xcolor}
@@ -163,6 +164,52 @@ surrounding equation.
 \item The abbreviation ``i.e.'' means ``that is'', and the abbreviation ``e.g.'' means ``for example''.
 \end{itemize}
 An excellent style manual for science writers is \cite{b7}.
+\begin{algorithm}
+    \caption{IoT Sensor Data Collection and Transmission}
+    \begin{algorithmic}[1]
+    \State \textbf{Initialize:}
+    \State \quad Initialize GPS module
+    \State \quad Initialize accelerometer/gyroscope
+    \State \quad Initialize vibration sensor
+    \State \quad Initialize OBD-II port connection
+    \State \quad Create empty dataframe $df$
+    \State \quad Connect to server
+    \State \quad Create main CSV file if not exists
+    
+    \While{not exit\_condition}
+        \State $timestamp \gets$ current time
+        
+        \State \textbf{Collect sensor data:}
+        \State \quad $gps\_data \gets$ read\_from\_NEO6M()
+        \State \quad $accel\_data, gyro\_data \gets$ read\_from\_MPU6050()
+        \State \quad $vibration\_level \gets$ read\_from\_SW420()
+        \State \quad $obd\_data \gets$ read\_from\_OBDII()
+        
+        \State \textbf{Organize data into record:}
+        \State \quad $record \gets \{timestamp, gps\_data, accel\_data, gyro\_data,$
+        \State \quad $vibration\_level, obd\_data\}$
+        \State \textbf{Append to dataframe:}
+        \State \quad $df \gets df \cup record$
+        
+        \State \textbf{Transmit to server:}
+        \State \quad transmit\_data\_to\_server($record$)
+        
+        \State \textbf{Append to CSV:}
+        \State \quad append\_to\_csv($record$, main\_csv\_file)
+        
+        \State \textbf{Check conditions:}
+        \State \quad $exit\_condition \gets$ check\_exit\_conditions()
+        
+        \State \textbf{Wait for next sampling interval}
+    \EndWhile
+    
+    \State \textbf{Cleanup:}
+    \State \quad Close all sensor connections
+    \State \quad Close server connection
+    \State \quad Save final state
+    \end{algorithmic}
+\end{algorithm}
+
 
 \subsection{Authors and Affiliations}
 \textbf{The class file is designed for, but not limited to, six authors.} A 
@@ -239,6 +286,8 @@ The preferred spelling of the word ``acknowledgment'' in America is without
 an ``e'' after the ``g''. Avoid the stilted expression ``one of us (R. B. 
 G.) thanks $\ldots$''. Instead, try ``R. B. G. thanks$\ldots$''. Put sponsor 
 acknowledgments in the unnumbered footnote on the first page.
+
+
 
 \section*{References}
 
