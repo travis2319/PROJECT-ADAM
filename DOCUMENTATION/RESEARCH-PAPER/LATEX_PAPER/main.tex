@@ -42,112 +42,17 @@ Verna,Goa \\
 }
 
 \maketitle
+\input{sections/abstract}
 
-\begin{abstract}
-The Automotive Diagnostic and Activity Monitoring (ADAM) System is an integrated solution designed to provide real-time insights into the health and behavior of four-wheeled vehicles. Acting as both a diagnostic tool and a forensic black box, ADAM harmonizes multiple sensing modules—including a Global Positioning System (GPS), a gyroscope and accelerometer (MPU6050), and a vibration sensor (SW-420)—to observe vehicular dynamics. At its core, the system interfaces with the vehicle’s Electronic Control Unit (ECU) via the On-Board Diagnostics (OBD) port, enabling deep access to engine parameters and fault codes.Sensor data is continuously collected, securely stored on an SD card, and synchronized with a PostgreSQL database. This rich dataset fuels a suite of machine learning models tailored for four key objectives: (1) Engine Health Monitoring, (2) Fuel Economy Analysis, (3) Driver Behavior Profiling, and (4) Predictive Maintenance. Insights derived from these models are visually rendered through an intuitive mobile application that presents the information via dynamic graphs and charts.To further enhance user engagement, the system incorporates an interactive AI-powered chatbot capable of responding to user queries and guiding necessary actions. Together, these components form a cohesive ecosystem—bridging vehicle intelligence with user accessibility, and paving the way for smarter, safer, and more informed driving experiences.
+\input{sections/keywords}
 
-\end{abstract}
+\input{sections/introduction}
+\input{sections/related_work}
+\input{sections/method}
+\input{sections/results}
+\input{sections/discussion}
+\input{sections/conclusion}
 
-\begin{IEEEkeywords}
-Raspberry pi 5, On Board Diagnostic(OBD), Global Positioning System(GPS), ECU(Electronic Control Unit)
-\end{IEEEkeywords}
-
-\section{Introduction}
-Over the last couple of years, vehicle monitoring has been a necessary measure to make vehicles and drivers safe, cut down on emissions to tackle climate change , and provide optimal performance. The significance of protecting human life and the necessity to obtain genuine information at the time of accidents for forensic analysis reinforce the importance of efficient monitoring systems. To serve this purpose, we created a vehicle monitoring logger on the basis of On-Board Diagnostics (OBD-II) port. The OBD-II port is a 16-pin standardized connector found in every contemporary vehicle,developed in the United States Of America in 1996, by the  Society of Automotive Engineers (SAE). It was imposed to enable regulation  of vehicle emission so as to ensure Environmental Protection Agency(EPA) standards are met. It is a diagnostic port used to monitor real-time readings of vehicle sensors and the Diagnostic Trouble Codes (DTCs) from the Electronic Control Unit (ECU), making it a valuable resource for monitoring vehicle performance.Ecu is a the main controller of the vehicle where all controls and actions are done.
-
-OBD II port supports communication protocols such as ISO15765-4 (CAN-BUS), ISO14230-4 (KWP2000), ISO 9141-2, SAE J1850 VPW, and SAE J1850 PWM.  This study is centered on the ISO 15765-4 (CAN-BUS) protocol that has been required on vehicles manufactured from 1996.
-The message request is send in a hexadecimal to the protocols and it gets interpreted according  to one of the five OBD II protocols and sends back a hexadecimal response.Obd II uses two types of codes to request ECU data that are Diagnostic Trouble Code (DTCs) and Parameter Identifiers (PIDs).DTC are used to diagnostic malfunctions in various subsystem of the vehicle and PIDs are used to measure real time parameters 
-
-
-\section{Literature Review:}
-In Recent years, there has been advancements in design and development of On board Diagnostic and also there are machine learning algorithms for predicting engine performance , fuel consumption and anomaly detection. In this section, we review the literature on design and development of OBD boards and developed machine learning algorithms.Additionally, we identify gaps in recent literature
-\subsection{Design and Development of On-Boards Diagnostic circuits}
-
-The study [1] contributes to the design of On Board Diagnostic systems that provides real-time information about a vehicle, such as engine speed, coolant temperature, pressure, and Diagnostic Trouble Codes (DTCs).Data Collection of OBD Using a keaz128 microcontroller.
-This paper [2] designs an Diagnostic system that has various data collection sources like gps,imu,camera and  OBD port and stores locally for every  100 ms. Using BeagleBoard-XM with TI OMAP3530 processor logs the data.
-This paper [3] designs of Diagnostic system that collect obd data using  ELM327 microcontroller along with gps .The data is transmitted to remote server and stored in sql database and transmit data using Carambola2 WiFi module.
-
-\subsection{Review of Machine Learning Algorithms}
-
-This study [4] is a detailed survey of machine learning methods used in engine performance, control, and fault diagnosis. It emphasizes the employment of Artificial Neural Networks (ANN), Support Vector Machines (SVM), Random Forests (RF), and neuro-fuzzy models such as ANFIS for improving fuel economy and emission control. The review also discusses the use of AI in engine control with a special focus on reinforcement learning (RL) and deep reinforcement learning (DRL) for enhanced adaptability, efficiency, and real-time decision-making in sophisticated engine operations.
-
-
-\section{Prepare Your Paper Before Styling}
-Before you begin to format your paper, first write and save the content as a 
-separate text file. Complete all content and organizational editing before 
-% formatting. Please note sections \ref{AA}--\ref{SCM} below for more information on 
-% proofreading, spelling and grammar.
-
-Keep your text and graphic files separate until after the text has been 
-formatted and styled. Do not number text heads---{\LaTeX} will do that 
-for you.
-
-\subsection{Abbreviations and Acronyms}\label{AA}
-Define abbreviations and acronyms the first time they are used in the text, 
-even after they have been defined in the abstract. Abbreviations such as 
-IEEE, SI, MKS, CGS, ac, dc, and rms do not have to be defined. Do not use 
-abbreviations in the title or heads unless they are unavoidable.
-
-\subsection{Units}
-\begin{itemize}
-\item Use either SI (MKS) or CGS as primary units. (SI units are encouraged.) English units may be used as secondary units (in parentheses). An exception would be the use of English units as identifiers in trade, such as ``3.5-inch disk drive''.
-\item Avoid combining SI and CGS units, such as current in amperes and magnetic field in oersteds. This often leads to confusion because equations do not balance dimensionally. If you must use mixed units, clearly state the units for each quantity that you use in an equation.
-\item Do not mix complete spellings and abbreviations of units: ``Wb/m\textsuperscript{2}'' or ``webers per square meter'', not ``webers/m\textsuperscript{2}''. Spell out units when they appear in text: ``. . . a few henries'', not ``. . . a few H''.
-\item Use a zero before decimal points: ``0.25'', not ``.25''. Use ``cm\textsuperscript{3}'', not ``cc''.)
-\end{itemize}
-
-\subsection{Equations}
-Number equations consecutively. To make your 
-equations more compact, you may use the solidus (~/~), the exp function, or 
-appropriate exponents. Italicize Roman symbols for quantities and variables, 
-but not Greek symbols. Use a long dash rather than a hyphen for a minus 
-sign. Punctuate equations with commas or periods when they are part of a 
-sentence, as in:
-\begin{equation}
-a+b=\gamma\label{eq}
-\end{equation}
-
-Be sure that the 
-symbols in your equation have been defined before or immediately following 
-the equation. Use ``\eqref{eq}'', not ``Eq.~\eqref{eq}'' or ``equation \eqref{eq}'', except at 
-the beginning of a sentence: ``Equation \eqref{eq} is . . .''
-
-\subsection{\LaTeX-Specific Advice}
-
-Please use ``soft'' (e.g., \verb|\eqref{Eq}|) cross references instead
-of ``hard'' references (e.g., \verb|(1)|). That will make it possible
-to combine sections, add equations, or change the order of figures or
-citations without having to go through the file line by line.
-
-Please don't use the \verb|{eqnarray}| equation environment. Use
-\verb|{align}| or \verb|{IEEEeqnarray}| instead. The \verb|{eqnarray}|
-environment leaves unsightly spaces around relation symbols.
-
-Please note that the \verb|{subequations}| environment in {\LaTeX}
-will increment the main equation counter even when there are no
-equation numbers displayed. If you forget that, you might write an
-article in which the equation numbers skip from (17) to (20), causing
-the copy editors to wonder if you've discovered a new method of
-counting.
-
-{\BibTeX} does not work by magic. It doesn't get the bibliographic
-data from thin air but from .bib files. If you use {\BibTeX} to produce a
-bibliography you must send the .bib files. 
-
-{\LaTeX} can't read your mind. If you assign the same label to a
-subsubsection and a table, you might find that Table I has been cross
-referenced as Table IV-B3. 
-
-{\LaTeX} does not have precognitive abilities. If you put a
-\verb|\label| command before the command that updates the counter it's
-supposed to be using, the label will pick up the last counter to be
-cross referenced instead. In particular, a \verb|\label| command
-should not go before the caption of a figure or a table.
-
-Do not use \verb|\nonumber| inside the \verb|{array}| environment. It
-will not stop equation numbers inside \verb|{array}| (there won't be
-any anyway) and it might stop a wanted equation number in the
-surrounding equation.
 
 \subsection{Some Common Mistakes}\label{SCM}
 \begin{itemize}
@@ -209,100 +114,6 @@ An excellent style manual for science writers is \cite{b7}.
     \State \quad Save final state
     \end{algorithmic}
 \end{algorithm}
-
-
-\subsection{Authors and Affiliations}
-\textbf{The class file is designed for, but not limited to, six authors.} A 
-minimum of one author is required for all conference articles. Author names 
-should be listed starting from left to right and then moving down to the 
-next line. This is the author sequence that will be used in future citations 
-and by indexing services. Names should not be listed in columns nor group by 
-affiliation. Please keep your affiliations as succinct as possible (for 
-example, do not differentiate among departments of the same organization).
-
-\subsection{Identify the Headings}
-Headings, or heads, are organizational devices that guide the reader through 
-your paper. There are two types: component heads and text heads.
-
-Component heads identify the different components of your paper and are not 
-topically subordinate to each other. Examples include Acknowledgments and 
-References and, for these, the correct style to use is ``Heading 5''. Use 
-``figure caption'' for your Figure captions, and ``table head'' for your 
-table title. Run-in heads, such as ``Abstract'', will require you to apply a 
-style (in this case, italic) in addition to the style provided by the drop 
-down menu to differentiate the head from the text.
-
-Text heads organize the topics on a relational, hierarchical basis. For 
-example, the paper title is the primary text head because all subsequent 
-material relates and elaborates on this one topic. If there are two or more 
-sub-topics, the next level head (uppercase Roman numerals) should be used 
-and, conversely, if there are not at least two sub-topics, then no subheads 
-should be introduced.
-
-\subsection{Figures and Tables}
-\paragraph{Positioning Figures and Tables} Place figures and tables at the top and 
-bottom of columns. Avoid placing them in the middle of columns. Large 
-figures and tables may span across both columns. Figure captions should be 
-below the figures; table heads should appear above the tables. Insert 
-figures and tables after they are cited in the text. Use the abbreviation 
-``Fig.~\ref{fig}'', even at the beginning of a sentence.
-
-\begin{table}[htbp]
-\caption{Table Type Styles}
-\begin{center}
-\begin{tabular}{|c|c|c|c|}
-\hline
-\textbf{Table}&\multicolumn{3}{|c|}{\textbf{Table Column Head}} \\
-\cline{2-4} 
-\textbf{Head} & \textbf{\textit{Table column subhead}}& \textbf{\textit{Subhead}}& \textbf{\textit{Subhead}} \\
-\hline
-copy& More table copy$^{\mathrm{a}}$& &  \\
-\hline
-\multicolumn{4}{l}{$^{\mathrm{a}}$Sample of a Table footnote.}
-\end{tabular}
-\label{tab1}
-\end{center}
-\end{table}
-
-\begin{figure}[htbp]
-\centerline{\includegraphics{fig1.png}}
-\caption{Example of a figure caption.}
-\label{fig}
-\end{figure}
-
-Figure Labels: Use 8 point Times New Roman for Figure labels. Use words 
-rather than symbols or abbreviations when writing Figure axis labels to 
-avoid confusing the reader. As an example, write the quantity 
-``Magnetization'', or ``Magnetization, M'', not just ``M''. If including 
-units in the label, present them within parentheses. Do not label axes only 
-with units. In the example, write ``Magnetization (A/m)'' or ``Magnetization 
-\{A[m(1)]\}'', not just ``A/m''. Do not label axes with a ratio of 
-quantities and units. For example, write ``Temperature (K)'', not 
-``Temperature/K''.
-
-\section*{Acknowledgment}
-
-The preferred spelling of the word ``acknowledgment'' in America is without 
-an ``e'' after the ``g''. Avoid the stilted expression ``one of us (R. B. 
-G.) thanks $\ldots$''. Instead, try ``R. B. G. thanks$\ldots$''. Put sponsor 
-acknowledgments in the unnumbered footnote on the first page.
-
-
-
-\section*{References}
-
-Please number citations consecutively within brackets \cite{b1}. The 
-sentence punctuation follows the bracket \cite{b2}. Refer simply to the reference 
-number, as in \cite{b3}---do not use ``Ref. \cite{b3}'' or ``reference \cite{b3}'' except at 
-the beginning of a sentence: ``Reference \cite{b3} was the first $\ldots$''
-
-Number footnotes separately in superscripts. Place the actual footnote at 
-the bottom of the column in which it was cited. Do not put footnotes in the 
-abstract or reference list. Use letters for table footnotes.
-
-Unless there are six authors or more give all authors' names; do not use 
-``et al.''. Papers that have not been published, even if they have been 
-submitted for publication, should be cited as ``unpublished'' \cite{b4}. Papers 
 
 
 \begin{thebibliography}{00}
