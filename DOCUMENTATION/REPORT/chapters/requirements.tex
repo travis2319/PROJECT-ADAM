@@ -1,0 +1,86 @@
+\chapter{REQUIREMENTS}
+\justify
+
+\section{Functional Requirements}
+Functional requirements define the specific operations and functionalities the ADAM System must perform under various conditions. These include:
+
+\begin{enumerate}
+    \item \textbf{Real-Time Data Collection:}
+    \begin{itemize}
+        \item Continuously retrieve and store data such as RPM, speed, engine temperature, and throttle position from the OBD-II interface.
+        \item Ensure secure and uninterrupted data transmission to the processing unit.
+    \end{itemize}
+
+    \item \textbf{Black Box Functionality:}
+    \begin{itemize}
+        \item Record and retain critical vehicle parameters during regular operation and immediately preceding an accident.
+        \item Enable playback or export of stored data for analysis and forensic purposes.
+    \end{itemize}
+    \item \textbf{Mobile Application Features:}
+    \begin{itemize}
+        \item Provide real-time visualizations of vehicle performance and health metrics.
+        \item Alert users to diagnostic issues and suggest maintenance actions.
+        \item Support CSV export of forensic data for law enforcement or insurance purposes.
+    \end{itemize}
+    \item \textbf{Driving Pattern Analysis:}
+    \begin{itemize}
+        \item Collect and analyze driving behavior, including acceleration, braking, and speed trends.
+        \item Provide feedback for users, insurers, and government agencies to improve safety and policy planning.
+    \end{itemize}
+    \item \textbf{Forensic Data Sharing:}
+    \begin{itemize}
+        \item Enable encrypted sharing of critical data with third parties, ensuring compliance with privacy standards.
+    \end{itemize}
+\end{enumerate}
+
+\section{Other Nonfunctional Requirements}
+Nonfunctional requirements describe the system's expected performance and quality attributes. These include:
+
+\begin{enumerate}
+    \item \textbf{Reliability:}
+    \begin{itemize}
+        \item Ensure 99.9% uptime for data collection and processing components.
+        \item Implement fail-safe mechanisms for data storage to prevent loss during system failure.
+    \end{itemize}
+    \item \textbf{Security:}
+    \begin{itemize}
+        \item Encrypt all stored and transmitted data to protect sensitive user and  vehicle information. 
+        \item Restrict access to authorized personnel or applications only.
+    \end{itemize}
+    \item \textbf{Performance:}
+    \begin{itemize}
+        \item Process and analyze real-time data within 1 second of retrieval.
+        \item Maintain seamless interaction between the mobile app and backend systems with minimal latency.
+    \end{itemize}
+    \item \textbf{Maintainability:}
+    \begin{itemize}
+        \item Design modular software components to facilitate updates and bug fixes.
+        \item Provide comprehensive documentation for developers and users.
+    \end{itemize}
+    \item \textbf{Scalability:}
+    \begin{itemize}
+        \item Support integration with diverse vehicle models and OBD-II protocols.
+        \item Ensure compatibility with additional sensors and third-party services in future expansions.
+    \end{itemize}
+\end{enumerate}
+
+\section{Hardware Requirements}
+The hardware required to develop and deploy the ADAM System includes:
+\begin{enumerate}
+    \item \textbf{Raspberry Pi 5:} Serves as the primary processing unit for data collection, analysis, and storage.
+    \item \textbf{OBD-II Reader:} Interfaces with the vehicle’s ECU to retrieve diagnostic data.
+    \item \textbf{GPS Module:} Tracks vehicle location for route analysis and forensic applications.
+    \item \textbf{Storage Devices:} SD card or external drives for secure, encrypted data storage.
+    \item \textbf{Power Supply:} Reliable and portable power solutions for the Raspberry Pi and peripherals.
+    \item \textbf{Display Monitor:} For debugging and system setup during development.
+\end{enumerate}
+
+\section{Software Requirements}
+The software required to implement the ADAM System includes:
+\begin{enumerate}
+    \item \textbf{Raspberry Pi OS}  for the main processing unit.
+    \item \textbf{Python}  for core logic and data processing.TensorFlow for machine learning and predictive analytics.Flask for building APIs and web-based interfaces.Cryptography libraries for secure data handling.GPS and CAN protocol libraries for location and ECU communication.
+    \item \textbf{React Native} React Native for developing a cross-platform mobile application.
+    \item \textbf{SQLite} a lightweight database for local storage during development.
+    \item \textbf{Supabase}  for remote data synchronization and backup.
+\end{enumerate}
