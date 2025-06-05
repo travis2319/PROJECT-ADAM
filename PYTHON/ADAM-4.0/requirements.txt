@@ -1,0 +1,4 @@
+pynmea2
+pyserial
+smbus2
+lgpio
