@@ -3,7 +3,7 @@ import pynmea2
 import time
 
 class Neo6M:
-    def __init__(self, port='/dev/ttyAMA0', baudrate=9600, timeout=1):
+    def __init__(self, port, baudrate, timeout=1):
         """Initialize GPS module with serial connection"""
         self.port = port
         self.baudrate = baudrate

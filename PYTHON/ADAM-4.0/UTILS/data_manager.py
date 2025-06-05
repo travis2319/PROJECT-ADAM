@@ -1,35 +1,41 @@
+import csv
 import os
-import json
 from datetime import datetime
 
-class DataManager:
-    def __init__(self, data_dir="data"):
-        self.data_dir = data_dir
-        
-        # Create data directory if it doesn't exist
-        if not os.path.exists(data_dir):
-            os.makedirs(data_dir)
-        
-        # Create daily directory
-        self.daily_dir = os.path.join(data_dir, datetime.now().strftime('%Y%m%d'))
-        if not os.path.exists(self.daily_dir):
-            os.makedirs(self.daily_dir)
-    
-    def save_combined_data(self, gps_data=None, motion_data=None, vibration_data=None):
-        """Save combined sensor data to JSON file"""
-        timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
-        
-        # Prepare data dict
-        data = {
-            'timestamp': timestamp,
-            'gps': gps_data if gps_data else {},
-            'motion': motion_data if motion_data else {},
-            'vibration': vibration_data if vibration_data else {}
-        }
-        
-        # Save to file
-        filename = os.path.join(self.daily_dir, f"data_{timestamp}.json")
-        with open(filename, 'w') as f:
-            json.dump(data, f, indent=2)
-        
-        return data
+class CSVDataManager:
+    def __init__(self, filename):
+        self.filename = filename
+        self._ensure_file_exists()
+
+    def _ensure_file_exists(self):
+        """Create file and headers if not present"""
+        if not os.path.isfile(self.filename):
+            with open(self.filename, 'w', newline='') as file:
+                writer = csv.writer(file)
+                writer.writerow([
+                    "Timestamp",
+                    "Latitude", "Longitude", "Altitude", "Satellites",
+                    "Accel_X", "Accel_Y", "Accel_Z",
+                    "Gyro_X", "Gyro_Y", "Gyro_Z",
+                    "Vibration"
+                ])
+
+    def log_data(self, gps_data, motion_data, vibration_status):
+        timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+        with open(self.filename, 'a', newline='') as file:
+            writer = csv.writer(file)
+            writer.writerow([
+                timestamp,
+                gps_data.get('latitude') if gps_data and gps_data['valid_fix'] else "",
+                gps_data.get('longitude') if gps_data and gps_data['valid_fix'] else "",
+                gps_data.get('altitude') if gps_data and gps_data['valid_fix'] else "",
+                gps_data.get('satellites') if gps_data and gps_data['valid_fix'] else "",
+                motion_data['accelerometer']['x'] if motion_data else "",
+                motion_data['accelerometer']['y'] if motion_data else "",
+                motion_data['accelerometer']['z'] if motion_data else "",
+                motion_data['gyroscope']['x'] if motion_data else "",
+                motion_data['gyroscope']['y'] if motion_data else "",
+                motion_data['gyroscope']['z'] if motion_data else "",
+                "Detected" if vibration_status else "None"
+            ])
