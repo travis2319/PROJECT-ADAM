@@ -1,0 +1,233 @@
+\newpage
+% Customize chapter title appearance
+\titleformat{\chapter}[block]
+{\normalfont\filcenter\LARGE\bfseries}
+{}
+{0pt}
+{\LARGE}
+
+\pagenumbering{arabic} % Switch to Arabic numerals
+\setcounter{page}{1}   % Reset page number to 1
+
+\setcounter{secnumdepth}{2}
+\chapter{INTRODUCTION}
+% \begin{center}
+
+% \textbf{\LARGE chapter 1}\\[1cm]
+% \end{center}
+
+\justify
+The Automotive Diagnostic and Activity Monitoring (ADAM) System is a pioneering project designed to enhance vehicle safety, improve maintenance efficiency, and support forensic investigations. By leveraging technologies such as Raspberry Pi, machine learning, and mobile app integration, ADAM provides real-time diagnostics, driving insights, and data collection capabilities. This comprehensive system aims to empower users, promote safer roads, and establish transparency in automotive operations.
+
+\section{PURPOSE}
+The Automotive Diagnostic and Activity Monitoring (ADAM) System is designed to redefine vehicle safety, user convenience, and forensic capabilities through innovative technology. By providing real-time diagnostics and driving insights, ADAM aims to promote safer roads, reduce risks, and ensure efficient vehicle maintenance. The system is also equipped to collect and analyze forensic data for post-accident investigations, aiding in uncovering critical information for law enforcement, insurance companies, and vehicle owners.
+
+ADAM empowers users with the ability to understand and monitor their vehicles, enabling informed decisions about maintenance and repairs while safeguarding against fraudulent practices in the automotive repair industry. This dual focus on proactive prevention and forensic analysis establishes the ADAM System as a transformative tool in modern automotive management.
+\section{PROJECT SCOPE}
+The ADAM System leverages a blend of hardware and software technologies, including Raspberry Pi, machine learning algorithms, and mobile app integration, to deliver comprehensive solutions for vehicle monitoring and diagnostics. The scope of the project encompasses:
+
+\subsection{Real-Time Engine Diagnostics and Alerts}
+The system continuously retrieves critical data from the vehicle's OBD-II port, such as engine performance metrics, error codes, and fuel efficiency. Real-time analysis of this data ensures that users are promptly alerted to potential issues, enabling timely interventions to prevent severe damage or unsafe conditions.
+
+\subsection{Driving Pattern Analysis for Insurance and Government Use}
+By analyzing driving behaviors such as speed, acceleration, and braking patterns, ADAM provides valuable insights for insurance companies to customize premiums based on driver performance. Additionally, these analytics can support government initiatives in traffic safety and urban planning.
+
+\subsection{Enhanced Vehicle Safety and Accident Analysis}
+Through advanced data collection and secure storage, ADAM functions as a black box for vehicles. It captures pre-accident data, which can be invaluable for forensic investigations, helping to establish circumstances leading to an incident and enhancing overall road safety.
+
+By integrating cutting-edge technologies, the ADAM System aims to revolutionize how vehicles are operated, maintained, and monitored, ensuring a safer and more transparent experience for all stakeholders.
+
+\section{LITERATURE SURVEY}
+\subsection{OVERVIEW}
+The development of the ADAM System draws on extensive research into OBD-II standards, vehicle diagnostics, and data security. The goal was to identify methodologies and technologies that ensure precise data collection, effective analysis, and secure handling. Studies emphasize the role of standardized protocols like PIDs and CAN in creating robust systems for automotive diagnostics and monitoring.
+
+A thorough review of relevant research papers has refined the project’s approach, combining proven methodologies with innovative applications. Key areas include vehicle data collection techniques, the integration of embedded systems like Raspberry Pi, and applications of machine learning for real-time diagnostics and forensic analysis.
+
+\subsection{Key Research Insights}
+1. \textbf{OBD-II Protocols and Standards}: Le Nguyen et al. (2024) highlight the importance of using standardized Parameter Identifications (PIDs) and CAN protocols for accurate data retrieval and diagnostics. Their research demonstrated the integration of e-black boxes with GPS and cameras to collect critical data for accident investigations, vehicle performance analysis, and driving behavior monitoring.
+
+2. \textbf{Embedded System Integration}: Sawant \& Mane (2024) explored the use of MSCAN modules with KEAZ128 microcontrollers for vehicle diagnostics. Their system focused on detecting and monitoring malfunctions using wireless communication between the OBD-II connector and external systems. The study’s experiments underscored the reliability of integrating microcontrollers and suggested future expansions to include additional diagnostic capabilities.
+
+3. \textbf{Data Security and Analysis}: Multiple studies underscore the importance of securing vehicle data using encryption techniques during storage and transmission. This ensures the integrity of sensitive information and prevents unauthorized access, which is vital for both user trust and forensic validity.
+
+\subsection{ Applications of Research}
+The literature survey directly informed the ADAM System’s design andimplementation. By leveraging standardized diagnostic protocols, integrating robustembedded systems, and adopting advanced data encryption, the ADAM System ensuresaccurate, reliable, and secure diagnostics. These insights have guided the creation of aversatile solution for real-time vehicle monitoring and forensic support.
+
+
+\begin{longtable}{|p{0.14\textwidth}|p{0.49\textwidth}|p{0.2\textwidth}|p{0.14\textwidth}|}
+\caption{Literature Review Summary\label{tab:literature-review}} \\
+\hline
+\textbf{\small PAPER \newline TITLE} & \textbf{\small DESCRIPTION} & \textbf{\small EXPERIMENT/\newline RESULTS} & \textbf{\small FUTURE WORK} \\
+\hline
+\endfirsthead
+
+\endhead
+
+% \hline \multicolumn{4}{|r|}{{Continued on next page}} \\ \hline
+\endfoot
+
+\hline
+\endlastfoot
+% 1st paper
+The Design and Implementation of New Vehicle Black Box Using The OBD Information
+\newline\newline
+{\small Duy Le Nguyen, Myung-Eui Lee, Artem Lensky}
+\newline\newline
+{\small (IEEE Xplore)} & 
+{\small The Paper discusses E-Black Box that is a combination of a black box and an event-driven recorder that communicates with a vehicle's ECU module through the OBD-II port to collect vehicle status information. It gathers data from various sources, including the OBD-II port, a camera, GPS, and a 9-degree-of-freedom inertial measurement unit (IMU).
+\newline\newline
+This data is logged in real-time to a Secure Digital (SD) card at intervals of 100 milliseconds. The recording process stops when the vehicle stops or an accident occurs and if the memory becomes full, the oldest data is automatically overwritten to ensure continuous operation.}
+\newline\newline
+The E-Black Box comes with two simulation modes: an online simulation mode that runs in real-time when the vehicle is in operation and an offline simulation mode for debugging and analysis of recorded data. It also comes with smartphone connectivity via Bluetooth, which allows it to send the vehicle's status and location in case of an accident. It can also search for nearby service centers or hospitals based on its status and location. & 
+Accident Investigation,
+Vehicle Performance,
+Driver Behavior Analysis & 
+Road tracking and obstacle detection algorithms \\
+\hline
+
+% 2nd paper
+\newpage
+\hline
+Design and Development of On-Board Diagnostic (OBD) Device for Cars
+\newline\newline
+Pooja Rajendra Sawant, Yashwant B Mane
+\newline\newline
+(IEEE Xplore) &
+This research paper discusses the design and development of an On-Board Diagnostic (OBD) system for cars, based on OBD-II standards established by the Society of Automotive Engineers (SAE). OBD-II standards have been mandatory for all cars sold after 1996. The system provides real-time information about a vehicle, such as engine speed, coolant temperature, pressure, and Diagnostic Trouble Codes (DTCs).
+\newline\newline
+DTCs are five-character codes that have a predefined structure, helping users know the actual status of their vehicles in real time and diagnose malfunctions. Codes can be generic or manufacturer-specific. OBD systems communicate with the CAN bus to enable the vehicle's ECU to communicate with the OBD device through the ISO 15765 standard.
+\newline\newline
+The device, according to the paper, employs a KEAZ128 microcontroller, an automotive-grade controller, to interpret the OBD-II protocol and act as a bridge between the vehicle and the user's computer. &
+Wireless communication between OBD connector and PC using Bluetooth, user-friendly GUI &
+Adding more diagnostic features and data into the device database \\
+\hline
+
+% 3rd paper
+\hline
+Design and Implementation of a Wireless OBD II Fleet Management System
+\newline\newline
+Reza Malekian, Ntefeng Ruth Moloisane, Lakshmi Nair, BT(Sunil) Maharaj, Uche A.K. Chude-Okonkwo
+\newline\newline
+(IEEE Xplore) &
+This paper introduces a wireless system for fleet management, monitoring vehicle speed and fuel consumption, and computing distance by using an OBD-II module along with GPS data. The system uses the ELM327 IC for decoding OBD-II signaling protocols and communicates using AT commands. The OBD-II protocols implemented are ISO 15765 (CAN), ISO 9141-2, and ISO 14230-4.
+\newline\newline
+In this system, speed is coded as "0D" in hexadecimal, and MAF is "10." The fuel is calculated based on the measured MAF, and distance is calculated based on the measured speed. This information is logged along with the GPS data simultaneously.
+\newline\newline
+All logged data is transmitted to a remote server via a Carambola2 WiFi module, where it is stored in an SQL database. The analysis of the data is made through a graphical interface. The system was tested on a BMW 125i and an OBD-II emulator. The measurements of distance had an error margin of about 5\%, mainly due to a 1-second data sampling interval. &
+Tested with OBD II emulator and a real vehicle. Able to accurately measure speed, fuel consumption, and distance with approximately 5\% error over short and long distances. Communication range is 900 meters for WiFi. &
+Proposed using GSM instead of WiFi for wider range, adding a backup battery to maintain wireless communication when the vehicle is off, and improving initialization time. \\
+\hline
+
+% 4th paper
+\newpage
+\hline
+Machine Learning Based Automatic Diagnosis in Mobile Communication Networks
+\newline\newline
+Kuo-Ming Chen, Tsung-Hui Chang, Kai-Cheng Wang, Ta-Sung Lee
+\newline\newline
+(IEEE Xplore) &
+This paper reports on an ML-based algorithm for automatic fault diagnosis in mobile communication networks. The scheme utilizes SONs, removing the need for expensive hardware by making the networks self-configurable, self-organizing, and self-healing. The presented methodology combines a Softmax NN and SVM models with the aim of improving diagnosis accuracy.
+\newline\newline
+It further uses KPIs as well as performance management counters (PMCs) that are used in feature extraction. The combined output from the Softmax NN along with SVM carries out multiclass classification while diagnosing network faults accordingly. Thus the ML-based algorithms are of unsupervised type because they learn the training datasets directly and thereby are malleable in real application scenarios.
+\newline\newline
+This dual capability addresses both single and multi-fault scenarios, making the system robust enough for modern mobile networks as an efficient alternative to fault-detection methods. &
+Achieves high accuracy in both single and multi-fault detection in LTE networks &
+Explore other models and enhance multi-fault detection. \\
+\hline
+
+% 5th paper
+\newpage
+\hline
+Vehicular Mobile Commerce
+\newline\newline
+Authors [Not provided in excerpt]
+\newline\newline
+(IEEE Xplore) &
+Wi-Fi-enabled vehicles enables m-commerce applications, like entertainment and diagnostics. Significant technical, safety, and financial challenges remain &
+Highlights real-world prototypes, such as Ford's Lincoln and an Atlanta traffic data project. These illustrate potential but underscore connectivity and safety issues. &
+Calls for solutions to improve stable computing tech in high-speed connectivity, security, privacy, and cost efficiency to make vehicular m-commerce practical and safe. \\
+\hline
+
+% 6th paper
+Automotive Internal-Combustion-Engine Fault Detection and Classification Using Artificial Neural Network Techniques
+\newline\newline
+Ryan Ahmed, Mohammed El Sayed, S. Andrew Gadsden, Jimi Tjong, Saeid Habibi
+\newline\newline
+(IEEE Xplore) &
+This research examines the use of artificial neural networks for the detection and classification of faults in internal combustion engines. The paper has trained such ANNs based on the vibration data measurements in the crank angle domain and with the potential to set up a consistent diagnostic system for dealerships and assembly plants, reducing the cost of manufacturers' warranty.
+\newline\newline
+Methodologies in the paper involve feedforward multilayer perceptron ANNs, with the appeal for these learning, adapting, noise rejecting, and handling nonlinear relations. Training algorithms used here include backpropagation, Levenberg-Marquardt, quasi-Newton, extended Kalman filter, and the newest variable structure filter introduced as a smooth variable structure filter. The variable structure filter is notable because of stability, robustness, and the good response to the uncertainties. &
+SVSF-ANN shows high accuracy and reliability for fault classification. &
+Expand to real-time applications and add more engine parameters. \\
+\hline
+
+\newpage
+\hline
+Automotive Internal-Combustion-Engine Fault Detection and Classification Using Artificial Neural Network Techniques &
+The research benefits the detection process of faults by avoiding special location models of fault. The test bench employed a semi-anechoic chamber with a four-stroke eight-cylinder engine. Triaxial accelerometers were used to collect data of vibrations and then transform this data into the crank angle domain by the help of a cylinder identification sensor. The tested faults included missing bearings, piston chirps, chain tensioners, etc., each of which possesses some specific vibration patterns. &
+SVSF-ANN shows high accuracy and reliability for fault classification. &
+Expand to real-time applications and add more engine parameters. \\
+\hline
+
+% 7th paper
+Deep Learning Model Based CO2 Emissions Prediction Using Vehicle Telematics Sensors Data
+\newline\newline
+Authors [Not provided in excerpt]
+\newline\newline
+(IEEE Xplore) &
+This paper presents an LSTM model that predicts CO2 emissions from OBD-II sensor data in real-time. The model is designed to handle noisy data and improve time-series prediction accuracy. The study demonstrates the model's effectiveness in predicting emissions and suggests its potential for broader deployment in real-time monitoring systems. &
+Outperforms other methods in handling noisy data and time-series prediction accuracy. &
+Use diverse datasets for broader deployment in real-time monitoring systems. \\
+\hline
+
+% 8th paper
+OBD SecureAlert: An Anomaly Detection System for Vehicles
+\newline\newline
+Sandeep Nair Narayanan, Sudip Mittal, Anupam Joshi
+\newline\newline
+(IEEE Xplore) &
+This paper presents OBD-SecureAlert, a data-driven anomaly detection system for cars designed to identify abnormal behaviors using CAN bus data. The CAN bus is an internal communication network found in vehicles that connects ECUs, sensors, and actuators. Since most CAN buses lack built-in security measures, they are open to cyberattacks that can compromise the safety of automobiles.
+\newline\newline
+OBD-SecureAlert eliminates this vulnerability by utilizing a Hidden Markov Model (HMM) for anomaly monitoring and detection against deviations from normal vehicle behavior. This system emphasizes detection instead of prevention, thereby creating an applicative solution to identify possible threats. It collects data from the CAN bus, which carries the values of speed and RPM sensors in the vehicle. After being trained, it analyzes the incoming data using a sliding window and flags data sets based on predefined threshold limits as anomalies or safety/cybersecurity threats. They simulate attack scenarios, like injecting anomalous data into the CAN bus, to detect anomalies. &
+Effectively uses a Hidden Markov Model (HMM) to detect anomalies in vehicle behavior by analyzing CAN bus data, successfully identifying threats like malicious data injections in real-time. &
+Integrating with machine learning models like LSTM or Transformer-based architectures for anomaly detection or real-time threat mitigation against early signs of wear or failure. \\
+\hline
+
+% 9th paper
+Assessing the Impact of Driving Behavior on Instantaneous Fuel Consumption
+\newline\newline
+Javier E. Meseguer, Carlos T. Calafate, Juan Carlos Cano, Pietro Manzoni
+\newline\newline
+(IEEE Xplore) &
+This paper talks about DrivingStyles, a platform whose aim is to analyze and improve driving habits to diminish fuel consumption and greenhouse gases. It uses data directly from the vehicle's Electronic Control Unit (ECU), accessed by an OBD-II Bluetooth interface, and smartphone technology to assess driving behavior and the efficiency of fuel.
+\newline\newline
+The research addresses the rising fuel costs and environmental pollution caused by greenhouse gas emissions. Applying data mining and neural networks, the platform classifies driving styles based on speed, acceleration, and engine RPM. It calculates fuel consumption using data from MAF, MAP, and IAT sensors, with alternative methods for cases where direct data is unavailable.
+\newline\newline
+The system consists of an Android app, an OBD-II interface, and a web-based data center. The app collects data from the vehicle and phone sensors and sends it to the data center for analysis. A neural network identifies driving styles and road types, while the data center visualizes fuel efficiency and habits using open-source tools.
+\newline\newline
+The platform also calculates CO2 emissions based on fuel consumption. The study reveals that driving style is significantly affecting the fuel usage and emissions. Aggressive driving is found to consume more fuel, and it can be up to 15–20\% saved in fuel by adopting efficient driving practices.
+&
+An efficient driving style can drastically reduce fuel consumption and reduce greenhouse gas emissions, with an estimated saving of 15--20\%. The DrivingStyles platform, with smartphone and vehicle data, is one of the practical tools to help raise awareness and improve driving styles for better energy efficiency. 
+&
+Long Short-Term Memory (LSTM) networks or Transformer models to better capture temporal driving patterns and develop individualized driving style profiles based on user-specific data to provide tailored recommendations. \\
+\hline
+
+
+% 10th paper
+Exploring Fuzzy Logic and Random Forest for Car Drivers’ Fuel Consumption Estimation in IoT-Enabled Serious Games
+\newline\newline
+Rana Massoud, Francesco Bellotti, Riccardo Berta, Alessandro De Gloria, Stefan Poslad
+\newline\newline
+(IEEE Xplore) &
+This paper explores the use of the Fuzzy Logic (FL) and Random Forest (RF) algorithms to estimate vehicle fuel consumption in the context of providing foundational support for the development of an IoT-enabled driving game which sends real-time feedback to promote good driving habits and minimize consumption using the enviroCar database.
+\newline\newline
+This research employs real-time vehicle data that are collected through the OBD-II interface to establish accurate models for FC estimation. Important variables include throttle position sensor (TPS), revolutions per minute (RPM), car speed, and fuel consumption (FC) and tested on a range of car models and driving environments is considered in order to make the system applicable in real-world applications.
+\newline\newline
+FL uses "if-then" rules to provide understandable feedback, while RF applies machine learning for high-accuracy predictions. Results show RF outperforms FL, achieving higher R² (0.896 vs. 0.65) and lower MSE (1.506 vs. 4.745). Both models operate in real-time, with RF emphasizing speed and RPM as critical predictors.
+\newline\newline
+Combining FL for intuitive coaching with RF for precise FC estimates should prove to improve IoT-enabled driving games. This solution should even steer game designers and also scale to other IoT applications which require real-time appraisals. &
+Fuzzy Logic (FL) provides interpretable feedback for coaching, while Random Forest (RF) delivers superior predictive accuracy for fuel consumption modeling. The combination of both models benefits from their strengths and makes them ideal for IoT-enabled driving games and applicable to other fields requiring real-time user performance assessment. &
+Benchmark the performance of RF and FL against newer algorithms, such as Gradient Boosting (e.g., XGBoost) or neural networks, to validate the choice of models. \\
+
+
+\end{longtable}
