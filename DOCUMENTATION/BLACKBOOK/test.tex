@@ -1,0 +1,75 @@
+\documentclass[12pt]{article}
+\usepackage[margin=0.5in]{geometry}
+\usepackage{tikz}
+\usepackage{eso-pic}
+\usepackage{graphicx}
+
+\pagestyle{empty} % Remove page numbers
+
+% Add border to every page
+\AddToShipoutPicture{%
+\begin{tikzpicture}[remember picture,overlay]
+% Outer border
+\draw[line width=2pt] 
+    ([xshift=20pt,yshift=-20pt]current page.north west) rectangle 
+    ([xshift=-20pt,yshift=20pt]current page.south east);
+% Inner border
+\draw[line width=1pt] 
+    ([xshift=25pt,yshift=-25pt]current page.north west) rectangle 
+    ([xshift=-25pt,yshift=25pt]current page.south east);
+\end{tikzpicture}%
+}
+
+\begin{document}
+
+\vspace*{\fill}
+
+\begin{center}
+
+{\Large \textbf{SMART-CONTRACT-BASED TENDER}}\\[0.5cm]
+{\Large \textbf{MANAGEMENT SYSTEM USING BLOCK-CHAIN}}
+
+\vspace{1cm}
+
+\begin{tabular}{ll}
+Mr. Pratik Rajan Kamat & 202007911 \\
+Mr. Rahul Rajendra Parab & 202007949 \\
+Mr. Tushar Devendra Naik & 202007957 \\
+Mr. Cyrus John Mascarenhas & 202105742 \\
+\end{tabular}
+
+\vspace{1.5cm}
+
+{\large Dissertation submitted in partial fulfillment of the requirements}\\
+{\large for the degree of}
+
+\vspace{0.5cm}
+
+{\Large \textbf{BACHELOR OF ENGINEERING}}\\
+{\Large \textbf{IN}}\\
+{\Large \textbf{COMPUTER ENGINEERING}}
+
+\vspace{0.5cm}
+
+{\large \textbf{OF GOA UNIVERSITY}}
+
+\vspace{1cm}
+
+% Placeholder for logo - replace with actual logo file
+\fbox{\parbox{3cm}{\centering LOGO\\[0.5cm]}}
+
+\vspace{1cm}
+
+{\Large \textbf{2023-2024}}
+
+\vspace{1cm}
+
+{\large \textbf{COMPUTER ENGINEERING}}\\
+{\large \textbf{PADRE CONCEICAO COLLEGE OF ENGINEERING}}\\
+{\large \textbf{VERNA GOA – 403722}}
+
+\end{center}
+
+\vspace*{\fill}
+
+\end{document}
