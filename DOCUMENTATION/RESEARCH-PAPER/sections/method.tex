@@ -1,2 +1,18 @@
-\section{method}
-    The Automotive Diagnostic and Activity Monitoring (ADAM) System is an integrated solution designed to provide real-time insights into the health and behavior of four-wheeled vehicles. Acting as both a diagnostic tool and a forensic black box, ADAM harmonizes multiple sensing modules—including a Global Positioning System (GPS), a gyroscope and accelerometer (MPU6050), and a vibration sensor (SW-420)—to observe vehicular dynamics. At its core, the system interfaces with the vehicle’s Electronic Control Unit (ECU) via the On-Board Diagnostics (OBD) port, enabling deep access to engine parameters and fault codes.Sensor data is continuously collected, securely stored on an SD card, and synchronized with a PostgreSQL database. This rich dataset fuels a suite of machine learning models tailored for four key objectives: (1) Engine Health Monitoring, (2) Fuel Economy Analysis, (3) Driver Behavior Profiling, and (4) Predictive Maintenance. Insights derived from these models are visually rendered through an intuitive mobile application that presents the information via dynamic graphs and charts.To further enhance user engagement, the system incorporates an interactive AI-powered chatbot capable of responding to user queries and guiding necessary actions. Together, these components form a cohesive ecosystem—bridging vehicle intelligence with user accessibility, and paving the way for smarter, safer, and more informed driving experiences.    
+\begin{figure*}[t]
+    \centering
+    \includegraphics[width=\textwidth]{assets/System_design.png}
+    \caption{System architecture of the proposed Automotive Diagnostic and Activity Monitoring (ADAM) system.}
+    \label{fig:system_architecture}
+\end{figure*}
+
+\section{Methodology}
+The proposed vehicle diagnostic and driver behaviour analysis system integrates various components of hardware and software to collect real time data collection for analysis and user analysis. The architecture is designed to collect vehicle information via obd II port, transmit it wirelessly to cloud server for processing and provides a visual representation of processed data through a mobile application.
+
+The system consists of 4 primary components:
+obd-II data collection and transmission
+data analysis using machine learning models
+cross platform mobile application
+A block diagram representing the overall system architecture and data flow from vehicle sensors to end user presentation is shown in figure 1.1
+
+    
+      
