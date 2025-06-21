@@ -25,3 +25,16 @@ we have implemented four machine learning models that predict based on data are:
 D. Cross platform mobile application
 The mobile application was developed using Expo (a cross platform framework), provides a dashboard for real time status, historical trends on fuel efficiency, driver behaviour and maintenance logs.
 
+\subsection{Model Training and Feature Importance Analysis}
+
+To classify engine conditions based on sensor readings, a Random Forest classifier was developed using an expert-labeled dataset named \texttt{Sensor-count\_Breeza-Verna-Version4.xlsx}. The dataset underwent preprocessing, which involved trimming whitespace from column headers and removing incomplete records to ensure data quality.
+
+The dataset was then divided into independent features and target labels, with the label column identified as \texttt{Lebelling}. Subsequently, an 80:20 train-validation split was applied to facilitate internal evaluation.
+
+A Random Forest model comprising 100 decision trees was trained on the training subset. The model's predictive performance was assessed on the validation set using a classification report, which provided precision, recall, and F1-score metrics.
+
+To interpret the model's decision-making process, feature importance scores were extracted. These scores indicate the relative influence of each sensor feature on the prediction outcome. A ranked list of features was generated, and the top ten most significant features were visualized using a horizontal bar plot. 
+
+Finally, the trained model was serialized and saved as \texttt{engine\_model.joblib} for future use in prediction and deployment pipelines.
+
+
