@@ -1,36 +1,40 @@
 \chapter{REQUIREMENTS}
 \justify
-
+In this chapter, we will learn about different types of Functional and Non-Functional requirements as well as Hardware and Software requirements, which ensure compatibility, aiding smooth project execution by setting clear expectations and guidelines for development and performance.
 \section{Functional Requirements}
 Functional requirements define the specific operations and functionalities the ADAM System must perform under various conditions. These include:
 
 \begin{enumerate}
     \item \textbf{Real-Time Data Collection:}
-    \begin{itemize}
-        \item Continuously retrieve and store data such as RPM, speed, engine temperature, and throttle position from the OBD-II interface.
-        \item Ensure secure and uninterrupted data transmission to the processing unit.
-    \end{itemize}
+    % \begin{itemize}
+    %     \item Continuously retrieve and store data such as RPM, speed, engine temperature, and throttle position from the OBD-II interface.
+    %     \item Ensure secure and uninterrupted data transmission to the processing unit.
+    % \end{itemize}
+    ADAM continuously retrieves live vehicle data (e.g., RPM, speed, Diagnostic Trouble Codes) from the OBD-II port and ensures reliable, uninterrupted transmission to the Raspberry Pi, even under varying vehicle conditions.
 
     \item \textbf{Black Box Functionality:}
-    \begin{itemize}
-        \item Record and retain critical vehicle parameters during regular operation and immediately preceding an accident.
-        \item Enable playback or export of stored data for analysis and forensic purposes.
-    \end{itemize}
+    % \begin{itemize}
+    %     \item Record and retain critical vehicle parameters during regular operation and immediately preceding an accident.
+    %     \item Enable playback or export of stored data for analysis and forensic purposes.
+    % \end{itemize}
+    Acts as a digital event data recorder, persistently storing sensor data during critical events like hard braking or collisions to support forensic analysis and accidents.
     \item \textbf{Mobile Application Features:}
-    \begin{itemize}
-        \item Provide real-time visualizations of vehicle performance and health metrics.
-        \item Alert users to diagnostic issues and suggest maintenance actions.
-        \item Support CSV export of forensic data for law enforcement or insurance purposes.
-    \end{itemize}
-    \item \textbf{Driving Pattern Analysis:}
-    \begin{itemize}
-        \item Collect and analyze driving behavior, including acceleration, braking, and speed trends.
-        \item Provide feedback for users, insurers, and government agencies to improve safety and policy planning.
-    \end{itemize}
+    % \begin{itemize}
+    %     \item Provide real-time visualizations of vehicle performance and health metrics.
+    %     \item Alert users to diagnostic issues and suggest maintenance actions.
+    %     \item Support CSV export of forensic data for law enforcement or insurance purposes.
+    % \end{itemize}
+    Provides daily logs in interactive graphs, delivers advanced analysis using machine learning algorithms, and features a chatbot interface for users to ask queries and receive instant insights.
+    % \item \textbf{Driving Pattern Analysis:}
+    % \begin{itemize}
+    %     \item Collect and analyze driving behavior, including acceleration, braking, and speed trends.
+    %     \item Provide feedback for users, insurers, and government agencies to improve safety and policy planning.
+    % \end{itemize}
     \item \textbf{Forensic Data Sharing:}
-    \begin{itemize}
-        \item Enable encrypted sharing of critical data with third parties, ensuring compliance with privacy standards.
-    \end{itemize}
+    % \begin{itemize}
+    %     \item Enable encrypted sharing of critical data with third parties, ensuring compliance with privacy standards.
+    % \end{itemize}
+     Enables controlled sharing of diagnostic data with external parties, ensuring user-defined access and compliance with privacy standards.
 \end{enumerate}
 
 \section{Other Nonfunctional Requirements}
@@ -38,49 +42,72 @@ Nonfunctional requirements describe the system's expected performance and qualit
 
 \begin{enumerate}
     \item \textbf{Reliability:}
-    \begin{itemize}
-        \item Ensure 99.9% uptime for data collection and processing components.
-        \item Implement fail-safe mechanisms for data storage to prevent loss during system failure.
-    \end{itemize}
+    % \begin{itemize}
+    %     \item Ensure 99.9% uptime for data collection and processing components.
+    %     \item Implement fail-safe mechanisms for data storage to prevent loss during system failure.
+    % \end{itemize}
+    Ensures high reliability by maintaining continuous uptime, implementing a buffer to securely cache data during connectivity interruptions, and utilizing failover mechanisms to guarantee uninterrupted data collection and secure backup until the data is successfully posted to the database
     \item \textbf{Security:}
-    \begin{itemize}
-        \item Encrypt all stored and transmitted data to protect sensitive user and  vehicle information. 
-        \item Restrict access to authorized personnel or applications only.
-    \end{itemize}
+    % \begin{itemize}
+    %     \item Encrypt all stored and transmitted data to protect sensitive user and  vehicle information. 
+    %     \item Restrict access to authorized personnel or applications only.
+    % \end{itemize}
+    security with strong authentication and strict authorization, allowing only verified users appropriate access.
     \item \textbf{Performance:}
-    \begin{itemize}
-        \item Process and analyze real-time data within 1 second of retrieval.
-        \item Maintain seamless interaction between the mobile app and backend systems with minimal latency.
-    \end{itemize}
+    % \begin{itemize}
+    %     \item Process and analyze real-time data within 1 second of retrieval.
+    %     \item Maintain seamless interaction between the mobile app and backend systems with minimal latency.
+    % \end{itemize}
+    The system processes and visualizes vehicle sensor data in real time, ensuring low latency and responsiveness, especially during critical events.
     \item \textbf{Maintainability:}
-    \begin{itemize}
-        \item Design modular software components to facilitate updates and bug fixes.
-        \item Provide comprehensive documentation for developers and users.
-    \end{itemize}
+    % \begin{itemize}
+    %     \item Design modular software components to facilitate updates and bug fixes.
+    %     \item Provide comprehensive documentation for developers and users.
+    % \end{itemize}
+    A modular architecture allows for independent updates to components like the UI, GPS module or other sensors. Well-maintained documentation enables efficient development, debugging, and onboarding.
     \item \textbf{Scalability:}
-    \begin{itemize}
-        \item Support integration with diverse vehicle models and OBD-II protocols.
-        \item Ensure compatibility with additional sensors and third-party services in future expansions.
-    \end{itemize}
+    % \begin{itemize}
+    %     \item Support integration with diverse vehicle models and OBD-II protocols.
+    %     \item Ensure compatibility with additional sensors and third-party services in future expansions.
+    % \end{itemize}
+    It supports various vehicle types and OBD-II protocols, allowing the addition of new sensors and integrations with external platforms (e.g., insurance APIs, fleet systems) for enterprise-level expansion.
 \end{enumerate}
 
 \section{Hardware Requirements}
 The hardware required to develop and deploy the ADAM System includes:
 \begin{enumerate}
-    \item \textbf{Raspberry Pi 5:} Serves as the primary processing unit for data collection, analysis, and storage.
-    \item \textbf{OBD-II Reader:} Interfaces with the vehicle’s ECU to retrieve diagnostic data.
-    \item \textbf{GPS Module:} Tracks vehicle location for route analysis and forensic applications.
-    \item \textbf{Storage Devices:} SD card or external drives for secure, encrypted data storage.
-    \item \textbf{Power Supply:} Reliable and portable power solutions for the Raspberry Pi and peripherals.
-    \item \textbf{Display Monitor:} For debugging and system setup during development.
+    \item \textbf{Raspberry Pi 5:} The Raspberry Pi 5 serves as the central unit for data collection, AI processing, and interfacing with mobile/cloud services, offering high performance and peripheral support.
+    \item \textbf{OBD-II Reader:} Connects to the vehicle’s ECU using protocols like CAN to read critical diagnostics data such as RPM, speed, engine temperature, throttle position, etc.
+    \item \textbf{GPS Module:} Provides location tracking for route analysis, theft monitoring, and event tagging to support forensic and insurance purposes.
+    \item \textbf{Storage Devices:} High-endurance SD card is used for scalable storage of large volumes of real-time and historical data.
+    \item \textbf{Power Supply:} Ensures uninterrupted operation using vehicle converters and a relayed battery pack, handling power fluctuations and downtime.
+    \item \textbf{Vibration Module:} Used to detect and transmit vibration or shock occurrences using a spring-based switch, providing a digital output when vibration is present. 
+    \item \textbf{Gyroscope and Acceleration:} Combines a 3-axis accelerometer and 3-axis gyroscope to measure movement, orientation, and sudden impacts, enabling accurate motion and accident detection.
 \end{enumerate}
 
 \section{Software Requirements}
-The software required to implement the ADAM System includes:
+To power the ADAM system effectively, a robust software stack is used, covering real-time embedded processing, user interfacing, secure data transmission, and cloud integration.
 \begin{enumerate}
-    \item \textbf{Raspberry Pi OS}  for the main processing unit.
-    \item \textbf{Python}  for core logic and data processing.TensorFlow for machine learning and predictive analytics.Flask for building APIs and web-based interfaces.Cryptography libraries for secure data handling.GPS and CAN protocol libraries for location and ECU communication.
-    \item \textbf{React Native} React Native for developing a cross-platform mobile application.
-    \item \textbf{SQLite} a lightweight database for local storage during development.
-    \item \textbf{Supabase}  for remote data synchronization and backup.
+    \item \textbf{Raspberry Pi OS:}  It is the base system running on the Pi.  Chosen for its compatibility with ARM architecture and extensive support for Python libraries and hardware integration, such as GPIO, OBD-II, , etc.
+    \item \textbf{Python:}  Primary language for system logic and real-time data handling, chosen for its simplicity and vast ecosystem.
+    \item \textbf{Google Colab} It is a free, cloud-based platform provided by Google that allows users to write and execute Python code in a collaborative environment. It provides access to GPUs, making it popular for machine learning tasks. 
+    \item \textbf{TensorFlow/Pytorch/scikit-learn Libraries:} Used for machine learning tasks like building models that detect anomalies or predict component failures based on historical data.
+    \item \textbf{FastAPI} Provides a lightweight web framework to build REST APIs connecting to PostgreSQL and enabling advanced analytics in Python.
+    \item \textbf{PostgreSQL} It is a powerful, open-source relational database known for its reliability, extensibility, ACID compliance, and advanced features that support complex data management and high-performance applications.
+    \item \textbf{Golang:} Uses the Fiber framework to build a high-performance web server, offering an Express-inspired API for rapid development, efficient routing, and minimal resource usage, making it well-suited for creating RESTful APIs and handling concurrent requests with ease
+    \item \textbf{React Native with Expo:} Enables rapid development of cross-platform Android and iOS apps from a single codebase, offering streamlined workflows, easy access to native APIs, and simplified testing and deployment.
+    \item \textbf{Docker:} Containers package the application and its dependencies into isolated, reproducible units, ensuring consistent operation across different systems without requiring cloud integration.
+    \item \textbf{Visual Studio Code:} Visual Studio Code (VS Code) is a free and open-source code editor developed by Microsoft. It supports various programming languages and features a customizable interface and a rich extension ecosystem.
+    \item \textbf{Supabase}  It is used for authenticating email, social, and passwordless logins, as well as OAuth, and for storing personal data, functioning like a document store with secure, user-managed access and integrated authorization controls
+\end{enumerate}
+
+\section{CHAPTER SUMMARY}
+\begin{enumerate}
+    \item{The ADAM system requires real-time data collection via the OBD-II port, with secure transmission to a Raspberry Pi for continuous vehicle monitoring.}
+    \item{Black box functionality ensures persistent storage of critical vehicle data before and during the incidents for forensic analysis and driver behavior evaluation.}
+    \item{A mobile application provides real-time vehicle status, graphical performance metrics, and machine learning analysis}
+    \item{Driving behavior is analyzed using machine learning to offer safe driving tips and insights for insurance and regulatory purposes.}
+    \item{Nonfunctional requirements include high system reliability, real-time responsiveness, modular maintainability, and scalability for different vehicles and future integrations.}
+    \item{Hardware components include Raspberry Pi 5, OBD-II reader, GPS module, encrypted storage (SD/SSD), reliable power supply, MPU6050, and SW420 }
+    \item{The software stack includes Raspberry Pi OS, Python and its libraries, FastAPIs, React Native, Postgresql, Golang, Docker, and Supabase.}
 \end{enumerate}

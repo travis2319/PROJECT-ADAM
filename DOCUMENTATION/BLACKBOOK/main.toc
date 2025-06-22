@@ -19,24 +19,26 @@
 \contentsline {section}{\numberline {2.2}Project Functions}{17}{section.2.2}%
 \contentsline {section}{\numberline {2.3}User Classes and Characteristics}{18}{section.2.3}%
 \contentsline {section}{\numberline {2.4}Operating Environment}{20}{section.2.4}%
-\contentsline {chapter}{\numberline {3}REQUIREMENTS}{21}{chapter.3}%
-\contentsline {section}{\numberline {3.1}Functional Requirements}{21}{section.3.1}%
-\contentsline {section}{\numberline {3.2}Other Nonfunctional Requirements}{22}{section.3.2}%
+\contentsline {section}{\numberline {2.5}CHAPTER SUMMARY}{21}{section.2.5}%
+\contentsline {chapter}{\numberline {3}REQUIREMENTS}{22}{chapter.3}%
+\contentsline {section}{\numberline {3.1}Functional Requirements}{22}{section.3.1}%
+\contentsline {section}{\numberline {3.2}Other Nonfunctional Requirements}{23}{section.3.2}%
 \contentsline {section}{\numberline {3.3}Hardware Requirements}{23}{section.3.3}%
-\contentsline {section}{\numberline {3.4}Software Requirements}{23}{section.3.4}%
-\contentsline {chapter}{\numberline {4}SYSTEM DESIGN}{25}{chapter.4}%
-\contentsline {section}{\numberline {4.1}System Architecture Overview}{25}{section.4.1}%
-\contentsline {chapter}{\numberline {5}IMPLEMENTATION}{32}{chapter.5}%
-\contentsline {section}{\numberline {5.1}Data Collection from Car OBD Port}{32}{section.5.1}%
-\contentsline {subsubsection}{Sensor Variability and Data Challenges}{32}{subsubsection*.6}%
-\contentsline {subsubsection}{Real-Time Data Collection}{32}{subsubsection*.7}%
-\contentsline {subsubsection}{PIDs And Their Metrics}{33}{subsubsection*.8}%
-\contentsline {subsection}{\numberline {5.1.1}Adaptability of the ADAM System}{33}{subsection.5.1.1}%
-\contentsline {subsection}{\numberline {5.1.2}Addressing Limitations}{34}{subsection.5.1.2}%
-\contentsline {section}{\numberline {5.2}Data Transfer to Go Server}{34}{section.5.2}%
-\contentsline {section}{\numberline {5.3}Data Storage in PostgreSQL Database}{34}{section.5.3}%
-\contentsline {section}{\numberline {5.4}Data Analysis Using FastAPI and Machine Learning}{34}{section.5.4}%
-\contentsline {section}{\numberline {5.5}Chatbot for User Interaction}{35}{section.5.5}%
-\contentsline {section}{\numberline {5.6}Data Visualization via Mobile App}{35}{section.5.6}%
-\contentsline {chapter}{\numberline {6}CONCLUSION}{36}{chapter.6}%
-\contentsline {chapter}{\numberline {7}BIBLIOGRAPHY}{38}{chapter.7}%
+\contentsline {section}{\numberline {3.4}Software Requirements}{24}{section.3.4}%
+\contentsline {section}{\numberline {3.5}CHAPTER SUMMARY}{26}{section.3.5}%
+\contentsline {chapter}{\numberline {4}SYSTEM DESIGN}{27}{chapter.4}%
+\contentsline {section}{\numberline {4.1}System Architecture Overview}{27}{section.4.1}%
+\contentsline {chapter}{\numberline {5}IMPLEMENTATION}{35}{chapter.5}%
+\contentsline {section}{\numberline {5.1}Data Collection from Car OBD Port}{35}{section.5.1}%
+\contentsline {subsubsection}{Sensor Variability and Data Challenges}{35}{subsubsection*.6}%
+\contentsline {subsubsection}{Real-Time Data Collection}{35}{subsubsection*.7}%
+\contentsline {subsubsection}{PIDs And Their Metrics}{36}{subsubsection*.8}%
+\contentsline {subsection}{\numberline {5.1.1}Adaptability of the ADAM System}{36}{subsection.5.1.1}%
+\contentsline {subsection}{\numberline {5.1.2}Addressing Limitations}{37}{subsection.5.1.2}%
+\contentsline {section}{\numberline {5.2}Data Transfer to Go Server}{37}{section.5.2}%
+\contentsline {section}{\numberline {5.3}Data Storage in PostgreSQL Database}{37}{section.5.3}%
+\contentsline {section}{\numberline {5.4}Data Analysis Using FastAPI and Machine Learning}{37}{section.5.4}%
+\contentsline {section}{\numberline {5.5}Chatbot for User Interaction}{38}{section.5.5}%
+\contentsline {section}{\numberline {5.6}Data Visualization via Mobile App}{38}{section.5.6}%
+\contentsline {chapter}{\numberline {6}CONCLUSION}{39}{chapter.6}%
+\contentsline {chapter}{\numberline {7}BIBLIOGRAPHY}{41}{chapter.7}%
