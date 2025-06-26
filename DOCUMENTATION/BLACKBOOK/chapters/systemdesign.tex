@@ -5,111 +5,97 @@
 % \end{center}
 
 \justify
-\section{System Architecture Overview} % (fold)
-
 \begin{figure}[h!]
     \centering
     \includegraphics[width=0.8\textwidth]{assets/system_design_v2.jpeg}
     \caption{System Design Overview}
+    \label{fig:system_design_overview}
 \end{figure}
+\section{System Architecture Overview} % (fold)
 
 The proposed vehicle diagnostic system integrates various components of hardware and software to collect real-time data for analysis. The architecture is designed to collect vehicle information via the OBD-II port, transmit it wirelessly to a cloud server for processing, and provide a visual representation of processed data through a mobile application. 
-The system consists of 4 primary components: Hardware Implementation, Data processing using machine learning models, Servers and Databases, and a cross-platform mobile application. A block diagram representing the overall system architecture and data flow from vehicle sensors to end user presentation is shown in Figure 1.1
-
-
+The system consists of 4 primary components: Hardware Implementation, Data processing using machine learning models, Servers and Databases, and a cross-platform mobile application. A block diagram representing the overall system architecture and data flow from vehicle sensors to end user presentation is shown in Fig.~\ref{fig:system_design_overview}.
 The diagram illustrates the flow of data and interactions within an automotive diagnostic and monitoring system. The system integrates multiple sensors, data processing units, databases, and APIs to achieve real-time diagnostics and data sharing. Below is a detailed explanation of the components and their interactions:
 
-% \begin{enumerate}
-%     \item \textbf{Sensor and Hardware Layer} At the core of the system lies the Raspberry Pi 5, which functions as the primary edge computing device. It interfaces with multiple onboard sensors and modules, including:
-%         \begin{enumerate}
-%             \item \textbf{Accelerometer & Gyroscope:} Captures motion dynamics and orientation data, essential for detecting aggressive maneuvers, collisions, or rollovers.
-%             \item \textbf{Vibration Sensor:} Monitors abnormal vibrations indicative of impacts or mechanical faults.
-%             \item \textbf{OBD-II Reader:} Establishes communication with the vehicle's ECU using standard automotive protocols (CAN, ISO 9141, KWP2000). It extracts critical diagnostic parameters such as RPM, throttle position, engine temperature, and fault codes.
-%             \item \textbf{GPS Module:} Provides accurate geolocation and route data, enabling context-aware analytics such as incident mapping and route reconstruction.
-%             \item \textbf{SD Card:} Facilitates local and persistent data storage, ensuring continuous logging even during network outages or vehicle downtimes.
-%         \end{enumerate}
-%     \item \textbf{Edge Device – Raspberry Pi 5} The Raspberry Pi 5 acts as the central processing unit at the vehicle level. It aggregates sensor inputs, performs real-time data processing, and securely transmits relevant information to the cloud server.
-%     \item \textbf{API Interface – Golang server} The FastAPI Server hosts the core application logic. It does the Machine learning analysis of collected data. This includes analyzing driving behavior, detecting anomalies, and performing predictive diagnostics using pre-trained models. By handling these computations at the API level, the system ensures near real-time insights and intelligent decision-making at the edge.Its use of a performant and scalable language like Go ensures low-latency operations and robust backend performance.
-%     \item \textbf{Database Layer – PostgreSQL} The PostgreSQL Database is the central repository for all collected and processed data. It maintains structured records of:
-%     \item \textbf{User Interface – Mobile Application (Expo Framework):}
-%     % image
-%     \begin{figure}[h!]
-%         \centering
-%         \includegraphics[width=13cm]{assets/obd_pinout.png}
-%         \caption{OBD-II Connector Pin-out}
-%         \label{fig:obd_pinout}
-%     \end{figure}
+\begin{enumerate}
+    \item {Sensor and Hardware Layer:} 
+        At the core of the system lies the Raspberry Pi 5, which functions as the primary edge computing device. It interfaces with multiple onboard sensors and modules, including:
+            \begin{table}[h!]
+            \centering
+            \begin{tabular}{|p{4.5cm}|p{10cm}|}
+            \hline
+            \textbf{Module Name} & \textbf{Description} \\
+            \hline
+            Accelerometer \& \\Gyroscope (MPU-6050) & Captures motion dynamics, acceleration, and orientation data. Essential for detecting aggressive driving, collisions, rollovers, and handling analysis. \\
+            \hline
+            Vibration Sensor \\(SW-420) & Monitors abnormal vibrations that may indicate impacts, rough terrain, mechanical faults, or engine irregularities. \\
+            \hline
+            OBD-II Reader & Communicates with the vehicle’s ECU via automotive protocols (CAN, ISO 9141, KWP2000). Extracts critical diagnostic data like RPM, throttle position, engine temperature, and fault codes. \\
+            \hline
+            GPS Module \\(NEO-6M) & Provides precise geolocation data, including latitude, longitude, speed, and timestamp, enabling route tracking, incident mapping, and trip analytics. \\
+            \hline
+            SD Card & Offers local and persistent storage for data logging, ensuring continuous record-keeping during network interruptions or when the vehicle is offline. \\
+            \hline
+            \end{tabular}
+            \caption{Modules and their Functional Descriptions}
+            \label{tab:module_descriptions}
+            \end{table}
+            \\
+    \item {Edge Device – Raspberry Pi 5} 
+        The Raspberry Pi 5 serves as the central processing and data aggregation unit at the vehicle level, collecting and processing real-time data from various onboard sensors and the vehicle’s ECU. It interfaces with multiple peripherals connected through its GPIO pins and I2C bus, including a NEO-6M GPS module for acquiring precise geolocation data, an MPU-6050 accelerometer and gyroscope for capturing acceleration, orientation, and motion metrics, and an SW-420 vibration sensor to detect mechanical vibrations indicative of movement or engine activity. Additionally, the system reads critical vehicle operational parameters such as RPM, speed, coolant temperature, and fuel levels via an OBD-II interface using a Python OBD library. The hardware connections for each sensor and module are detailed in the table below:
+            \begin{table}[h!]
+            \centering
+            \begin{tabular}{|c|c|c|}
+            \hline
+            \textbf{Device} & \textbf{Connection} & \textbf{GPIO Pins} \\
+            \hline
+            \multirow{4}{*}{NEO-6M GPS} 
+            & VCC & Pin 17 (3.3V) \\
+            & GND & Pin 20 \\
+            & TX  & GPIO15 (Pin 10) \\
+            & RX  & Not Connected \\
+            \hline
+            \multirow{4}{*}{MPU-6050}
+            & VCC & Pin 1 (3.3V) \\
+            & GND & Pin 6 \\
+            & SCL & I2C SCL (Pin 5) \\
+            & SDA & I2C SDA (Pin 3) \\
+            \hline
+            \multirow{3}{*}{SW-420 Sensor}
+            & VCC & Pin 4 (5V) \\
+            & GND & Pin 14 \\
+            & D0  & GPIO17 (Pin 11) \\
+            \hline
+            \end{tabular}
+            \caption{Device to GPIO Pin Connections on Raspberry Pi}
+            \label{tab:device_gpio_connections}
+            \end{table}
+        The Raspberry Pi 5 runs two parallel threads for efficient data handling: one continuously polls OBD-II data every second, while the other simultaneously captures readings from the connected sensors. All collected data is synchronized, merged into a unified Pandas DataFrame with timestamped entries, and stored locally as a CSV file for redundancy. The system then attempts to transmit this data to a Go-based cloud server via HTTP GET requests in real-time. If network connectivity is unavailable, it temporarily saves the data to a local CSV file, ensuring no data loss by queuing the entries for batch transmission once the connection is re-established. This edge computing framework enables continuous, intelligent vehicle monitoring and secure data management, supporting essential applications such as predictive maintenance, fuel emission analysis, engine health diagnostics, and real-time fleet tracking.
+    \item {API Interface – Golang server}
+        The Golang Server acts as the intermediate communication layer between the Raspberry Pi 5 edge device and the backend infrastructure, enabling structured, secure, and reliable data exchange. It exposes three RESTful endpoints: /upload, /data, and /health, each designed to handle specific interactions. The /upload endpoint, accessible via a POST request, receives CSV files containing logged telemetry data from the Raspberry Pi. Upon receiving a file, it processes the content using Go’s CSV reader package, reads the records line by line, and dynamically constructs SQL queries to insert the data into a PostgreSQL database, ensuring flexibility in handling varying data formats. The /data endpoint, accessible via a GET request, executes predefined SQL queries on the database to fetch the latest stored records and returns the results as a structured HTTP response to the requester. Additionally, a lightweight /health endpoint, using a GET method, provides a quick health check mechanism for monitoring the server’s operational status. This Golang-based API server forms a robust and efficient bridge between the vehicle's edge-level data collection systems and centralized backend services, ensuring reliable data ingestion, storage, and retrieval in real-time or batch scenarios.
+    \item {Database Layer – PostgreSQL}
+        The PostgreSQL Database serves as the central data repository, securely storing all structured and processed telemetry and diagnostic data collected from the vehicle. It maintains comprehensive records, including vehicle diagnostics data such as engine parameters, error codes, and sensor readings retrieved via OBD-II, along with GPS logs for tracking geospatial coordinates, route histories, and vehicle movement timestamps. Additionally, it records continuous temperature data for monitoring engine coolant and other thermal parameters, as well as sensor data like gyroscope readings and vibration events. Deployed as a Docker container within the same Docker bridge network as the Golang API server and FastAPI machine learning server, PostgreSQL ensures seamless, containerized data exchange. A dedicated database named Adam is created to organize this information, featuring structured tables for OBD data, GPS logs, gyroscope readings, vibration events, and user details, each associated with a unique user ID for secure, user-specific data management. PostgreSQL’s ACID-compliant transaction handling and advanced querying capabilities guarantee data integrity, consistency, and security, making it an ideal, reliable choice for this mission-critical automotive data management solution.
+    \item {Backend Logic – FastAPI Server}
+        The FastAPI Server acts as the backbone of the application, hosting the core business logic and handling machine learning-driven analytics on the collected vehicle data. It processes and analyzes critical parameters such as fuel emissions, engine health, and predictive maintenance requirements, ensuring timely and actionable insights. Additionally, it powers an integrated chatbot service for user interaction and support.\\
+        By performing these computations at the API level, the system delivers near real-time analytics and intelligent decision-making at the edge, reducing the dependency on cloud resources and enhancing responsiveness for end users.
+    \item {User Interface – Mobile Application (Expo Framework)}
+        Developed using Expo (React Native), the mobile application provides a user-friendly interface for various stakeholders, including vehicle owners, fleet managers, and insurance agents. It enables users to:
+        \begin{itemize}
+            \item {View real-time and historical vehicle data}
+            \item {Receive alerts and notifications}
+            \item {Access performance analytics and incident logs.}
+            \item {Export data for insurance or forensic purposes.}
+        \end{itemize}
 
-%     The OBD-II standard specifies a 16-pin connector known as the J1962 connector, which is used universally across most vehicles. The pinout for this connector is defined as follows:
+The application communicates securely with the backend servers, ensuring synchronization of data and a consistent user experience across platforms.
+\end{enumerate}
 
-% \begin{table}[h!]
-%     \centering
-%     \caption{OBD-II Connector Pinout}
-%     \label{table:obd_pinout}
-%     \renewcommand{\arraystretch}{2.5} % Adjust row height (1 cm approx. with default font size)
-%     \begin{tabular}{|c|l|}
-%     \hline
-%     \textbf{Pin} & \textbf{Function} \\ \hline
-%     1  & Manufacturer discretion \\ \hline
-%     2  & Bus positive Line (SAE J1850 PWM and VPW) \\ \hline
-%     3  & Manufacturer discretion \\ \hline
-%     4  & Chassis ground \\ \hline
-%     5  & Signal ground \\ \hline
-%     6  & CAN high (ISO 15765-4 and SAE J2284) \\ \hline
-%     7  & K-line (ISO 9141-2 and ISO 14230-4) \\ \hline
-%     8  & Manufacturer discretion \\ \hline
-%     9  & Manufacturer discretion \\ \hline
-%     10 & Bus negative Line (SAE J1850 PWM only) \\ \hline
-%     11 & Manufacturer discretion \\ \hline
-%     12 & Manufacturer discretion \\ \hline
-%     13 & Manufacturer discretion \\ \hline
-%     14 & CAN low (ISO 15765-4 and SAE J2284) \\ \hline
-%     15 & L-line (ISO 9141-2 and ISO 14230-4) \\ \hline
-%     16 & Battery voltage (+12 Volt for type A connector, +24 Volt for type B connector) \\ \hline
-%     \end{tabular}
-%     \end{table}
-    
-
-
-
-
-% The assignment of unspecified pins is left to the vehicle manufacturer's discretion, allowing for variations in implementation across different brands and models.
-
-% The communication between the OBD system and the Engine Control Unit (ECU) occurs through standardized protocols. This communication involves several key components:
-
-% Data Link Connector: The OBD-II connector serves as a physical interface for diagnostic tools to communicate with the ECU.
-% Protocols: Various communication protocols are utilized, including:
-
-
-% \begin{itemize}
-%     \item ISO 9141-2
-%     \item ISO 14230-4 (Keyword Protocol 2000)
-%     \item ISO 15765-4 (CAN bus)
-% \end{itemize}
-
-% Parameter Identification (PID): PIDs are specific data points that can be queried from the ECU. They provide information about various vehicle parameters such as engine RPM, vehicle speed, coolant temperature, etc. Each PID corresponds to a specific function or piece of data that the ECU can report back to diagnostic tools.
-
-% \item \textbf{Python Script} A Python script retrieves data from the ECU and processes it for further analysis or storage. It acts as a bridge between the raw sensor data and the database/server layer.
-
-% \item \textbf{Postgres Database} The Postgres database serves as the primary storage for processed telemetry data. It provides a structured and reliable backend for managing sensor data and results from further computations.
-
-% \item \textbf{Go Server} The Go server processes data stored in the Postgres database and performs additional tasks, such as:
-% \begin{itemize}
-%     \item Data aggregation
-%     \item Complex computations or analytics
-%     \item API responses for connected systems
-% \end{itemize}
-% \item \textbf{FastAPI Script} The FastAPI script interacts with the Postgres database to:
-% \begin{itemize}
-%     \item Expose APIs for retrieving or upserting data
-%     \item Enable data queries from other applications or systems
-%     \item Provide endpoints for monitoring, diagnostics, and reporting
-% \end{itemize}
-% \newpage
-% \item \textbf{Mobile App} The app provides the user interface for interacting with the system. Through the integration with a Golang server and PostgreSQL database, the app can:
-% \begin{itemize}
-%     \item Display real-time telemetry data
-%     \item Provide diagnostic reports
-%     \item Enable user interaction and configuration of the system
-% \end{itemize}
-% \end{enumerate}
+\section{CHAPTER SUMMARY}
+    \begin{enumerate}
+        \item \textbf{Sensor Integration:}  The system begins with the integration of multiple sensors that capture real-time vehicle data, including parameters such as engine RPM, GPS coordinates, temperature readings, etc. These sensors transmit raw data directly to the connected Raspberry Pi5.
+        \item \textbf{Raspberry Pi 5 – Edge Processing Unit:}  Acting as the central processing unit, the Raspberry Pi 5 receives and pre-processes all incoming data. Interfacing with GPS, accelerometer, gyroscope, and vibration sensors to gather motion and location data. It also retrieves key engine metrics like RPM, speed, and temperature via the OBD-II interface using a Python-based library.
+        \item \textbf{GoLang Server – Backend and Data Management:}  The GoLang server is responsible for handling data flow, and ensuring the efficient storage of processed data into the PostgreSQL database. It also supports secure data sharing with authorized stakeholders and enables smooth communication with external systems.
+        \item \textbf{PostgreSQL Database – Central Data Repository:}  All vehicle diagnostics, GPS logs, behavioral insights, and incident data are stored in the PostgreSQL database. Its ACID compliance ensures data integrity and reliability, while advanced querying capabilities support efficient data retrieval and analytics.
+        \item \textbf{FastAPI Server – API and Analytics Layer:}  The FastAPI server acts as the application’s API layer, receiving structured data from the Raspberry Pi. It performs validation and additional analytics such as predictive maintenance using machine learning models. The processed data is then forwarded to the Mobile Application for display 
+        \item \textbf{Mobile Application – User Interface Layer:}  The mobile app serves as the primary user-facing component. It connects with the FAST API backend to display real-time vehicle stats, historical data visualizations, and alerts for issues like overheating or abnormal driving behavior. The app supports role-based access for vehicle owners, fleet managers, and insurance personnel, ensuring a user-friendly and secure experience.
+    \end{enumerate}
