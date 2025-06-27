@@ -18,7 +18,7 @@ The system consists of 4 primary components: Hardware Implementation, Data proce
 The diagram illustrates the flow of data and interactions within an automotive diagnostic and monitoring system. The system integrates multiple sensors, data processing units, databases, and APIs to achieve real-time diagnostics and data sharing. Below is a detailed explanation of the components and their interactions:
 
 \begin{enumerate}
-    \item {Sensor and Hardware Layer:} 
+    \item \textbf{Sensor and Hardware Layer:} 
         At the core of the system lies the Raspberry Pi 5, which functions as the primary edge computing device. It interfaces with multiple onboard sensors and modules, including:
             \begin{table}[h!]
             \centering
@@ -41,7 +41,7 @@ The diagram illustrates the flow of data and interactions within an automotive d
             \label{tab:module_descriptions}
             \end{table}
             \\
-    \item {Edge Device – Raspberry Pi 5} 
+    \item \textbf{Edge Device – Raspberry Pi 5} 
         The Raspberry Pi 5 serves as the central processing and data aggregation unit at the vehicle level, collecting and processing real-time data from various onboard sensors and the vehicle’s ECU. It interfaces with multiple peripherals connected through its GPIO pins and I2C bus, including a NEO-6M GPS module for acquiring precise geolocation data, an MPU-6050 accelerometer and gyroscope for capturing acceleration, orientation, and motion metrics, and an SW-420 vibration sensor to detect mechanical vibrations indicative of movement or engine activity. Additionally, the system reads critical vehicle operational parameters such as RPM, speed, coolant temperature, and fuel levels via an OBD-II interface using a Python OBD library. The hardware connections for each sensor and module are detailed in the table below:
             \begin{table}[h!]
             \centering
@@ -71,23 +71,25 @@ The diagram illustrates the flow of data and interactions within an automotive d
             \label{tab:device_gpio_connections}
             \end{table}
         The Raspberry Pi 5 runs two parallel threads for efficient data handling: one continuously polls OBD-II data every second, while the other simultaneously captures readings from the connected sensors. All collected data is synchronized, merged into a unified Pandas DataFrame with timestamped entries, and stored locally as a CSV file for redundancy. The system then attempts to transmit this data to a Go-based cloud server via HTTP GET requests in real-time. If network connectivity is unavailable, it temporarily saves the data to a local CSV file, ensuring no data loss by queuing the entries for batch transmission once the connection is re-established. This edge computing framework enables continuous, intelligent vehicle monitoring and secure data management, supporting essential applications such as predictive maintenance, fuel emission analysis, engine health diagnostics, and real-time fleet tracking.
-    \item {API Interface – Golang server}
+    \item \textbf{API Interface – Golang server}
         The Golang Server acts as the intermediate communication layer between the Raspberry Pi 5 edge device and the backend infrastructure, enabling structured, secure, and reliable data exchange. It exposes three RESTful endpoints: /upload, /data, and /health, each designed to handle specific interactions. The /upload endpoint, accessible via a POST request, receives CSV files containing logged telemetry data from the Raspberry Pi. Upon receiving a file, it processes the content using Go’s CSV reader package, reads the records line by line, and dynamically constructs SQL queries to insert the data into a PostgreSQL database, ensuring flexibility in handling varying data formats. The /data endpoint, accessible via a GET request, executes predefined SQL queries on the database to fetch the latest stored records and returns the results as a structured HTTP response to the requester. Additionally, a lightweight /health endpoint, using a GET method, provides a quick health check mechanism for monitoring the server’s operational status. This Golang-based API server forms a robust and efficient bridge between the vehicle's edge-level data collection systems and centralized backend services, ensuring reliable data ingestion, storage, and retrieval in real-time or batch scenarios.
-    \item {Database Layer – PostgreSQL}
+    \item \textbf{Database Layer – PostgreSQL}
         The PostgreSQL Database serves as the central data repository, securely storing all structured and processed telemetry and diagnostic data collected from the vehicle. It maintains comprehensive records, including vehicle diagnostics data such as engine parameters, error codes, and sensor readings retrieved via OBD-II, along with GPS logs for tracking geospatial coordinates, route histories, and vehicle movement timestamps. Additionally, it records continuous temperature data for monitoring engine coolant and other thermal parameters, as well as sensor data like gyroscope readings and vibration events. Deployed as a Docker container within the same Docker bridge network as the Golang API server and FastAPI machine learning server, PostgreSQL ensures seamless, containerized data exchange. A dedicated database named Adam is created to organize this information, featuring structured tables for OBD data, GPS logs, gyroscope readings, vibration events, and user details, each associated with a unique user ID for secure, user-specific data management. PostgreSQL’s ACID-compliant transaction handling and advanced querying capabilities guarantee data integrity, consistency, and security, making it an ideal, reliable choice for this mission-critical automotive data management solution.
-    \item {Backend Logic – FastAPI Server}
+    \item \textbf{Backend Logic – FastAPI Server}
         The FastAPI Server acts as the backbone of the application, hosting the core business logic and handling machine learning-driven analytics on the collected vehicle data. It processes and analyzes critical parameters such as fuel emissions, engine health, and predictive maintenance requirements, ensuring timely and actionable insights. Additionally, it powers an integrated chatbot service for user interaction and support.\\
         By performing these computations at the API level, the system delivers near real-time analytics and intelligent decision-making at the edge, reducing the dependency on cloud resources and enhancing responsiveness for end users.
-    \item {User Interface – Mobile Application (Expo Framework)}
-        Developed using Expo (React Native), the mobile application provides a user-friendly interface for various stakeholders, including vehicle owners, fleet managers, and insurance agents. It enables users to:
+    \item \textbf{User Interface – Mobile Application (Expo Framework)}
+        Developed using Expo (React Native), the mobile application provides a user-friendly interface for personal vehicle owners. It enables users to:        
         \begin{itemize}
-            \item {View real-time and historical vehicle data}
-            \item {Receive alerts and notifications}
-            \item {Access performance analytics and incident logs.}
-            \item {Export data for insurance or forensic purposes.}
+            \item {View historical vehicle data.}
+            \item {Tracks trip history, average speed, top speed, fuel logs.}
+            \item {Displays real-time or historical engine temperature, coolant temperature, or outside ambient temperature.}
+            \item {Tracks real-time GPS location, and nearby services like petrol pumps and repair centers with navigation.}
+            \item {Offers tools for monitoring engine health, checking emission compliance, and predicting maintenance needs with detailed insights.}
+            \item {Displays Car's technical and ownership details}
+            \item {Provides Chat support or AI help related to car issues.}
         \end{itemize}
-
-The application communicates securely with the backend servers, ensuring synchronization of data and a consistent user experience across platforms.
+        The application communicates securely with the backend servers, ensuring synchronization of data and a consistent user experience across platforms.
 \end{enumerate}
 
 \section{CHAPTER SUMMARY}
