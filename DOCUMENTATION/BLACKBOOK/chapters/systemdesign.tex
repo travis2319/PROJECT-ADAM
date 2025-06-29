@@ -18,10 +18,10 @@ The system consists of 4 primary components: Hardware Implementation, Data proce
 The diagram illustrates the flow of data and interactions within an automotive diagnostic and monitoring system. The system integrates multiple sensors, data processing units, databases, and APIs to achieve real-time diagnostics and data sharing. Below is a detailed explanation of the components and their interactions:
 
 \begin{enumerate}
-    \item \textbf{Sensor and Hardware Layer:} 
-        At the core of the system lies the Raspberry Pi 5, which functions as the primary edge computing device. It interfaces with multiple onboard sensors and modules, including:
-            \begin{table}[h!]
-            \centering
+    \item \textbf{Sensor and Hardware Layer:}
+        \begin{table}[h!]\centering
+            \caption{Modules and their Functional Descriptions}
+            \label{tab:module_descriptions} 
             \begin{tabular}{|p{4.5cm}|p{10cm}|}
             \hline
             \textbf{Module Name} & \textbf{Description} \\
@@ -37,14 +37,13 @@ The diagram illustrates the flow of data and interactions within an automotive d
             SD Card & Offers local and persistent storage for data logging, ensuring continuous record-keeping during network interruptions or when the vehicle is offline. \\
             \hline
             \end{tabular}
-            \caption{Modules and their Functional Descriptions}
-            \label{tab:module_descriptions}
-            \end{table}
-            \\
+        \end{table}    
+        At the core of the system lies the Raspberry Pi 5, which functions as the primary edge computing device. It interfaces with multiple onboard sensors and modules
     \item \textbf{Edge Device – Raspberry Pi 5} 
         The Raspberry Pi 5 serves as the central processing and data aggregation unit at the vehicle level, collecting and processing real-time data from various onboard sensors and the vehicle’s ECU. It interfaces with multiple peripherals connected through its GPIO pins and I2C bus, including a NEO-6M GPS module for acquiring precise geolocation data, an MPU-6050 accelerometer and gyroscope for capturing acceleration, orientation, and motion metrics, and an SW-420 vibration sensor to detect mechanical vibrations indicative of movement or engine activity. Additionally, the system reads critical vehicle operational parameters such as RPM, speed, coolant temperature, and fuel levels via an OBD-II interface using a Python OBD library. The hardware connections for each sensor and module are detailed in the table below:
-            \begin{table}[h!]
-            \centering
+        \begin{table}[h!]\centering
+            \caption{Device to GPIO Pin Connections on Raspberry Pi}
+            \label{tab:device_gpio_connections}
             \begin{tabular}{|c|c|c|}
             \hline
             \textbf{Device} & \textbf{Connection} & \textbf{GPIO Pins} \\
@@ -67,9 +66,7 @@ The diagram illustrates the flow of data and interactions within an automotive d
             & D0  & GPIO17 (Pin 11) \\
             \hline
             \end{tabular}
-            \caption{Device to GPIO Pin Connections on Raspberry Pi}
-            \label{tab:device_gpio_connections}
-            \end{table}
+        \end{table}
         The Raspberry Pi 5 runs two parallel threads for efficient data handling: one continuously polls OBD-II data every second, while the other simultaneously captures readings from the connected sensors. All collected data is synchronized, merged into a unified Pandas DataFrame with timestamped entries, and stored locally as a CSV file for redundancy. The system then attempts to transmit this data to a Go-based cloud server via HTTP GET requests in real-time. If network connectivity is unavailable, it temporarily saves the data to a local CSV file, ensuring no data loss by queuing the entries for batch transmission once the connection is re-established. This edge computing framework enables continuous, intelligent vehicle monitoring and secure data management, supporting essential applications such as predictive maintenance, fuel emission analysis, engine health diagnostics, and real-time fleet tracking.
     \item \textbf{API Interface – Golang server}
         The Golang Server acts as the intermediate communication layer between the Raspberry Pi 5 edge device and the backend infrastructure, enabling structured, secure, and reliable data exchange. It exposes three RESTful endpoints: /upload, /data, and /health, each designed to handle specific interactions. The /upload endpoint, accessible via a POST request, receives CSV files containing logged telemetry data from the Raspberry Pi. Upon receiving a file, it processes the content using Go’s CSV reader package, reads the records line by line, and dynamically constructs SQL queries to insert the data into a PostgreSQL database, ensuring flexibility in handling varying data formats. The /data endpoint, accessible via a GET request, executes predefined SQL queries on the database to fetch the latest stored records and returns the results as a structured HTTP response to the requester. Additionally, a lightweight /health endpoint, using a GET method, provides a quick health check mechanism for monitoring the server’s operational status. This Golang-based API server forms a robust and efficient bridge between the vehicle's edge-level data collection systems and centralized backend services, ensuring reliable data ingestion, storage, and retrieval in real-time or batch scenarios.

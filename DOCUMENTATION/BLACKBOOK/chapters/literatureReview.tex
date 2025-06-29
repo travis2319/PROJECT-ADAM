@@ -12,7 +12,7 @@ A thorough review of relevant research papers has refined the project’s approa
 3. \textbf{Data Security and Analysis}: Multiple studies underscore the importance of securing vehicle data using encryption techniques during storage and transmission. This ensures the integrity of sensitive information and prevents unauthorized access, which is vital for both user trust and forensic validity.
 
 \subsection{ Applications of Research}
-The literature survey directly informed the ADAM System’s design andimplementation. By leveraging standardized diagnostic protocols, integrating robustembedded systems, and adopting advanced data encryption, the ADAM System ensuresaccurate, reliable, and secure diagnostics. These insights have guided the creation of aversatile solution for real-time vehicle monitoring and forensic support.
+The literature survey directly informed the ADAM System's design by leveraging standardized protocols, embedded systems, and data encryption to ensure accurate, reliable, and secure diagnostics for real-time vehicle monitoring and forensic support.
 
 
 \begin{longtable}{|p{0.14\textwidth}|p{0.49\textwidth}|p{0.2\textwidth}|p{0.14\textwidth}|}
@@ -160,13 +160,13 @@ Assessing the Impact of Driving Behavior on Instantaneous Fuel Consumption
 Javier E. Meseguer, Carlos T. Calafate, Juan Carlos Cano, Pietro Manzoni
 \newline
 (IEEE Xplore) &
-This paper talks about DrivingStyles, a platform whose aim is to analyze and improve driving habits to diminish fuel consumption and greenhouse gases. It uses data directly from the vehicle's Electronic Control Unit (ECU), accessed by an OBD-II Bluetooth interface, and smartphone technology to assess driving behavior and the efficiency of fuel.
+This paper presents DrivingStyles, a platform designed to analyze and improve driving habits for reducing fuel consumption and greenhouse gas emissions. The system uses real-time data from vehicle Electronic Control Units (ECUs) through OBD-II Bluetooth interfaces and smartphone technology to evaluate driving behavior and fuel efficiency.
 \newline
-The research addresses the rising fuel costs and environmental pollution caused by greenhouse gas emissions. Applying data mining and neural networks, the platform classifies driving styles based on speed, acceleration, and engine RPM. It calculates fuel consumption using data from MAF, MAP, and IAT sensors, with alternative methods for cases where direct data is unavailable.
+The platform employs data mining and neural networks to classify driving styles based on speed, acceleration, and engine RPM. The system architecture includes an Android app, OBD-II interface, and web-based data center that collects and analyzes vehicle data. Study findings show driving style significantly affects fuel usage and emissions, with efficient driving practices achieving 15-20\% fuel savings compared to aggressive driving behaviors.
 \newline
-The system consists of an Android app, an OBD-II interface, and a web-based data center. The app collects data from the vehicle and phone sensors and sends it to the data center for analysis. A neural network identifies driving styles and road types, while the data center visualizes fuel efficiency and habits using open-source tools.
-\newline
-The platform also calculates CO2 emissions based on fuel consumption. The study reveals that driving style is significantly affecting the fuel usage and emissions. Aggressive driving is found to consume more fuel, and it can be up to 15–20\% saved in fuel by adopting efficient driving practices.
+% The system consists of an Android app, an OBD-II interface, and a web-based data center. The app collects data from the vehicle and phone sensors and sends it to the data center for analysis. A neural network identifies driving styles and road types, while the data center visualizes fuel efficiency and habits using open-source tools.
+% \newline
+% The platform also calculates CO2 emissions based on fuel consumption. The study reveals that driving style is significantly affecting the fuel usage and emissions. Aggressive driving is found to consume more fuel, and it can be up to 15–20\% saved in fuel by adopting efficient driving practices.
 &
 An efficient driving style can drastically reduce fuel consumption and reduce greenhouse gas emissions, with an estimated saving of 15--20\%. The DrivingStyles platform, with smartphone and vehicle data, is one of the practical tools to help raise awareness and improve driving styles for better energy efficiency. 
 &
@@ -180,18 +180,21 @@ Exploring Fuzzy Logic and Random Forest for Car Drivers’ Fuel Consumption Esti
 Rana Massoud, Francesco Bellotti, Riccardo Berta, Alessandro De Gloria, Stefan Poslad
 \newline
 (IEEE Xplore) &
-This paper explores the use of the Fuzzy Logic (FL) and Random Forest (RF) algorithms to estimate vehicle fuel consumption in the context of providing foundational support for the development of an IoT-enabled driving game which sends real-time feedback to promote good driving habits and minimize consumption using the enviroCar database.
+This paper explores Fuzzy Logic (FL) and Random Forest (RF) algorithms to estimate vehicle fuel consumption for developing an IoT-enabled driving game that provides real-time feedback to promote efficient driving habits using the enviroCar database.
 \newline
-This research employs real-time vehicle data that are collected through the OBD-II interface to establish accurate models for FC estimation. Important variables include throttle position sensor (TPS), revolutions per minute (RPM), car speed, and fuel consumption (FC) and tested on a range of car models and driving environments is considered in order to make the system applicable in real-world applications.
+The research uses real-time vehicle data collected through OBD-II interfaces, focusing on throttle position sensor (TPS), RPM, vehicle speed, and fuel consumption across various car models and driving conditions. FL uses "if-then" rules for understandable feedback, while RF applies machine learning for high-accuracy predictions.
 \newline
-FL uses "if-then" rules to provide understandable feedback, while RF applies machine learning for high-accuracy predictions. Results show RF outperforms FL, achieving higher R² (0.896 vs. 0.65) and lower MSE (1.506 vs. 4.745). Both models operate in real-time, with RF emphasizing speed and RPM as critical predictors.
-\newline
-Combining FL for intuitive coaching with RF for precise FC estimates should prove to improve IoT-enabled driving games. This solution should even steer game designers and also scale to other IoT applications which require real-time appraisals. &
-Fuzzy Logic (FL) provides interpretable feedback for coaching, while Random Forest (RF) delivers superior predictive accuracy for fuel consumption modeling. The combination of both models benefits from their strengths and makes them ideal for IoT-enabled driving games and applicable to other fields requiring real-time user performance assessment. &
+Results show RF outperforms FL with higher R² (0.896 vs. 0.65) and lower MSE (1.506 vs. 4.745), identifying speed and RPM as critical predictors. Combining FL's intuitive coaching with RF's precise estimates enhances IoT-enabled driving games and scales to other real-time IoT applications.
+&
+Fuzzy Logic (FL) provides interpretable feedback for coaching, while Random Forest (RF) delivers superior predictive accuracy for fuel consumption modeling. The combination of both models benefits from their strengths and makes them ideal for IoT-enabled driving games and applicable to other fields requiring real-time user performance assessment. 
+&
 Benchmark the performance of RF and FL against newer algorithms, such as Gradient Boosting (e.g., XGBoost) or neural networks, to validate the choice of models. \\
 
 
 \end{longtable}
+
+\newpage
+\vspace*{1cm} % Adds vertical space at the top of the new page
 
 \section{CHAPTER SUMMARY}
 \begin{enumerate}

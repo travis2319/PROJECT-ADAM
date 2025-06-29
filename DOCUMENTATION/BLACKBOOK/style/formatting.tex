@@ -23,3 +23,19 @@
 % === Page Layout ===
 \geometry{margin=1in}          % 1-inch margins
 \onehalfspacing                % 1.5-line spacing
+
+% Chapter Number and Name
+\titleformat{\chapter}[display]
+  {\normalfont\bfseries\fontsize{22}{24}\selectfont}
+  {\chaptertitlename\ \thechapter}{20pt}
+  {\normalfont\bfseries\fontsize{20}{22}\selectfont\justifying}
+
+% Section Title (Subtitle)
+\titleformat{\section}
+  {\normalfont\bfseries\fontsize{16}{18}\selectfont}
+  {\thesection}{1em}{}
+
+% Subsection Title (Sub-subtitle)
+\titleformat{\subsection}
+  {\normalfont\bfseries\fontsize{14}{16}\selectfont}
+  {\thesubsection}{1em}{}

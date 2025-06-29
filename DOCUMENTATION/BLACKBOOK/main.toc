@@ -6,35 +6,38 @@
 \contentsline {chapter}{\numberline {1}INTRODUCTION}{1}{chapter.1}%
 \contentsline {section}{\numberline {1.1}PURPOSE}{1}{section.1.1}%
 \contentsline {section}{\numberline {1.2}PROJECT SCOPE}{1}{section.1.2}%
-\contentsline {subsection}{\numberline {1.2.1}REAL-TIME ENGINE DIAGNOSTIC AND ALERTS}{2}{subsection.1.2.1}%
+\contentsline {subsection}{\numberline {1.2.1}REAL-TIME ENGINE DIAGNOSTIC AND ALERTS}{1}{subsection.1.2.1}%
 \contentsline {subsection}{\numberline {1.2.2}DRIVING PATTER ANALYSIS FOR INSURANCE AND GOVERNMENT USE}{2}{subsection.1.2.2}%
 \contentsline {subsection}{\numberline {1.2.3}ENHANCE VEHICLE SAFETY AND ACCIDENT ANALYSIS}{2}{subsection.1.2.3}%
 \contentsline {section}{\numberline {1.3}LITERATURE SURVEY}{2}{section.1.3}%
 \contentsline {subsection}{\numberline {1.3.1}OVERVIEW}{2}{subsection.1.3.1}%
-\contentsline {subsection}{\numberline {1.3.2}Key Research Insights}{3}{subsection.1.3.2}%
+\contentsline {subsection}{\numberline {1.3.2}Key Research Insights}{2}{subsection.1.3.2}%
 \contentsline {subsection}{\numberline {1.3.3} Applications of Research}{3}{subsection.1.3.3}%
-\contentsline {section}{\numberline {1.4}CHAPTER SUMMARY}{16}{section.1.4}%
-\contentsline {chapter}{\numberline {2}OVERALL DESCRIPTION}{17}{chapter.2}%
-\contentsline {section}{\numberline {2.1}PROJECT PERSPECTIVE}{17}{section.2.1}%
-\contentsline {section}{\numberline {2.2}PROJECT FUCNCTIONS}{17}{section.2.2}%
-\contentsline {section}{\numberline {2.3}USER CLASSES AND CHARACTERISTICS}{18}{section.2.3}%
-\contentsline {section}{\numberline {2.4}OPERATING ENVIROMENT}{20}{section.2.4}%
-\contentsline {section}{\numberline {2.5}CHAPTER SUMMARY}{21}{section.2.5}%
-\contentsline {chapter}{\numberline {3}REQUIREMENTS}{22}{chapter.3}%
-\contentsline {section}{\numberline {3.1}FUCNTION REQUIREMENTS}{22}{section.3.1}%
-\contentsline {section}{\numberline {3.2}OTHER NONFUCNTIONAL REQUIREMENTS}{22}{section.3.2}%
-\contentsline {section}{\numberline {3.3}HARDWARE REQUIREMENTS}{23}{section.3.3}%
-\contentsline {section}{\numberline {3.4}SOFTWARE REQUIREMENTS}{24}{section.3.4}%
-\contentsline {section}{\numberline {3.5}CHAPTER SUMMARY}{25}{section.3.5}%
-\contentsline {chapter}{\numberline {4}SYSTEM DESIGN}{27}{chapter.4}%
-\contentsline {section}{\numberline {4.1}SYSTEM ARCHITECTURE OVERVIEW}{28}{section.4.1}%
-\contentsline {section}{\numberline {4.2}CHAPTER SUMMARY}{32}{section.4.2}%
-\contentsline {chapter}{\numberline {5}IMPLEMENTATION}{34}{chapter.5}%
-\contentsline {section}{\numberline {5.1}INTRODUCTION}{34}{section.5.1}%
-\contentsline {subsection}{\numberline {5.1.1}HARDWARE IMPLEMENTATION}{34}{subsection.5.1.1}%
-\contentsline {section}{\numberline {5.2}GOLANG}{38}{section.5.2}%
-\contentsline {section}{\numberline {5.3}POSTGRES DB}{39}{section.5.3}%
-\contentsline {section}{\numberline {5.4}FASTAPI}{40}{section.5.4}%
-\contentsline {section}{\numberline {5.5}MOBILE APPLICATION}{41}{section.5.5}%
-\contentsline {chapter}{\numberline {6}CONCLUSION}{44}{chapter.6}%
-\contentsline {chapter}{\numberline {7}BIBLIOGRAPHY}{46}{chapter.7}%
+\contentsline {section}{\numberline {1.4}CHAPTER SUMMARY}{13}{section.1.4}%
+\contentsline {chapter}{\numberline {2}OVERALL DESCRIPTION}{14}{chapter.2}%
+\contentsline {section}{\numberline {2.1}PROJECT PERSPECTIVE}{14}{section.2.1}%
+\contentsline {section}{\numberline {2.2}PROJECT FUCNCTIONS}{14}{section.2.2}%
+\contentsline {section}{\numberline {2.3}USER CLASSES AND CHARACTERISTICS}{15}{section.2.3}%
+\contentsline {section}{\numberline {2.4}OPERATING ENVIROMENT}{16}{section.2.4}%
+\contentsline {section}{\numberline {2.5}CHAPTER SUMMARY}{16}{section.2.5}%
+\contentsline {chapter}{\numberline {3}REQUIREMENTS}{18}{chapter.3}%
+\contentsline {section}{\numberline {3.1}FUCNTION REQUIREMENTS}{18}{section.3.1}%
+\contentsline {section}{\numberline {3.2}OTHER NONFUCNTIONAL REQUIREMENTS}{18}{section.3.2}%
+\contentsline {section}{\numberline {3.3}HARDWARE REQUIREMENTS}{19}{section.3.3}%
+\contentsline {section}{\numberline {3.4}SOFTWARE REQUIREMENTS}{19}{section.3.4}%
+\contentsline {section}{\numberline {3.5}CHAPTER SUMMARY}{21}{section.3.5}%
+\contentsline {chapter}{\numberline {4}SYSTEM DESIGN}{22}{chapter.4}%
+\contentsline {section}{\numberline {4.1}SYSTEM ARCHITECTURE OVERVIEW}{22}{section.4.1}%
+\contentsline {section}{\numberline {4.2}CHAPTER SUMMARY}{26}{section.4.2}%
+\contentsline {chapter}{\numberline {5}IMPLEMENTATION}{28}{chapter.5}%
+\contentsline {section}{\numberline {5.1}INTRODUCTION}{28}{section.5.1}%
+\contentsline {subsection}{\numberline {5.1.1}HARDWARE IMPLEMENTATION}{28}{subsection.5.1.1}%
+\contentsline {section}{\numberline {5.2}GOLANG}{32}{section.5.2}%
+\contentsline {section}{\numberline {5.3}POSTGRES DB}{35}{section.5.3}%
+\contentsline {section}{\numberline {5.4}FASTAPI}{36}{section.5.4}%
+\contentsline {subsection}{\numberline {5.4.1}System Architecture and Data Processing}{38}{subsection.5.4.1}%
+\contentsline {subsection}{\numberline {5.4.2}Rule-Based Diagnostic Framework}{42}{subsection.5.4.2}%
+\contentsline {subsection}{\numberline {5.4.3}Maintenance Classification and Reporting}{43}{subsection.5.4.3}%
+\contentsline {section}{\numberline {5.5}MOBILE APPLICATION}{45}{section.5.5}%
+\contentsline {chapter}{\numberline {6}CONCLUSION}{48}{chapter.6}%
+\contentsline {chapter}{\numberline {7}BIBLIOGRAPHY}{49}{chapter.7}%

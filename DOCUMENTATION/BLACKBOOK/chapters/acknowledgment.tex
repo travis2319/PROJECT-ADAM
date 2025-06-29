@@ -6,10 +6,10 @@
 \renewcommand{\headrulewidth}{0pt}
 
 % Now redefine chapter to use fancy on its opening page
-\titleformat{\chapter}[hang]{\normalfont\Huge\bfseries}{\thechapter}{20pt}{}
+\titleformat{\chapter}[display]{\normalfont\Huge\bfseries\centering}{\thechapter}{20pt}{}
 \titlespacing*{\chapter}{0pt}{0pt}{20pt}
 
-\usepackage{etoolbox}
+% \usepackage{etoolbox}
 \makeatletter
 \patchcmd{\chapter}{\thispagestyle{plain}}{\thispagestyle{fancy}}{}{}
 \makeatother
@@ -34,7 +34,8 @@
 \newpage
 \pagenumbering{roman} % Start page numbering in Roman numerals
 \setcounter{page}{1} % Begin numbering from page 1
-\chapter*{\centering  ACKNOWLEDGMENT}
+\chapter*{ACKNOWLEDGMENT}
+
 \addcontentsline{toc}{chapter}{ACKNOWLEDGMENT}
 % \begin{center}
 % \textbf{\LARGE ACKNOWLEDGMENT}\\[1cm]

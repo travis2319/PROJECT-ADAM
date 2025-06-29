@@ -1,9 +1,11 @@
+
 \newpage
 \chapter*{\centering LIST OF ABBREVIATIONS}
 \addcontentsline{toc}{chapter}{LIST OF ABBREVIATIONS}
 
-\large
-\begin{tabular*}{\textwidth}{@{\extracolsep{\fill}}ll}
+% Solution 1: Using regular tabular with centering
+\begin{center}
+\begin{tabular}{l@{\hspace{2cm}}l}
 \textbf{Name} & \textbf{Description} \\
 \\[-0.3cm]
 ADAM: & Automotive Diagnostic and Activity Monitoring \\
@@ -14,8 +16,26 @@ RTO:  & Regional Transport Office \\
 GPS:  & Global Positioning System \\
 IAT:  & Intake Air Temperature \\
 MAF:  & Mass Air Flow \\
-\end{tabular*}
+\end{tabular}
+\end{center}
+% \newpage
+% \chapter*{\centering LIST OF ABBREVIATIONS}
+% \addcontentsline{toc}{chapter}{LIST OF ABBREVIATIONS}
 
+% \begin{center}
+% \begin{tabular*}{0.95\textwidth}{@{\extracolsep{5pt}}ll}
+% \textbf{Name} & \textbf{Description} \\
+% \\[-0.3cm]
+% ADAM: & Automotive Diagnostic and Activity Monitoring \\
+% OBD:  & On-Board Diagnostics Port \\
+% DTC:  & Diagnostic Trouble Codes \\
+% ECU:  & Engine Control Unit \\
+% RTO:  & Regional Transport Office \\
+% GPS:  & Global Positioning System \\
+% IAT:  & Intake Air Temperature \\
+% MAF:  & Mass Air Flow \\
+% \end{tabular*}
+% \end{center}
 
 % \newpage
 % \begin{center}
