@@ -1,14 +1,42 @@
+% \renewcommand{\cftdotsep}{\cftnodots} % remove dots
+% \setlength{\cftbeforeloftitleskip}{-1.5cm} % remove vertical space before title
+% \renewcommand{\listfigurename}{} % empty title
+% \begin{center}
+%     \LARGE \textbf{LIST OF FIGURES}
+% \end{center}
+% \listoffigures
 \newpage
-\chapter*{\centering LIST OF FIGURES}
+\chapter*{\centering  LIST OF FIGURES}
 \addcontentsline{toc}{chapter}{LIST OF FIGURES}
 
+
 \Large
-\begin{tabular*}{\textwidth}{@{\extracolsep{\fill}}lll}
-\textbf{Figure} & \textbf{Name} & \textbf{Page No.} \\
-\\[-0.3cm] % adjust space after header row
-Fig. 4.1 & System Flow Chart & (20) \\
-Fig. 4.2 & Electronic Control Unit (ECU) & (23) \\
-\end{tabular*}
+\begin{center}
+    \begin{tabular*}{0.95\textwidth}{@{\extracolsep{\fill}}c p{9cm} c}
+        \textbf{Figure} & \textbf{Name} & \textbf{Page No.} \\
+        \\[-0.3cm] % adjust space after header row
+        Fig. 4.1 & System Design Overview & (27) \\
+        Fig. 5.1 & Automotive Diagnostic And Activity Monitoring & (23) \\
+        Fig. 5.2 & Flow Diagram Of Raspberry Pi & (35) \\
+        Fig. 5.3 & Dashboard of the ADAM mobile   application & (42) \\
+        Fig. 5.4 & The dashboard includes direct navigation to four essential modules & (43) \\
+        Fig. 5.5 & The bottom tab of the ADAM mobile application provides quick access to key features & (43) \\
+
+    \end{tabular*}
+\end{center}
+
+% \Large
+% \begin{tabular*}{\textwidth}{@{\extracolsep{\fill}}lll}
+% \textbf{Figure} & \textbf{Name} & \textbf{Page No.} \\
+% \\[-0.3cm] % adjust space after header row
+% Fig. 4.1 & System Design Overview & (27) \\
+% Fig. 5.1 &  Automotive Diagnostic And Activity Monitoring & (23) \\
+% Fig. 5.2 & Flow Diagram Of Raspberry pi & (35) \\
+% Fig. 5.3 & Dashboard of the ADAM mobile application & (42) \\
+% Fig. 5.4 & The dashboard includes direct navigation \\ [0.3cm]to four essential modules & (43) \\
+% Fig. 5.5 & The bottom tab of the ADAM mobile application provides quick access to key features & (43) \\
+% \end{tabular*}
+
 
 % \newpage
 % \begin{center}

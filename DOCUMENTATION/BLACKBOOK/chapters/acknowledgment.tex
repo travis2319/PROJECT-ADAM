@@ -1,19 +1,35 @@
-\pagestyle{fancy} % Enable fancy page style
-
-% Clear default header and footer
+\pagestyle{fancy}
 \fancyhf{}
-
-% Set left footer to Roman page number
-\fancyfoot[R]{\thepage} % Right footer
-
-% Set left footer to custom text
-\fancyfoot[L]{BEProjectReportCP5For2025} % Left footer
-
-% Set header with title
+\fancyfoot[R]{\thepage}
+\fancyfoot[L]{BEProjectReportCP5For2025}
 \fancyhead[L]{AUTOMOTIVE DIAGNOSTIC AND ACTIVITY MONITORING (ADAM) SYSTEM}
-
-% Disable the horizontal line under the header
 \renewcommand{\headrulewidth}{0pt}
+
+% Now redefine chapter to use fancy on its opening page
+\titleformat{\chapter}[hang]{\normalfont\Huge\bfseries}{\thechapter}{20pt}{}
+\titlespacing*{\chapter}{0pt}{0pt}{20pt}
+
+\usepackage{etoolbox}
+\makeatletter
+\patchcmd{\chapter}{\thispagestyle{plain}}{\thispagestyle{fancy}}{}{}
+\makeatother
+
+% \pagestyle{fancy} % Enable fancy page style
+
+% % Clear default header and footer
+% \fancyhf{}
+
+% % Set left footer to Roman page number
+% \fancyfoot[R]{\thepage} % Right footer
+
+% % Set left footer to custom text
+% \fancyfoot[L]{BEProjectReportCP5For2025} % Left footer
+
+% % Set header with title
+% \fancyhead[L]{AUTOMOTIVE DIAGNOSTIC AND ACTIVITY MONITORING (ADAM) SYSTEM}
+
+% % Disable the horizontal line under the header
+% \renewcommand{\headrulewidth}{0pt}
 
 \newpage
 \pagenumbering{roman} % Start page numbering in Roman numerals

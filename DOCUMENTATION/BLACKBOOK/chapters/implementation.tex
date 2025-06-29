@@ -1,5 +1,6 @@
 % \newpage
 \chapter{IMPLEMENTATION}
+\pagestyle{fancy}
 % \begin{center}
 % % \textbf{\LARGE \centering IMPLEMENTATION}\\[1cm]
 % \end{center}
@@ -10,80 +11,274 @@
     \caption{Automotive Diagnostic And Activity Monitoring (ADAM) BOX}
     \label{fig:ADAM Box}
 \end{figure}
-\section{Data Collection from Car OBD Port}
+\section{INTRODUCTION}
 
-The \textbf{Automotive Diagnostic and Activity Monitoring (ADAM)} system utilizes the car's \textbf{OBD2 (On-Board Diagnostics)} port to collect a wide range of real-time vehicle data, including critical parameters such as engine RPM, vehicle speed, fuel consumption, and engine load. The type and quantity of data available through the OBD2 interface can vary significantly depending on the car's make, model, and the sensors it supports.
+This chapter discusses the implementation of our system, which consists of three primary components: the hardware setup, cloud-based storage and analysis, and a mobile application for user interaction.
+    \subsection{HARDWARE IMPLEMENTATION}
+        The hardware implementation consists of multiple sensors connected to a Raspberry Pi 5, serving as the central edge computing unit for real-time data acquisition, local processing, and cloud transmission. The system integrates several key components:
+        \begin{itemize}
+            \item Raspberry Pi 5: Acts as the central processing unit, efficiently handling real-time data acquisition, local computation, and sensor coordination
+            \item GPS Module (NEO-6M): Enables accurate vehicle location tracking and route history monitoring
+            \item Vibration Sensor (SW-420): Detects collision events and unusual vibrations indicative of accidents or aggressive driving patterns
+            \item Gyroscope Module: Monitors vehicle orientation, tilt, and angular motion for advanced motion analysis, including rollover detection and abrupt turn identification
+            \item Power Management: Connected to the vehicle battery via a relay system to prevent direct current cut-off when the car is turned off, ensuring continuous monitoring capability
+        \end{itemize}
+        \begin{figure}[h]
+            \centering
+            \includegraphics[width=1\textwidth]{assets/flow_diagram_hardware.png}
+            \caption{Flow Diagram Of Raspberry pi}
+            \label{fig:Flow Diagram}
+        \end{figure}
+        \begin{lstlisting}[language=Python,
+        caption={Main Hardware Implementation Function},
+        label={lst:hardware_main},
+        basicstyle=\small\ttfamily,
+        backgroundcolor=\color{gray!10},
+        frame=tb,
+        framerule=0.5pt,
+        rulecolor=\color{blue!30},
+        breaklines=true,
+        showstringspaces=false,
+        commentstyle=\color{green!60}\itshape,
+        keywordstyle=\color{blue!80}\bfseries,
+        stringstyle=\color{red!70},
+        numberstyle=\tiny\color{gray},
+        numbers=left,
+        stepnumber=1,
+        tabsize=4,
+        captionpos=t,
+        xleftmargin=0.5cm,
+        xrightmargin=0.5cm,
+        aboveskip=1em,
+        belowskip=1em
+        ]
+            def main():
+                """
+                Main hardware implementation function for edge-based automotive data collection
+                Demonstrates parallel sensor data acquisition, local preprocessing, and cloud transmission
+                """
+                global Async_conn, esp_conn, running
+                
+                print("Initializing ADAM - Automotive Data Acquisition Module")
+                
+                # Read configuration parameters
+                obd_port, esp8266_port, esp8266_baud, sensor_file, temp_csv_path, data_csv_path, server_url = read_config()
+                
+                try:
+                    # Initialize hardware connections
+                    Async_conn = Async_connection(obd_port)  # OBD-II interface
+                    esp_conn = Esp8266_conn(esp8266_port, esp8266_baud)  # ESP8266 sensor module
+                    
+                    print(f"Hardware initialized - OBD: {obd_port} | ESP8266: {esp8266_port}")
+                    
+                    # Main data collection loop
+                    iteration = 1
+                    while running:
+                        print(f"\n--- Data Collection Cycle {iteration} ---")
+                        
+                        # Parallel sensor data acquisition
+                        results = {}
+                        
+                        # Create concurrent threads for multi-sensor data collection
+                        obd_thread = threading.Thread(
+                            target=collect_obd_data, 
+                            args=(Async_conn, 1, sensor_file, results)
+                        )
+                        esp_thread = threading.Thread(
+                            target=collect_serial_data,
+                            args=(esp_conn, results)
+                        )
+                        
+                        # Execute parallel data collection
+                        obd_thread.start()
+                        esp_thread.start()
+                        obd_thread.join()
+                        esp_thread.join()
+                        
+                        # Local preprocessing and data fusion
+                        if 'obd_df' in results and 'serial_df' in results:
+                            combined_df = merge_dataframes(results['obd_df'], results['serial_df'])
+                            
+                            # Edge processing: Save locally with timestamp
+                            combined_df.to_csv(temp_csv_path, index=False)
+                            append_to_data_csv(temp_csv_path, data_csv_path)
+                            
+                            # Cloud transmission for centralized analysis
+                            upload_result = upload_to_server(temp_csv_path, server_url)
+                            
+                            print(f"Cycle {iteration} complete - Data processed and transmitted")
+                        
+                        iteration += 1
+                        time.sleep(1)  # Regular interval collection
+                        
+                except Exception as e:
+                    print(f"Hardware implementation error: {e}")
+                finally:
+                    # Cleanup hardware connections
+                    if Async_conn: Async_conn.close()
+                    if esp_conn: esp_conn.close()
 
-\subsubsection{Sensor Variability and Data Challenges}
-Each car is equipped with a unique set of sensors, leading to differences in the \textbf{Parameter IDs (PIDs)} that are supported. For instance, while one vehicle might provide detailed oxygen sensor readings, another might lack these advanced diagnostics. The ADAM system adapts to this variability by querying the Supported PIDs (PIDS\_A, PIDS\_B, etc.) to identify which parameters can be accessed for a given vehicle. This ensures effective operation across a broad range of car models.
+            def merge_dataframes(obd_df, serial_df):
+                """
+                Local preprocessing: Merge multi-sensor data with timestamp synchronization
+                """
+                obd_df = obd_df.reset_index(drop=True)
+                serial_df = serial_df.reset_index(drop=True)
+                
+                # Add synchronized timestamp for data correlation
+                timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                obd_df["MERGED_TIMESTAMP"] = timestamp
+                
+                # Horizontal concatenation for unified sensor data
+                combined_df = pd.concat([obd_df, serial_df], axis=1)
+                return combined_df
+        \end{lstlisting}
 
-\subsubsection{Real-Time Data Collection}
-Although the system collects data in \textbf{real-time}, there is a slight delay in transmission and processing. Data points are typically retrieved at intervals of \textbf{30 minutes} due to system and hardware limitations, balancing resource efficiency with the need for timely diagnostics. Despite this, the system continuously monitors vehicle performance and updates its diagnostics.
+        The Raspberry Pi collected sensor data at regular intervals, pre-processed it locally, and transmitted the information to a cloud backend for storage and analysis. This edge setup ensured low-latency data capture and immediate response to critical driving events.
 
-\subsubsection{PIDs And Their Metrics}
-The following is a subset of the PIDs that the system may query, along with their descriptions and response values:
+\section{GOLANG}
+    Once data is collected and processed locally by the Raspberry Pi 5 edge device, it is transmitted to a Golang-based server which acts as a middleware communication layer. This Go server ensures the reliable and secure transmission of structured telemetry data from edge to backend systems, enabling near real-time monitoring and decision-making.
+    The Go server exposes a set of RESTful API endpoints for interacting with various components of the data pipeline. These include:
+    \begin{enumerate}
+        \item \textbf{/upload:} Handles incoming CSV files via POST requests. Data is parsed using Go’s CSV reader libraries, and SQL queries are dynamically constructed for storage in the PostgreSQL database.
+        \item \textbf{/data:} Allows GET requests to fetch the most recent or specific historical records from the database. This enables dashboards, apps, or other services to retrieve and display relevant vehicle data.
+        \item \textbf{/health:} A lightweight endpoint that returns the server's health status, used for monitoring and diagnostics.
+    \end{enumerate}
+    Through these endpoints, the Go server functions as the key intermediary for reliable, flexible, and secure data ingestion into the centralized storage system.
+\section{POSTGRES DB}
+    The collected data is stored in a PostgreSQL (PGSQL) database for future processing and analysis. This database serves as the central repository for storing vehicle data, including various parameters like engine temperature, fuel consumption, speed, and more. The structured format of the database allows for efficient querying and data retrieval.
+    All incoming telemetry and diagnostic data are stored in a PostgreSQL (PGSQL) relational database, which acts as the core data repository for the ADAM system. PostgreSQL is selected due to its enterprise-level capabilities, including full support for ACID transactions, advanced indexing techniques, query optimization, and secure storage features.
+    The PostgreSQL database is designed with a normalized schema that efficiently captures and organizes various datasets such as:
+    Engine diagnostic parameters and fault codes
 
-\begin{table}[h!]
+    \begin{itemize}
+        \item GPS and route tracking logs
+        \item Vehicle movement and sensor activity
+        \item Temperature metrics and thermal events
+        \item User metadata and access logs
+    \end{itemize}
+    Structured storage facilitates rapid query response times and easy retrieval of records for downstream analytics and machine learning tasks. This centralized repository ensures long-term archival, auditability, and scalability as data volume grows.
+
+\section{FASTAPI}
+    Once stored, the diagnostic data is accessed by a FastAPI-based application layer. This server plays a central role in processing data, serving APIs to external interfaces, and executing real-time and scheduled analysis tasks. One of its most critical roles is the application of Machine Learning (ML) models trained on historical vehicle data to derive predictive insights.
+    \begin{enumerate}
+        \item \textbf{Emissions Diagnostic:} The emissions router (\path{routers/emissions.py}) processes real-time sensor data to determine emission compliance status using the EnhancedCarEmissionsMLModel. When a request is received, the router accepts CSV uploads or JSON payloads containing sensor readings such as CO levels, NOx concentrations, and particulate matter measurements. The data is validated using Pydantic models before being passed to the emissions model, which preprocesses the sensor values, applies Indian emission standard thresholds, and generates compliance classifications using a trained Random Forest classifier. The router returns structured JSON responses containing compliance status, confidence scores, and detailed sensor analysis, along with optional confusion matrix visualizations for model performance assessment.
+        \item \textbf{Engine Health Diagnostic:} The engine health router (\path{routers/engine_health.py}) analyzes OBD diagnostic data through the EngineHealthPredictor model to assess overall engine condition. The router processes incoming requests containing engine parameters like RPM, coolant temperature, fuel trim values, intake pressure, and engine load. After data validation, the information is passed to the engine health model, which applies rule-based thresholds to detect anomalies across multiple engine systems. The model uses a Gradient Boosting Classifier to categorize engine status as "Good" or "Needs Attention" based on sensor patterns. The router formats the diagnostic results into comprehensive health reports that include specific maintenance recommendations, anomaly details, and performance metrics suitable for both technical users and vehicle owners.
+        \item \textbf{Predictive Maintenance:} The predictive maintenance router (\path{routers/predictive_maintenance.py}) generates maintenance schedules and component replacement predictions using the VehicleMaintenance class. This router accepts comprehensive vehicle data including mileage, operating hours, sensor readings, and usage patterns. The maintenance model applies rule-based algorithms to estimate wear patterns for various components such as tire wear, spark plug condition, brake pad status, and fluid change intervals. Unlike the machine learning approaches used in emissions and engine health modules, this system uses deterministic calculations based on manufacturer specifications and operational stress factors. The router returns detailed maintenance reports with specific recommendations, estimated replacement dates, and priority levels for each vehicle component, enabling proactive fleet management and service scheduling.
+    \end{enumerate}
+
+\section{MOBILE APPLICATION}
+    The ADAM system’s mobile application serves as the primary user interface for data visualization and user interaction. Built using cross-platform frameworks like React Native or Flutter, the app is designed for both Android and iOS devices, ensuring wide accessibility.
+    \begin{itemize}
+        \item \textbf{Real-Time Monitoring:} The app provides real-time updates on vehicle diagnostics, including engine health, fuel efficiency, and emission compliance. Users can view live data streams from the OBD-II interface, allowing them to monitor their vehicle's performance on-the-go.
+        \item \textbf{Maintenance Alerts:} Users receive notifications for upcoming maintenance tasks based on predictive analytics. The app alerts users about required services such as oil changes, tire rotations, and brake inspections, helping them stay proactive in vehicle care.
+        \item \textbf{Driver Behavior Analytics:} The app tracks driver behavior metrics such as acceleration patterns, braking habits, and speed compliance. This data is visualized through intuitive graphs and charts, enabling users to improve their driving habits for better fuel efficiency and safety.
+        \item \textbf{Emission Compliance Status:} Users can check their vehicle's emission status against regulatory standards. The app provides insights into emission levels and compliance with local environmental regulations.
+        \item \textbf{User-Friendly Interface:} The mobile app features a clean and intuitive design that allows users to easily navigate through various sections, access detailed reports, and interact with the system without technical expertise.
+        \item \textbf{Chatbot Integration:} The app includes a chatbot that allows users to ask questions about their vehicle's performance, maintenance schedules, and diagnostic results. The chatbot provides instant responses, making it easy for users to get information without navigating through complex menus.
+    \end{itemize}
+    The mobile application serves as the primary interface for users to interact with the ADAM system, providing a seamless experience for monitoring vehicle performance, receiving maintenance alerts, and accessing diagnostic information
+
+    \begin{figure}[h]  % 'h' means place here
     \centering
-    \caption{Example PIDs and Their Metrics}
-    \label{tab:pids_metrics}
-    \renewcommand{\arraystretch}{2.5} % Adjust row height (approximately 1 cm with default font size)
-    \begin{tabular}{ | c | p{7cm} | p{5cm} | p{3cm} | }
-        \hline
-        \textbf{PID} & \textbf{Name} & \textbf{Description} & \textbf{Response Value} \\
-        \hline
-        1  & STATUS               & Status since DTCs cleared              & Special \\  \hline
-        4  & ENGINE\_LOAD         & Calculated engine load                 & Unit: Percent \\  \hline
-        0C & RPM                  & Engine RPM                             & Unit: RPM \\  \hline
-        0D & SPEED                & Vehicle speed                          & Unit: KPH \\  \hline
-        10 & MAF                  & Airflow rate (Mass Air Flow)           & Unit: grams/second \\  \hline
-        2C & COMMANDED\_EGR       & Commanded Exhaust Gas Recirculation    & Unit: Percent \\  \hline
-        5C & OIL\_TEMP            & Engine oil temperature                 & Unit: Celsius \\  \hline
-        59 & FUEL\_RAIL\_PRESSURE\_ABS & Absolute fuel rail pressure      & Unit: Kilopascal \\  \hline
-    \end{tabular}
-\end{table}
+    \includegraphics[width=0.2\textwidth]{assets/Dashboard.png}
+    \caption{Dashboard of the ADAM mobile application}
+    \label{fig:ADAM Box}
+    \end{figure}
+
+    \begin{figure}[h]  % 'h' means place here
+    \centering
+    \includegraphics[width=1\textwidth]{assets/Dashboard-Arrows.png}
+    \caption{The dashboard includes direct navigation to four essential modules}
+    \label{fig:ADAM Box}
+    \end{figure}
+
+    \begin{figure}[h]  % 'h' means place here
+    \centering
+    \includegraphics[width=1\textwidth]{assets/App-Bottom-Tab.png}
+    \caption{The bottom tab of the ADAM mobile application provides quick access to key features}
+    \label{fig:ADAM Box}
+    \end{figure}
 
 
-\subsection{Adaptability of the ADAM System}
-The variability in available PIDs necessitates a flexible system design. The ADAM system is designed to dynamically query the supported PIDs of each vehicle and adjust its data collection and processing pipeline accordingly. This ensures that it can handle everything from basic diagnostics to advanced performance monitoring based on the car's capabilities.
+% \section{Data Collection from Car OBD Port}
 
-\subsection{Addressing Limitations}
-While data is collected in delayed intervals, the insights generated by the system are still valuable for \textbf{diagnostic analysis} and \textbf{predictive maintenance}. Future iterations aim to minimize delays and increase data retrieval speed for a truly real-time experience. By leveraging rich datasets from the OBD2 port and accommodating sensor variability, the ADAM system provides robust and customizable diagnostics for various vehicles.
+% The \textbf{Automotive Diagnostic and Activity Monitoring (ADAM)} system utilizes the car's \textbf{OBD2 (On-Board Diagnostics)} port to collect a wide range of real-time vehicle data, including critical parameters such as engine RPM, vehicle speed, fuel consumption, and engine load. The type and quantity of data available through the OBD2 interface can vary significantly depending on the car's make, model, and the sensors it supports.
 
-\section{Data Transfer to Go Server}
-After data is collected from the car’s OBD port, it is sent to a \textbf{Go server}. This server acts as middleware to handle data flow efficiently from the Python script to backend systems, ensuring seamless data exchange for real-time monitoring and analysis.
+% \subsubsection{Sensor Variability and Data Challenges}
+% Each car is equipped with a unique set of sensors, leading to differences in the \textbf{Parameter IDs (PIDs)} that are supported. For instance, while one vehicle might provide detailed oxygen sensor readings, another might lack these advanced diagnostics. The ADAM system adapts to this variability by querying the Supported PIDs (PIDS\_A, PIDS\_B, etc.) to identify which parameters can be accessed for a given vehicle. This ensures effective operation across a broad range of car models.
 
-\section{Data Storage in PostgreSQL Database}
-The collected data is stored in a \textbf{PostgreSQL (PGSQL)} database for future processing and analysis. This database serves as a central repository for storing vehicle data, including various parameters like engine temperature, fuel consumption, speed, etc. The structured format allows for efficient querying and data retrieval.
+% \subsubsection{Real-Time Data Collection}
+% Although the system collects data in \textbf{real-time}, there is a slight delay in transmission and processing. Data points are typically retrieved at intervals of \textbf{30 minutes} due to system and hardware limitations, balancing resource efficiency with the need for timely diagnostics. Despite this, the system continuously monitors vehicle performance and updates its diagnostics.
 
-\section{Data Analysis Using FastAPI and Machine Learning}
-Once stored in PostgreSQL, \textbf{FastAPI} is used to access and process this data for various analyses. Machine learning models are applied to perform several tasks:
+% \subsubsection{PIDs And Their Metrics}
+% The following is a subset of the PIDs that the system may query, along with their descriptions and response values:
 
-\begin{enumerate}
-    \item \textbf{Predictive Maintenance}: ML algorithms predict potential failures of car components by analyzing historical and real-time data.
-    \item \textbf{Driver Behavior}: The system tracks aspects of driver behavior such as acceleration and braking patterns.
-    \item \textbf{Emission Compliance}: It monitors emission-related parameters to ensure compliance with environmental regulations.
-    \item \textbf{Engine Health Prediction}: Real-time data analysis predicts potential issues like overheating or mechanical failures.
-\end{enumerate}
+% \begin{table}[h!]
+%     \centering
+%     \caption{Example PIDs and Their Metrics}
+%     \label{tab:pids_metrics}
+%     \renewcommand{\arraystretch}{2.5} % Adjust row height (approximately 1 cm with default font size)
+%     \begin{tabular}{ | c | p{7cm} | p{5cm} | p{3cm} | }
+%         \hline
+%         \textbf{PID} & \textbf{Name} & \textbf{Description} & \textbf{Response Value} \\
+%         \hline
+%         1  & STATUS               & Status since DTCs cleared              & Special \\  \hline
+%         4  & ENGINE\_LOAD         & Calculated engine load                 & Unit: Percent \\  \hline
+%         0C & RPM                  & Engine RPM                             & Unit: RPM \\  \hline
+%         0D & SPEED                & Vehicle speed                          & Unit: KPH \\  \hline
+%         10 & MAF                  & Airflow rate (Mass Air Flow)           & Unit: grams/second \\  \hline
+%         2C & COMMANDED\_EGR       & Commanded Exhaust Gas Recirculation    & Unit: Percent \\  \hline
+%         5C & OIL\_TEMP            & Engine oil temperature                 & Unit: Celsius \\  \hline
+%         59 & FUEL\_RAIL\_PRESSURE\_ABS & Absolute fuel rail pressure      & Unit: Kilopascal \\  \hline
+%     \end{tabular}
+% \end{table}
 
-\section{Chatbot for User Interaction}
-An integrated chatbot allows users to interact with the system regarding their car's performance metrics. It can answer queries such as:
-\begin{itemize}
-    \item \textbf{Current vehicle health} (e.g., engine status, fuel efficiency)
-    \item \textbf{Upcoming maintenance tasks}
-    \item \textbf{Emission compliance}
-    \item \textbf{Engine health status and alerts}
-\end{itemize}
 
-This feature provides users with a conversational interface for obtaining insights without complex navigation through menus.
 
-\section{Data Visualization via Mobile App}
-The ADAM system presents vehicle diagnostics through a mobile app interface that visualizes key performance metrics such as:
-\begin{itemize}
-    \item \textbf{Maintenance schedules and alerts}
-    \item \textbf{Driver behavior analytics}
-    \item \textbf{Engine health status and predictions}
-    \item \textbf{Emission compliance status}
-\end{itemize}
 
-This user-friendly app enables car owners to track their vehicle's performance, receive maintenance notifications, and monitor real-time data for optimal vehicle health management.
+
+
+% \subsection{Adaptability of the ADAM System}
+% The variability in available PIDs necessitates a flexible system design. The ADAM system is designed to dynamically query the supported PIDs of each vehicle and adjust its data collection and processing pipeline accordingly. This ensures that it can handle everything from basic diagnostics to advanced performance monitoring based on the car's capabilities.
+
+% \subsection{Addressing Limitations}
+% While data is collected in delayed intervals, the insights generated by the system are still valuable for \textbf{diagnostic analysis} and \textbf{predictive maintenance}. Future iterations aim to minimize delays and increase data retrieval speed for a truly real-time experience. By leveraging rich datasets from the OBD2 port and accommodating sensor variability, the ADAM system provides robust and customizable diagnostics for various vehicles.
+
+% \section{Data Transfer to Go Server}
+% After data is collected from the car’s OBD port, it is sent to a \textbf{Go server}. This server acts as middleware to handle data flow efficiently from the Python script to backend systems, ensuring seamless data exchange for real-time monitoring and analysis.
+
+% \section{Data Storage in PostgreSQL Database}
+% The collected data is stored in a \textbf{PostgreSQL (PGSQL)} database for future processing and analysis. This database serves as a central repository for storing vehicle data, including various parameters like engine temperature, fuel consumption, speed, etc. The structured format allows for efficient querying and data retrieval.
+
+% \section{Data Analysis Using FastAPI and Machine Learning}
+% Once stored in PostgreSQL, \textbf{FastAPI} is used to access and process this data for various analyses. Machine learning models are applied to perform several tasks:
+
+% \begin{enumerate}
+%     \item \textbf{Predictive Maintenance}: ML algorithms predict potential failures of car components by analyzing historical and real-time data.
+%     \item \textbf{Driver Behavior}: The system tracks aspects of driver behavior such as acceleration and braking patterns.
+%     \item \textbf{Emission Compliance}: It monitors emission-related parameters to ensure compliance with environmental regulations.
+%     \item \textbf{Engine Health Prediction}: Real-time data analysis predicts potential issues like overheating or mechanical failures.
+% \end{enumerate}
+
+% \section{Chatbot for User Interaction}
+% An integrated chatbot allows users to interact with the system regarding their car's performance metrics. It can answer queries such as:
+% \begin{itemize}
+%     \item \textbf{Current vehicle health} (e.g., engine status, fuel efficiency)
+%     \item \textbf{Upcoming maintenance tasks}
+%     \item \textbf{Emission compliance}
+%     \item \textbf{Engine health status and alerts}
+% \end{itemize}
+
+% This feature provides users with a conversational interface for obtaining insights without complex navigation through menus.
+
+% \section{Data Visualization via Mobile App}
+% The ADAM system presents vehicle diagnostics through a mobile app interface that visualizes key performance metrics such as:
+% \begin{itemize}
+%     \item \textbf{Maintenance schedules and alerts}
+%     \item \textbf{Driver behavior analytics}
+%     \item \textbf{Engine health status and predictions}
+%     \item \textbf{Emission compliance status}
+% \end{itemize}
+
+% This user-friendly app enables car owners to track their vehicle's performance, receive maintenance notifications, and monitor real-time data for optimal vehicle health management.
