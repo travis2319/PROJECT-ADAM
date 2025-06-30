@@ -3,14 +3,25 @@
 This chapter delves into the Automotive Diagnostic and Activity Monitoring (ADAM) System, providing an in-depth exploration of its innovative design, core functions, and user-centric features. It outlines the project’s integration of advanced hardware and software components to offer comprehensive solutions in vehicle diagnostics, maintenance, and forensic analysis.
 
 \section{PROJECT PERSPECTIVE}
-The Automotive Diagnostic and Activity Monitoring (ADAM) System is a standalone innovation designed to replace traditional diagnostic tools with advanced, integrated solutions. It communicates directly with the car’s Engine Control Unit (ECU) via OBD-II protocols, offering a seamless and efficient interface. By collecting real-time data and facilitating in-depth analysis, ADAM provides vehicle owners, insurers, and government bodies with actionable insights to enhance safety, maintenance, and operational transparency.\\
-Unlike conventional diagnostic tools, the ADAM System combines hardware components, such as a Raspberry Pi and GPS modules, with sophisticated software algorithms for predictive diagnostics and forensic capabilities. This ensures reliability, user convenience, and versatility across various use cases. The system’s ability to integrate seamlessly with a variety of vehicle models makes it a scalable and forward-compatible solution.
+
+The \textbf{Automotive Diagnostic and Activity Monitoring (ADAM) System} is an innovative, standalone automotive diagnostic platform designed to supersede conventional vehicle diagnostic tools with an advanced, integrated ecosystem. It establishes a direct interface with a vehicle's \textbf{Engine Control Unit (ECU)} via standard \textbf{OBD-II protocols}, enabling continuous real-time data acquisition and analysis. This system provides valuable insights to \textbf{vehicle owners, insurers, fleet operators, and government authorities}, enhancing road safety, maintenance scheduling, emissions compliance, and operational transparency.
+
+\vspace{0.3cm}
+
+From a hardware perspective, the ADAM System comprises a \textbf{Raspberry Pi 5 (4GB RAM)} as its central processing unit, interfaced with essential automotive-grade sensors such as the \textbf{Neo-6M GPS module} for location tracking, the \textbf{SW-420 vibration sensor} for impact and abnormal motion detection, and the \textbf{MPU-6050 accelerometer and gyroscope} module for capturing dynamic vehicle behavior. Power is supplied through a \textbf{6000mAh 11.1V 3S Li-ion battery}, ensuring reliable, continuous operation independent of the vehicle’s primary power source.
+
+\vspace{0.3cm}
+
+On the software side, the system architecture is built around a \textbf{Golang server using the Fiber framework}, which manages data ingestion and storage via a \textbf{PostgreSQL database}. Complementing this, a \textbf{FastAPI-based Python service} handles advanced analytics by executing machine learning models that classify engine health conditions, detect emissions anomalies, and generate predictive maintenance schedules. These models process both real-time and historical telemetry to deliver actionable diagnostics, anticipate component failures, and support compliance with environmental standards.
+
+\vspace{0.3cm}
+
+For user interaction, ADAM features a \textbf{React Native mobile application built on the Expo framework}, providing an intuitive interface where users can monitor diagnostic data, receive health alerts, track vehicle performance metrics, and access predictive maintenance recommendations. This cohesive integration of hardware, software, intelligent analytics, and user interface establishes the ADAM System as a scalable, reliable, and forward-compatible solution for modern automotive diagnostics and fleet management.
 
 \section{PROJECT FUCNCTIONS}
 
 \begin{enumerate}
     \item \textbf{Black Box Data Collection:} The system records key parameters, including RPM, speed, throttle position, engine temperature, and error codes. This data is stored securely and can be analyzed to understand vehicle performance and pre-accident conditions. By functioning as a black box, ADAM serves as a reliable source of information for investigations, aiding in uncovering critical details about vehicle operations prior to incidents.
-
     \item \textbf{Mobile App Visualizations:} Users can access real-time vehicle statistics, diagnostics, and alerts through an intuitive mobile application. The app also provides detailed visualizations and suggestions for maintenance, ensuring users are informed and empowered to take necessary actions. Additionally, the app integrates with cloud services to enable historical data access, trend analysis, and remote monitoring.
     \item \textbf{Forensic Data Sharing:} ADAM facilitates secure export of vehicle data in CSV format for use by insurance companies and law enforcement agencies. This feature supports claim verification and accident investigations, providing transparency and accountability. Advanced encryption ensures that data remains confidential during transmission, preserving the integrity of sensitive information.
 \end{enumerate}
@@ -40,7 +51,7 @@ Unlike conventional diagnostic tools, the ADAM System combines hardware componen
         \item[-] Incorporate ADAM’s analytics into broader smart city initiatives to optimize transportation networks.
     \end{itemize}
 \end{enumerate}
-\newpage
+
 \section{OPERATING ENVIROMENT}
 \begin{enumerate}
     \item \textbf{Hardware Components:}
