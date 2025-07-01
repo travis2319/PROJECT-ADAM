@@ -38,26 +38,26 @@
 \contentsline {section}{\numberline {5.2}GOLANG}{32}{section.5.2}%
 \contentsline {section}{\numberline {5.3}POSTGRES DB}{36}{section.5.3}%
 \contentsline {section}{\numberline {5.4}FASTAPI}{36}{section.5.4}%
-\contentsline {subsection}{\numberline {5.4.1}System Architecture and Data Processing}{38}{subsection.5.4.1}%
-\contentsline {subsection}{\numberline {5.4.2}Rule-Based Diagnostic Framework}{42}{subsection.5.4.2}%
-\contentsline {subsection}{\numberline {5.4.3}Maintenance Classification and Reporting}{43}{subsection.5.4.3}%
+\contentsline {subsection}{\numberline {5.4.1}System Architecture and Data Processing}{39}{subsection.5.4.1}%
+\contentsline {subsection}{\numberline {5.4.2}Rule-Based Diagnostic Framework}{43}{subsection.5.4.2}%
+\contentsline {subsection}{\numberline {5.4.3}Maintenance Classification and Reporting}{44}{subsection.5.4.3}%
 \contentsline {section}{\numberline {5.5}MOBILE APPLICATION}{46}{section.5.5}%
 \contentsline {subsection}{\numberline {5.5.1}User Interface Structure}{46}{subsection.5.5.1}%
 \contentsline {subsection}{\numberline {5.5.2}Component Details}{46}{subsection.5.5.2}%
 \contentsline {subsection}{\numberline {5.5.3}Navigation and Routing}{47}{subsection.5.5.3}%
 \contentsline {subsection}{\numberline {5.5.4}Illustrative Layout}{48}{subsection.5.5.4}%
 \contentsline {subsection}{\numberline {5.5.5}Chatbot for User Interaction}{54}{subsection.5.5.5}%
-\contentsline {subsection}{\numberline {5.5.6}Car Profile and Document Management System}{55}{subsection.5.5.6}%
-\contentsline {subsubsection}{Car Profile Overview Screen}{55}{subsubsection*.9}%
-\contentsline {subsubsection}{Insurance Details}{56}{subsubsection*.10}%
+\contentsline {subsection}{\numberline {5.5.6}Car Profile and Document Management System}{56}{subsection.5.5.6}%
+\contentsline {subsubsection}{Car Profile Overview Screen}{56}{subsubsection*.9}%
+\contentsline {subsubsection}{Insurance Details}{57}{subsubsection*.10}%
 \contentsline {subsubsection}{Licence Upload}{57}{subsubsection*.11}%
-\contentsline {subsubsection}{PUC (Pollution Under Control) Certificate}{57}{subsubsection*.12}%
-\contentsline {subsubsection}{ID Proof Management}{57}{subsubsection*.13}%
-\contentsline {subsubsection}{Quick Actions}{57}{subsubsection*.14}%
+\contentsline {subsubsection}{PUC (Pollution Under Control) Certificate}{58}{subsubsection*.12}%
+\contentsline {subsubsection}{ID Proof Management}{58}{subsubsection*.13}%
+\contentsline {subsubsection}{Quick Actions}{58}{subsubsection*.14}%
 \contentsline {subsubsection}{Location Feature}{58}{subsubsection*.15}%
-\contentsline {paragraph}{Nearby Services Discovery}{58}{paragraph*.16}%
-\contentsline {paragraph}{Interactive Map Experience}{58}{paragraph*.17}%
-\contentsline {paragraph}{Map Themes and Views}{59}{paragraph*.18}%
-\contentsline {paragraph}{Integrated Navigation}{59}{paragraph*.19}%
-\contentsline {chapter}{\numberline {6}CONCLUSION}{60}{chapter.6}%
-\contentsline {chapter}{\numberline {7}BIBLIOGRAPHY}{61}{chapter.7}%
+\contentsline {paragraph}{Nearby Services Discovery}{59}{paragraph*.16}%
+\contentsline {paragraph}{Interactive Map Experience}{59}{paragraph*.17}%
+\contentsline {paragraph}{Map Themes and Views}{60}{paragraph*.18}%
+\contentsline {paragraph}{Integrated Navigation}{60}{paragraph*.19}%
+\contentsline {chapter}{\numberline {6}CONCLUSION}{61}{chapter.6}%
+\contentsline {chapter}{\numberline {7}BIBLIOGRAPHY}{62}{chapter.7}%

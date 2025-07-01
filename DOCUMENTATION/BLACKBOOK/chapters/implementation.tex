@@ -400,53 +400,87 @@ func HealthHandler(c *fiber.Ctx) error {
         \item \textbf{Emissions Diagnostic:} 
             The emissions router (\path{routers/emissions.py}) processes real-time sensor data to determine emission compliance status using the EnhancedCarEmissionsMLModel. When a request is received, the router accepts CSV uploads or JSON payloads containing sensor readings such as CO levels, NOx concentrations, and particulate matter measurements. The data is validated using Pydantic models before being passed to the emissions model, which preprocesses the sensor values, applies Indian emission standard thresholds, and generates compliance classifications using a trained Random Forest classifier. The router returns structured JSON responses containing compliance status, confidence scores, and detailed sensor analysis, along with optional confusion matrix visualizations for model performance assessment.
         \item \textbf{Engine Health Diagnostic:} 
-            As part of the \textbf{ADAM system}, an engine health monitoring module was built using a \textbf{Random Forest Classifier} trained on OBD-II vehicle telemetry. The model classifies engine condition as \textit{"Good"} or \textit{"Needs Attention"}, enabling predictive maintenance and improving vehicle safety.
+            The ADAM system includes an advanced engine health monitoring module that leverages a \textbf{Random Forest Classifier} trained on OBD-II vehicle telemetry data. This model classifies engine conditions as either \textit{"Good"} or \textit{"Needs Attention"}, enabling predictive maintenance recommendations and contributing to enhanced vehicle safety and operational efficiency.
 
-            \subsection*{Workflow}
+\subsubsection*{Workflow}
 
-            \begin{itemize}
-                \item OBD-II data (RPM, throttle position, temperature, voltage, misfire counts, etc.) is preprocessed and labeled as healthy or faulty.
-                \item Data split: \textbf{70\% training}, \textbf{30\% testing}.
-                \item The Random Forest model is trained and tested, achieving \textbf{92\% accuracy}, with perfect precision and recall.
-                \item Feature importance analysis identified RPM, coolant temperature, throttle position, misfire counts, and control module voltage as key predictors.
-            \end{itemize}
-            \begin{table}[H]
-                \centering
-                \caption{Internal Evaluation on Expert Data (Engine Health Classification)}
-                \label{tab:engine_health_evaluation}
-                \begin{tabular}{|l|c|c|c|c|}
-                    \hline
-                    \textbf{Class} & \textbf{Precision} & \textbf{Recall} & \textbf{F1-Score} & \textbf{Support} \\
-                    \hline
-                    \texttt{bb} (Needs Attention) & 0.85 & 0.85 & 0.85 & 48 \\
-                    \texttt{gg} (Good)             & 0.95 & 0.95 & 0.95 & 137 \\
-                    \hline
-                    \textbf{Accuracy}              & \multicolumn{4}{|c|}{0.92 (185 samples)} \\
-                    \hline
-                    \textbf{Macro Average}         & 0.90 & 0.90 & 0.90 & 185 \\
-                    \hline
-                    \textbf{Weighted Average}      & 0.92 & 0.92 & 0.92 & 185 \\
-                    \hline
-                \end{tabular}
-            \end{table}
+\begin{itemize}
+    \item OBD-II diagnostic data including parameters like RPM, throttle position, coolant temperature, voltage, fuel trim values, and misfire counts are preprocessed and labeled as healthy or faulty.
+    \item The dataset underwent cleaning by dropping non-numeric and irrelevant columns, encoding categorical labels, coercing all data to numeric types, and handling missing values via median imputation.
+    \item Features were standardized using \texttt{StandardScaler}, and the data was split into \textbf{80\% training} and \textbf{20\% testing}.
+    \item A \textbf{Random Forest Classifier} with 150 estimators was trained and evaluated.
+    \item Cross-validation using \textbf{5-fold StratifiedKFold} was performed to ensure reliable model performance.
+\end{itemize}
 
-            \subsection*{Router Function}
+\subsubsection*{Performance Evaluation}
 
-            The \path{engine_health.py} router processes incoming OBD data, runs it through the trained model, and returns a health status report with:
-            \begin{itemize}
-                \item Predicted engine condition
-                \item Anomaly detection insights
-                \item Maintenance recommendations
-            \end{itemize}
+The model achieved a mean cross-validation accuracy of \textbf{96.1\%}. Final evaluation on the hold-out test set produced the following classification report:
 
-            A distribution graph visualizes occurrences of predicted engine conditions across the dataset, as shown in \textbf{Figure~\ref{fig:engine_condition_distribution}}.
+\begin{table}[H]
+    \centering
+    \caption{Evaluation on Test Data (Engine Health Classification)}
+    \label{tab:engine_health_evaluation_new}
+    \begin{tabular}{|l|c|c|c|c|}
+        \hline
+        \textbf{Class} & \textbf{Precision} & \textbf{Recall} & \textbf{F1-Score} & \textbf{Support} \\
+        \hline
+        \texttt{0} (Needs Attention) & 0.98 & 0.98 & 0.98 & 50 \\
+        \texttt{1} (Good)             & 0.99 & 0.99 & 0.99 & 135 \\
+        \hline
+        \textbf{Accuracy}              & \multicolumn{4}{|c|}{0.99 (185 samples)} \\
+        \hline
+        \textbf{Macro Average}         & 0.99 & 0.99 & 0.99 & 185 \\
+        \hline
+        \textbf{Weighted Average}      & 0.99 & 0.99 & 0.99 & 185 \\
+        \hline
+    \end{tabular}
+\end{table}
 
-            \begin{figure}[H]
-                \centering
-                \includegraphics[width=0.7\textwidth]{assets/predeicte image.png}
-                \caption{Predicted Engine Condition Distribution (Good vs. Needs Attention)}
-                \label{fig:engine_condition_distribution}
-            \end{figure}
+\subsubsection*{Dataset Structure}
+
+The OBD-II dataset used for model training contained \textbf{33 initial columns}, of which several non-numeric and redundant fields were removed during preprocessing. The final cleaned dataset included \textbf{27 numerical features}, each representing various vehicle telemetry parameters relevant to engine health assessment. The list of original dataset columns is as follows:
+
+\begin{table}[H]
+    \centering
+    \caption{Original Dataset Columns and Data Types}
+    \label{tab:dataset_columns}
+    \begin{tabular}{|l|l|l|l|}
+        \hline
+        \textbf{Feature Name} & \textbf{Data Type} & \textbf{Feature Name} & \textbf{Data Type} \\
+        \hline
+        Timestamp\_OBD            & int64     & STATUS                    & object    \\
+        FUEL\_STATUS              & object    & ENGINE\_LOAD               & float64   \\
+        COOLANT\_TEMP             & int64     & SHORT\_FUEL\_TRIM\_1       & float64   \\
+        LONG\_FUEL\_TRIM\_1       & float64   & INTAKE\_PRESSURE           & int64     \\
+        RPM                       & float64   & SPEED                      & float64   \\
+        TIMING\_ADVANCE           & float64   & INTAKE\_TEMP               & int64     \\
+        THROTTLE\_POS             & float64   & O2\_SENSORS                & object    \\
+        O2\_B1S1                  & float64   & O2\_B1S2                   & float64   \\
+        OBD\_COMPLIANCE           & object    & RUN\_TIME                  & int64     \\
+        PIDS\_B                   & object    & DISTANCE\_W\_MIL           & float64   \\
+        EVAPORATIVE\_PURGE        & float64   & WARMUPS\_SINCE\_DTC\_CLEAR & float64   \\
+        DISTANCE\_SINCE\_DTC\_CLEAR & float64 & BAROMETRIC\_PRESSURE       & int64     \\
+        PIDS\_C                   & object    & CONTROL\_MODULE\_VOLTAGE   & float64   \\
+        ABSOLUTE\_LOAD            & float64   & RELATIVE\_THROTTLE\_POS    & float64   \\
+        THROTTLE\_POS\_B          & float64   & ACCELERATOR\_POS\_D        & float64   \\
+        ACCELERATOR\_POS\_E       & float64   & THROTTLE\_ACTUATOR         & float64   \\
+        Labelling                 & object    &                            &           \\
+        \hline
+    \end{tabular}
+\end{table}
+
+
+After preprocessing, categorical and irrelevant fields such as \texttt{Timestamp\_OBD}, \texttt{STATUS}, \texttt{O2\_SENSORS}, \texttt{OBD\_COMPLIANCE}, \texttt{PIDS\_B}, and \texttt{PIDS\_C} were removed, leaving \textbf{27 numerical features} used for model training and prediction.
+
+
+A distribution graph visualizes the occurrences of predicted engine conditions in the dataset, illustrated in \textbf{Figure~\ref{fig:engine_condition_distribution_new}}.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\textwidth]{assets/Engine-Health-Confutsion-Matrix.png}
+    \caption{Confusion Matrix of Predicted Engine Conditions}
+    \label{fig:engine_condition_distribution_new}
+\end{figure}
 
         \item \textbf{Predictive Maintenance System:} 
         The \textbf{Predictive Maintenance Router} (\path{routers/predictive\_maintenance.py}) serves as a cornerstone module within the \textbf{ADAM system}, engineered to deliver comprehensive fleet maintenance analytics through automated diagnostic workflows. The system integrates real-time vehicle telemetry processing with rule-based maintenance scheduling to ensure optimal fleet operational reliability.
@@ -604,44 +638,33 @@ def generate_predictive_diagnosis():
         \end{lstlisting}
 
         \subsection{Rule-Based Diagnostic Framework}
-        
-        Distinguished from machine learning approaches utilized in other system modules, the predictive maintenance router implements deterministic, threshold-based algorithms derived from OEM specifications and empirical operational data. This methodology ensures consistent, interpretable diagnostic outcomes across diverse vehicle configurations and operational environments.
 
-        The diagnostic evaluation framework, as depicted in \textbf{Figure \ref{fig:predictive-maintenance-flowchart}}, processes real-time sensor data through the OBD-II interface and applies conditional assessment protocols across critical vehicle subsystems:
+Unlike machine learning modules, the predictive maintenance router adopts a deterministic, threshold-based diagnostic approach derived from OEM specifications and operational data. This ensures interpretable, consistent outcomes across vehicle types.
 
-        \begin{itemize}
-            \item \textbf{Engine Lubrication System:} Engine run-time exceeding 7,500 operational units triggers automatic oil change scheduling with immediate priority classification.
-            
-            \item \textbf{Air Intake Management:} Intake manifold pressure readings outside the optimal 95–105 kPa range indicate air filtration system degradation requiring filter replacement.
-            
-            \item \textbf{Ignition System Integrity:} Non-zero misfire count detection signals spark plug deterioration, prompting ignition component inspection and replacement scheduling.
-            
-            \item \textbf{Electrical System Health:} Control module voltage measurements below the critical 11.5V threshold indicate battery system compromise requiring immediate attention.
-            
-            \item \textbf{Throttle Response Calibration:} Throttle position sensor variance exceeding 10\% deviation indicates calibration drift necessitating system recalibration procedures.
-            
-            \item \textbf{Fuel Mixture Optimization:} Oxygen sensor voltage readings outside the standard 0.8–1.2V operational window suggest air-fuel mixture irregularities requiring sensor maintenance.
-            
-            \item \textbf{Thermal Management:} Coolant temperature measurements exceeding 110°C operational threshold indicate cooling system inefficiency requiring immediate intervention.
-            
-            \item \textbf{Emissions Control Monitoring:} Any active evaporative system diagnostic trouble codes (DTCs) automatically flag emission control system maintenance requirements.
-        \end{itemize}
+As shown in \textbf{Figure~\ref{fig:predictive-maintenance-flowchart}}, real-time OBD-II sensor data is evaluated against predefined thresholds for key subsystems:
 
-        \subsection{Maintenance Classification and Reporting}
-        
-        The system employs a tri-tier classification scheme to prioritize maintenance interventions based on operational criticality and safety implications. Each vehicle assessment results in one of three status classifications:
+\begin{itemize}
+    \item \textbf{Engine Lubrication:} Run-time over 7,500 units triggers oil change scheduling.
+    \item \textbf{Air Intake:} Manifold pressure outside 95–105 kPa signals filter replacement.
+    \item \textbf{Ignition:} Non-zero misfire count prompts spark plug inspection.
+    \item \textbf{Electrical:} Control voltage below 11.5V flags battery compromise.
+    \item \textbf{Throttle:} Sensor deviation exceeding 10\% indicates recalibration.
+    \item \textbf{Fuel Mixture:} Oxygen sensor voltage outside 0.8–1.2V suggests irregularities.
+    \item \textbf{Cooling:} Coolant temperatures above 110°C indicate inefficiency.
+    \item \textbf{Emissions:} Active DTCs flag emission system maintenance needs.
+\end{itemize}
 
-        \begin{description}
-            \item[\textbf{Critical Status:}] Vehicles exhibiting conditions requiring immediate maintenance intervention to prevent operational failure or safety compromise.
-            
-            \item[\textbf{Warning Status:}] Vehicles demonstrating early-stage component degradation requiring scheduled maintenance within the next service interval.
-            
-            \item[\textbf{Good Status:}] Vehicles operating within normal parameters with no immediate maintenance requirements identified.
-        \end{description}
+\subsection{Maintenance Classification and Reporting}
 
-        Upon completion of the diagnostic evaluation cycle, the system generates comprehensive maintenance documentation including component-specific recommendations, estimated replacement timelines, cost projections, and priority-based scheduling suggestions. This systematic approach ensures fleet managers receive actionable intelligence for proactive maintenance planning while minimizing unscheduled downtime and operational disruptions.
+Maintenance outcomes are categorized into:
 
-        The rule-based diagnostic strategy provides superior transparency and reliability compared to black-box machine learning alternatives, enabling maintenance technicians to understand the precise reasoning behind each recommendation while maintaining consistent diagnostic accuracy across the entire vehicle fleet.
+\begin{description}
+    \item[\textbf{Critical:}] Immediate intervention required.
+    \item[\textbf{Warning:}] Scheduled maintenance advised.
+    \item[\textbf{Good:}] No issues detected.
+\end{description}
+
+Post-diagnosis, the system generates reports detailing component-specific findings, recommended actions, and maintenance priorities. This rule-based strategy ensures transparent, actionable diagnostics without reliance on opaque models.
 
         \begin{figure}[H]
             \centering
@@ -771,11 +794,17 @@ def generate_predictive_diagnosis():
 % Third figure
 \begin{figure}[h]
     \centering
-    \includegraphics[width=0.9\textwidth]{assets/App-Bottom-Tab.png}
+    \includegraphics[width=0.95\textwidth]{assets/App-Bottom-Tab.png}
     \caption{The bottom tab of the ADAM mobile application provides quick access to key features}
     \label{fig:bottom-tab}
 \end{figure}
 
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\textwidth]{assets/Analysis-UI.jpeg}
+    \caption{Analysis Screen UI in ADAM Mobile Application}
+    \label{fig:analysis_screen}
+\end{figure}
     The following snippet shows the implementation of the \texttt{Analysis} screen in the ADAM mobile application. It uses \texttt{React Native}, \texttt{useFetch} hooks for data fetching, and \texttt{DataCard} components to display real-time telemetry and diagnostics:
 
     \begin{lstlisting}[
@@ -987,7 +1016,7 @@ The chatbot processes these queries by retrieving relevant data from the Postgre
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.35\textwidth]{assets/Chatbot_UI.png}
+    \includegraphics[width=0.8\textwidth]{assets/Chatbot_UI.jpeg}
     \caption{Chatbot Interaction Interface on Mobile Device}
     \label{fig:chatbot_ui}
 \end{figure}
@@ -1018,7 +1047,7 @@ The primary screen in this module provides a summary of the vehicle and serves a
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.9\textwidth]{assets/Car_Profile_UI.png}
+    \includegraphics[width=1\textwidth]{assets/Car_Profile_UI.png}
     \caption{Car Profile Overview Interface on Mobile Device}
     \label{fig:car_profile_ui}
 \end{figure}
