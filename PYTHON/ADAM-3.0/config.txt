@@ -1,5 +1,5 @@
 [Ports]
-obd_port=/dev/pts/2
+obd_port=/dev/pts/3
 esp8266_port=/dev/ttyUSB0
 esp8266_baud=115200
 
@@ -9,4 +9,4 @@ temp_csv_path=temp.csv
 data_csv_path=v3_Kushaq_new-28.csv
 
 [Server]
-server_url=http://127.0.0.1:3000/upload
+server_url=http://127.0.0.1:3000/upload 
