@@ -1,5 +1,5 @@
 [Ports]
-obd_port=/dev/pts/3
+obd_port=/dev/pts/6
 esp8266_port=/dev/ttyUSB0
 esp8266_baud=115200
 
