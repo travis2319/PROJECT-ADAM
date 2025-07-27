@@ -1,54 +1,85 @@
-\section{discussion}
-    \begin{algorithm}[H]
-        \caption{Training and Evaluation of Engine Condition Classification Model}
-        \begin{algorithmic}[1]
-        \State \textbf{Input:} Expert sensor dataset (\texttt{Sensor-count\_Breeza-Verna-Version4.xlsx})
-        \State \textbf{Output:} Trained classification model and feature importance ranking
+\section{Machine Learning Workflow for Engine Condition Analysis}
+
+\begin{algorithm}[H]
+\caption{Training and Evaluation of Classification Model}
+\begin{algorithmic}[1]
+\State \textbf{Input:} Expert dataset (\texttt{Sensor-of\_Breeza-v4.xlsx})
+\State \textbf{Output:} Trained model and feature ranking
+\State Load and clean dataset (strip headers, remove NaNs)
+\State Split data into features ($X$) and labels ($y$)
+\State Perform 80:20 train-validation split
+\State Train Random Forest with 100 trees
+\State Evaluate model with classification metrics
+\State Rank features by importance and plot top 10
+\State Save model as \texttt{engine\_model.joblib}
+\end{algorithmic}
+\end{algorithm}
+
+\begin{algorithm}[H]
+\caption{Prediction and Engine Condition Summary}
+\begin{algorithmic}[1]
+\State \textbf{Input:} \texttt{engine\_model.joblib}, test data \texttt{Breeza\_bits.csv}
+\State \textbf{Output:} Predicted labels and summary
+\State Load model and test data
+\State Clean and align test data with model features
+\State Predict engine condition labels
+\State Count occurrences of each label
+\State Determine overall status: GOOD, BAD, or Balanced
+\State Plot label distribution
+\end{algorithmic}
+\end{algorithm}
+
+% \section{Machine Learning Workflow for Engine Condition Analysis}
+%     \begin{algorithm}[H]
+%         \caption{Training and Evaluation of Engine Condition Classification Model}
+%         \begin{algorithmic}[1]
+%         \State \textbf{Input:} Expert sensor dataset (\texttt{Sensor-count\_Breeza-Verna-Version4.xlsx})
+%         \State \textbf{Output:} Trained classification model and feature importance ranking
         
-        \State Load the expert dataset from the Excel file
-        \State Clean the dataset by stripping whitespace from column names and removing rows with missing values
-        \State Separate the dataset into features ($X$) and target labels ($y$)
-        \State Split the dataset into training and validation sets using an 80:20 ratio
-        \State Initialize the Random Forest classifier with 100 estimators and a fixed random seed
-        \State Train the model using the training dataset
-        \State Predict the labels for the validation set
-        \State Evaluate the model's performance using a classification report
-        \State Compute the importance scores of each sensor feature using the trained model
-        \State Create a ranked list of features based on their importance scores
-        \State Visualize the top 10 most influential features using a bar plot
-        \State Save the trained model to disk as \texttt{engine\_model.joblib}
-        \end{algorithmic}
-        \end{algorithm}
+%         \State Load the expert dataset from the Excel file
+%         \State Clean the dataset by stripping whitespace from column names and removing rows with missing values
+%         \State Separate the dataset into features ($X$) and target labels ($y$)
+%         \State Split the dataset into training and validation sets using an 80:20 ratio
+%         \State Initialize the Random Forest classifier with 100 estimators and a fixed random seed
+%         \State Train the model using the training dataset
+%         \State Predict the labels for the validation set
+%         \State Evaluate the model's performance using a classification report
+%         \State Compute the importance scores of each sensor feature using the trained model
+%         \State Create a ranked list of features based on their importance scores
+%         \State Visualize the top 10 most influential features using a bar plot
+%         \State Save the trained model to disk as \texttt{engine\_model.joblib}
+%         \end{algorithmic}
+%         \end{algorithm}
     
-    \begin{algorithm}[H]
-        \caption{Engine Condition Prediction and Summary Report}
-        \begin{algorithmic}[1]
-        \State \textbf{Input:} Trained model file \texttt{engine\_model.joblib}, test dataset \texttt{Breeza\_bits.csv}
-        \State \textbf{Output:} Predicted labels, prediction summary, and overall engine condition status
+%     \begin{algorithm}[H]
+%         \caption{Engine Condition Prediction and Summary Report}
+%         \begin{algorithmic}[1]
+%         \State \textbf{Input:} Trained model file \texttt{engine\_model.joblib}, test dataset \texttt{Breeza\_bits.csv}
+%         \State \textbf{Output:} Predicted labels, prediction summary, and overall engine condition status
         
-        \State Load the trained model from \texttt{engine\_model.joblib}
-        \State Load the test dataset from \texttt{Breeza\_bits.csv}
-        \State Clean the dataset by stripping column names and removing missing values
-        \State Retrieve and display the list of features expected by the model
-        \State Extract corresponding features from the test dataset based on the model's feature list
-        \State Predict the engine condition labels using the loaded model
-        \State Count the occurrences of each predicted label
-        \State Display the count of predictions per class label
-        \State Plot a bar chart to visualize the distribution of predicted labels
+%         \State Load the trained model from \texttt{engine\_model.joblib}
+%         \State Load the test dataset from \texttt{Breeza\_bits.csv}
+%         \State Clean the dataset by stripping column names and removing missing values
+%         \State Retrieve and display the list of features expected by the model
+%         \State Extract corresponding features from the test dataset based on the model's feature list
+%         \State Predict the engine condition labels using the loaded model
+%         \State Count the occurrences of each predicted label
+%         \State Display the count of predictions per class label
+%         \State Plot a bar chart to visualize the distribution of predicted labels
         
-        \If {both labels 'gg' and 'bb' are present in predictions}
-            \If {count of 'gg' $>$ count of 'bb'}
-                \State Report \textbf{Overall Condition: GOOD}
-            \ElsIf {count of 'bb' $>$ count of 'gg'}
-                \State Report \textbf{Overall Condition: BAD}
-            \Else
-                \State Report \textbf{Balanced Condition: Equal 'gg' and 'bb' predictions}
-            \EndIf
-        \Else
-            \State Display message indicating one or both labels were not detected in predictions
-        \EndIf
+%         \If {both labels 'gg' and 'bb' are present in predictions}
+%             \If {count of 'gg' $>$ count of 'bb'}
+%                 \State Report \textbf{Overall Condition: GOOD}
+%             \ElsIf {count of 'bb' $>$ count of 'gg'}
+%                 \State Report \textbf{Overall Condition: BAD}
+%             \Else
+%                 \State Report \textbf{Balanced Condition: Equal 'gg' and 'bb' predictions}
+%             \EndIf
+%         \Else
+%             \State Display message indicating one or both labels were not detected in predictions
+%         \EndIf
         
-        \end{algorithmic}
-        \end{algorithm}
+%         \end{algorithmic}
+%         \end{algorithm}
         
         

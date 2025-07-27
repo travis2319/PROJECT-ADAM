@@ -1,12 +1,19 @@
-\section{Methodology}
-A. System Architecture overview
-The proposed vehicle diagnostic and driver behaviour analysis system integrates various components of hardware and software to collect real time data collection for analysis and user analysis. The architecture is designed to collect vehicle information via obd II port, transmit it wirelessly to cloud server for processing and provides a visual representation of processed data through a mobile application.
+\section{System Architecture and Methodology}
 
-The system consists of 4 primary components:
-Hardware Implementation
-Data processing using machine learning models
-cross platform mobile application
-A block diagram representing the overall system architecture and data flow from vehicle sensors to end user presentation is shown in figure 1.1
+The proposed Automotive Diagnostic and Activity Monitoring (ADAM) system is a modular and scalable solution that integrates hardware sensors, software analytics, and cloud-based infrastructure to collect, process, and visualize real-time vehicular data. The architecture is designed to support both diagnostic analysis and driver behavior profiling, offering both forensic insight and real-time feedback through a mobile dashboard.
+
+\subsection{System Overview}
+
+The ADAM system consists of four key components:
+
+\begin{itemize}
+    \item \textbf{Hardware Layer:} In-vehicle data acquisition using OBD-II and external sensors.
+    \item \textbf{Edge Device and Local Storage:} Data logging using Raspberry Pi and SD card.
+    \item \textbf{Cloud-Based Machine Learning Pipeline:} Preprocessing, inference, and analytics.
+    \item \textbf{Mobile Application:} User-facing interface for visualization and alerts.
+\end{itemize}
+
+Figure~\ref{fig:system_architecture} illustrates the overall flow of information from sensor input to final user display via the mobile app.
 
 \begin{figure}[t]
     \centering
@@ -15,26 +22,141 @@ A block diagram representing the overall system architecture and data flow from 
     \label{fig:system_architecture}
 \end{figure}
 
-B. Hardware Implementation
-We have utilized an obd-II interface device compatible with standard protocols such as CAN( ISO 15765-4) and K-Line (ISO 9141-2). The device communicates with a raspberry pi 5 (a single-board computer),which is used for data collection along with other sensors like neo 6m gps module, sw 420 vibration sensor, mpu 6050 gyroscope/acceleration module. The data which is collected is stored in micro SD which can be used for forensic analysis.
+\subsection{Hardware Integration}
 
-C. Data Processing using machine learning model 
-we have implemented four machine learning models that predict based on data are:
- driver behaviour analysis, fuel consumption, predictive maintenance, engine health performance
+The system is built around a Raspberry Pi 5, which interfaces with a standard OBD-II adapter supporting CAN (ISO 15765-4) and K-Line (ISO 9141-2) protocols. In addition to retrieving internal engine diagnostics, the system integrates external sensors such as:
 
-D. Cross platform mobile application
-The mobile application was developed using Expo (a cross platform framework), provides a dashboard for real time status, historical trends on fuel efficiency, driver behaviour and maintenance logs.
+\begin{itemize}
+    \item \textbf{Neo-6M GPS module} – For geolocation and speed tracking.
+    \item \textbf{MPU-6050 IMU} – To measure acceleration and orientation.
+    \item \textbf{SW-420 vibration sensor} – To detect abnormal vibrations indicative of mechanical faults.
+\end{itemize}
+
+All raw sensor data is logged to a local microSD card, enabling forensic data retention in case of network unavailability or vehicle incidents.
+
+\subsection{Machine Learning-Based Data Processing}
+
+To enhance vehicle monitoring capabilities, four supervised machine learning models were developed, focusing on:
+
+\begin{enumerate}
+    \item \textbf{Driver Behavior Analysis}
+    \item \textbf{Fuel Consumption Estimation}
+    \item \textbf{Predictive Maintenance}
+    \item \textbf{Engine Health Performance}
+\end{enumerate}
+
+These models are trained on structured vehicular datasets and are periodically updated through retraining pipelines.
+
+\subsection{Cross-Platform Mobile Application}
+
+A mobile application, developed using the Expo framework, acts as the primary interface for end-users. It presents real-time diagnostic summaries, trends over time, and user-specific notifications using dynamic visualizations. The app is compatible with both Android and iOS, offering accessibility to a wide user base.
 
 \subsection{Model Training and Feature Importance Analysis}
 
-To classify engine conditions based on sensor readings, a Random Forest classifier was developed using an expert-labeled dataset named \texttt{Sensor-count\_Breeza-Verna-Version4.xlsx}. The dataset underwent preprocessing, which involved trimming whitespace from column headers and removing incomplete records to ensure data quality.
+To classify engine health based on sensor features, a Random Forest classifier was trained using a domain-labeled dataset named \texttt{Sensor-count\_Breeza-Verna-Version4.xlsx}. After preprocessing, including trimming column headers and dropping incomplete entries, the dataset was split into features and labels.
 
-The dataset was then divided into independent features and target labels, with the label column identified as \texttt{Lebelling}. Subsequently, an 80:20 train-validation split was applied to facilitate internal evaluation.
+An 80:20 train-validation split was applied, followed by training a 100-tree Random Forest model. Performance was evaluated using standard metrics such as precision, recall, and F1-score. Feature importance scores were then extracted and visualized, enabling interpretation of the most impactful sensor inputs. The trained model was serialized as \texttt{engine\_model.joblib} for deployment on the Raspberry Pi.
 
-A Random Forest model comprising 100 decision trees was trained on the training subset. The model's predictive performance was assessed on the validation set using a classification report, which provided precision, recall, and F1-score metrics.
+\section{OBD-II and Diagnostic Parameters}
 
-To interpret the model's decision-making process, feature importance scores were extracted. These scores indicate the relative influence of each sensor feature on the prediction outcome. A ranked list of features was generated, and the top ten most significant features were visualized using a horizontal bar plot. 
+On-Board Diagnostics II (OBD-II) is a standardized system implemented in all vehicles manufactured after 1996, primarily aimed at monitoring vehicle emissions, engine performance, and subsystem faults. Developed by the Society of Automotive Engineers (SAE), the OBD-II specification includes a 16-pin connector that grants access to the vehicle’s Electronic Control Unit (ECU).
 
-Finally, the trained model was serialized and saved as \texttt{engine\_model.joblib} for future use in prediction and deployment pipelines.
+\subsection{OBD-II Functionality in ADAM}
+
+In the ADAM system, the OBD-II interface serves as a primary data acquisition point, capturing key engine parameters and fault indicators in real time. The Raspberry Pi communicates with the OBD-II adapter via USB or UART, retrieving information encoded in hexadecimal format.
+
+Two major types of codes are used for ECU communication:
+
+\begin{itemize}
+    \item \textbf{Parameter IDs (PIDs):} Used to request real-time sensor data (e.g., speed, RPM, fuel level).
+    \item \textbf{Diagnostic Trouble Codes (DTCs):} Used to indicate errors or faults in vehicle subsystems.
+\end{itemize}
+
+\subsection{Parameter ID (PID) Communication}
+
+When a PID request is sent to the ECU (e.g., `010C` for RPM), the ECU responds with a data frame in hexadecimal. This frame includes the requested values, which are decoded using standard formulas. For example:
+
+\begin{itemize}
+    \item PID `0C` (Engine RPM): Response = `41 0C 1A F8` → RPM = ((1A × 256) + F8) / 4
+    \item PID `0D` (Vehicle Speed): Response = `41 0D 3C` → Speed = 60 km/h
+\end{itemize}
+
+\subsection{Diagnostic Trouble Codes (DTCs)}
+
+DTCs provide encoded fault messages that indicate malfunctions in systems such as ignition, emissions, or engine timing. A typical DTC (e.g., `P0302`) can be decoded as:
+\begin{itemize}
+    \item \texttt{P} – Powertrain
+    \item \texttt{03} – Misfire
+    \item \texttt{02} – Cylinder 2
+\end{itemize}
+
+In ADAM, DTCs are parsed, logged, and flagged in the mobile app to prompt maintenance actions.
+
+\subsection{Supported PID Table}
+
+Table~\ref{tab:obd_pids} provides an overview of commonly used PIDs retrieved by the ADAM system.
+
+\begin{table}[h]
+\centering
+\caption{Common OBD-II Parameter Identifiers (PIDs)}
+\begin{tabular}{|c|l|l|}
+\hline
+\textbf{PID} & \textbf{Parameter} & \textbf{Units / Description} \\
+\hline
+0C & Engine RPM & Revolutions per minute \\
+0D & Vehicle Speed & Kilometers per hour \\
+05 & Coolant Temperature & Degrees Celsius \\
+0F & Intake Air Temp & Degrees Celsius \\
+11 & Throttle Position & Percentage \\
+10 & MAF Air Flow Rate & Grams per second \\
+2F & Fuel Level & Percentage \\
+42 & Control Module Voltage & Volts \\
+\hline
+\end{tabular}
+\label{tab:obd_pids}
+\end{table}
+
+Through OBD-II, the ADAM system acquires a rich dataset that serves as the foundation for analytics, predictive diagnostics, and personalized feedback to users.
+
+
+
+% \section{Methodology}
+% A. System Architecture overview
+% The proposed vehicle diagnostic and driver behaviour analysis system integrates various components of hardware and software to collect real time data collection for analysis and user analysis. The architecture is designed to collect vehicle information via obd II port, transmit it wirelessly to cloud server for processing and provides a visual representation of processed data through a mobile application.
+
+% The system consists of 4 primary components:
+% Hardware Implementation
+% Data processing using machine learning models
+% cross platform mobile application
+% A block diagram representing the overall system architecture and data flow from vehicle sensors to end user presentation is shown in figure 1.1
+
+% \begin{figure}[t]
+%     \centering
+%     \includegraphics[width=\columnwidth]{assets/System_design.png}
+%     \caption{System architecture of the proposed Automotive Diagnostic and Activity Monitoring (ADAM) system.}
+%     \label{fig:system_architecture}
+% \end{figure}
+
+% B. Hardware Implementation
+% We have utilized an obd-II interface device compatible with standard protocols such as CAN( ISO 15765-4) and K-Line (ISO 9141-2). The device communicates with a raspberry pi 5 (a single-board computer),which is used for data collection along with other sensors like neo 6m gps module, sw 420 vibration sensor, mpu 6050 gyroscope/acceleration module. The data which is collected is stored in micro SD which can be used for forensic analysis.
+
+% C. Data Processing using machine learning model 
+% we have implemented four machine learning models that predict based on data are:
+%  driver behaviour analysis, fuel consumption, predictive maintenance, engine health performance
+
+% D. Cross platform mobile application
+% The mobile application was developed using Expo (a cross platform framework), provides a dashboard for real time status, historical trends on fuel efficiency, driver behaviour and maintenance logs.
+
+% \subsection{Model Training and Feature Importance Analysis}
+
+% To classify engine conditions based on sensor readings, a Random Forest classifier was developed using an expert-labeled dataset named \texttt{Sensor-count\_Breeza-Verna-Version4.xlsx}. The dataset underwent preprocessing, which involved trimming whitespace from column headers and removing incomplete records to ensure data quality.
+
+% The dataset was then divided into independent features and target labels, with the label column identified as \texttt{Lebelling}. Subsequently, an 80:20 train-validation split was applied to facilitate internal evaluation.
+
+% A Random Forest model comprising 100 decision trees was trained on the training subset. The model's predictive performance was assessed on the validation set using a classification report, which provided precision, recall, and F1-score metrics.
+
+% To interpret the model's decision-making process, feature importance scores were extracted. These scores indicate the relative influence of each sensor feature on the prediction outcome. A ranked list of features was generated, and the top ten most significant features were visualized using a horizontal bar plot. 
+
+% Finally, the trained model was serialized and saved as \texttt{engine\_model.joblib} for future use in prediction and deployment pipelines.
 
 
